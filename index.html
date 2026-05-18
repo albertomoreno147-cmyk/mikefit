@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mike Fit">
+<meta name="theme-color" content="#0A0A0F">
+<title>Mike Fit</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0A0F;
+  --surface: #13131A;
+  --card: #1C1C26;
+  --border: rgba(255,255,255,0.07);
+  --text: #F0EFE8;
+  --muted: rgba(240,239,232,0.45);
+  --accent: #C8F135;
+  --accent-dim: rgba(200,241,53,0.12);
+  --accent-border: rgba(200,241,53,0.3);
+  --blue: #4A9EFF;
+  --blue-dim: rgba(74,158,255,0.12);
+  --orange: #FF8C42;
+  --orange-dim: rgba(255,140,66,0.12);
+  --green: #3DD68C;
+  --green-dim: rgba(61,214,140,0.12);
+  --red: #FF5C5C;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); }
+body { font-family: 'DM Sans', sans-serif; color: var(--text); }
+
+.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+/* STATUS BAR SPACER */
+.status-bar { height: var(--safe-top); background: var(--bg); flex-shrink: 0; }
+
+/* HEADER */
+.header { padding: 12px 20px 16px; flex-shrink: 0; }
+.header-top { display: flex; justify-content: space-between; align-items: center; }
+.header-greeting { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+.header-date { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+.streak-pill { background: var(--accent-dim); border: 1px solid var(--accent-border); border-radius: 20px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--accent); }
+
+/* SCROLL CONTENT */
+.scroll-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; padding-bottom: 16px; }
+
+/* BOTTOM NAV */
+.bottom-nav { flex-shrink: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 6px; gap: 4px; cursor: pointer; position: relative; }
+.nav-item svg { width: 22px; height: 22px; stroke: var(--muted); transition: stroke 0.2s; }
+.nav-item span { font-size: 10px; color: var(--muted); transition: color 0.2s; font-weight: 500; }
+.nav-item.active svg { stroke: var(--accent); }
+.nav-item.active span { color: var(--accent); }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); position: absolute; bottom: 4px; opacity: 0; transition: opacity 0.2s; }
+.nav-item.active .nav-dot { opacity: 1; }
+
+/* PAGES */
+.page { display: none; animation: fadeIn 0.2s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* CARDS */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; font-family: 'Space Mono', monospace; }
+
+/* MACRO GRID */
+.macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+.macro-box { background: var(--surface); border-radius: 12px; padding: 10px 8px; text-align: center; }
+.macro-val { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+.macro-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 500; }
+
+/* PROGRESS BARS */
+.prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.prog-row:last-child { margin-bottom: 0; }
+.prog-label { font-size: 12px; color: var(--muted); width: 70px; flex-shrink: 0; }
+.prog-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+.prog-num { font-size: 11px; font-weight: 600; font-family: 'Space Mono', monospace; width: 68px; text-align: right; flex-shrink: 0; }
+
+/* WEEK STRIP */
+.week-strip { display: flex; gap: 6px; margin-bottom: 12px; }
+.day-pill { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px 4px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.day-pill.today { border-color: var(--accent-border); background: var(--accent-dim); }
+.day-pill.done { border-color: rgba(61,214,140,0.3); background: rgba(61,214,140,0.08); }
+.day-name { font-size: 9px; color: var(--muted); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; }
+.day-type { font-size: 9px; font-weight: 600; }
+.day-dot { width: 5px; height: 5px; border-radius: 50%; margin: 4px auto 0; }
+
+/* EXERCISE ROWS */
+.ex-item { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.ex-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ex-check { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+.ex-check.done { background: var(--accent); border-color: var(--accent); }
+.ex-check.done svg { stroke: #0A0A0F; }
+.ex-check svg { width: 12px; height: 12px; stroke: var(--muted); }
+.ex-info { flex: 1; }
+.ex-name { font-size: 13px; font-weight: 500; }
+.ex-sets { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.ex-kg { display: flex; align-items: center; gap: 4px; }
+.kg-btn { width: 26px; height: 26px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.kg-val { font-size: 13px; font-weight: 600; font-family: 'Space Mono', monospace; width: 42px; text-align: center; }
+
+/* MEAL ROWS */
+.meal-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.meal-item:last-child { border-bottom: none; padding-bottom: 0; }
+.meal-dot-wrap { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
+.meal-dot-wrap.done { border-color: var(--accent-border); background: var(--accent-dim); }
+.meal-body { flex: 1; }
+.meal-name { font-size: 13px; font-weight: 500; }
+.meal-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.meal-macros { display: flex; gap: 8px; margin-top: 5px; }
+.mmac { font-size: 10px; font-family: 'Space Mono', monospace; padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+.mmac-p { background: var(--blue-dim); color: var(--blue); }
+.mmac-c { background: var(--orange-dim); color: var(--orange); }
+.mmac-f { background: var(--green-dim); color: var(--green); }
+.meal-time { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; flex-shrink: 0; padding-top: 2px; }
+
+/* SUPP CHECKLIST */
+.supp-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.supp-item:last-child { border-bottom: none; }
+.supp-info { flex: 1; }
+.supp-name { font-size: 13px; font-weight: 500; }
+.supp-dose { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.supp-days { display: flex; gap: 4px; }
+.sday { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); font-size: 9px; font-weight: 600; color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; font-family: 'Space Mono', monospace; }
+.sday.done { background: var(--accent); border-color: var(--accent); color: #0A0A0F; }
+
+/* PROGRESS PAGE */
+.stat-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.stat-box { flex: 1; background: var(--surface); border-radius: 12px; padding: 12px; }
+.stat-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; font-family: 'Space Mono', monospace; }
+.stat-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+.prog-ex-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.prog-ex-row:last-child { border-bottom: none; }
+.prog-ex-name { flex: 1; font-size: 12px; }
+.prog-ex-now { font-size: 12px; font-weight: 600; font-family: 'Space Mono', monospace; color: var(--muted); }
+.prog-arrow { color: var(--muted); font-size: 12px; }
+.prog-ex-next { font-size: 12px; font-weight: 600; font-family: 'Space Mono', monospace; color: var(--accent); }
+
+/* PESO INPUT */
+.peso-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.peso-input-row input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--text); font-size: 15px; font-family: 'Space Mono', monospace; outline: none; }
+.peso-input-row input:focus { border-color: var(--accent-border); }
+.save-btn { background: var(--accent); color: #0A0A0F; border: none; border-radius: 12px; padding: 12px 20px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+.save-btn:active { opacity: 0.8; }
+
+.coach-btn { width: 100%; background: var(--accent-dim); border: 1px solid var(--accent-border); border-radius: 14px; padding: 14px; color: var(--accent); font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.coach-btn svg { width: 18px; height: 18px; stroke: var(--accent); }
+
+.peso-log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.peso-log-item:last-child { border-bottom: none; }
+.peso-log-date { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+.peso-log-val { font-size: 14px; font-weight: 600; font-family: 'Space Mono', monospace; }
+.peso-log-diff { font-size: 11px; font-family: 'Space Mono', monospace; }
+
+/* NOTES */
+.note-area { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; resize: none; outline: none; min-height: 80px; line-height: 1.5; }
+.note-area:focus { border-color: var(--accent-border); }
+.note-save { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; width: 100%; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 8px; transition: all 0.15s; }
+.note-save:active { border-color: var(--accent-border); color: var(--accent); }
+
+/* SECTION HEADER */
+.sec-header { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 14px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="status-bar"></div>
+
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-greeting">Hola, Mike 👋</div>
+        <div class="header-date" id="header-date"></div>
+      </div>
+      <div class="streak-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span id="streak-count">Día 1</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-content">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="week-strip">
+        <div class="day-pill today"><div class="day-name">Lun</div><div class="day-type" style="color:#C8F135">PUSH</div><div class="day-dot" style="background:#C8F135"></div></div>
+        <div class="day-pill"><div class="day-name">Mar</div><div class="day-type" style="color:#4A9EFF">PULL</div><div class="day-dot" style="background:#4A9EFF"></div></div>
+        <div class="day-pill"><div class="day-name">Mié</div><div class="day-type" style="color:#3DD68C">Z2</div><div class="day-dot" style="background:#3DD68C"></div></div>
+        <div class="day-pill"><div class="day-name">Jue</div><div class="day-type" style="color:#FF8C42">LEGS</div><div class="day-dot" style="background:#FF8C42"></div></div>
+        <div class="day-pill"><div class="day-name">Vie</div><div class="day-type" style="color:#FF5C5C">FULL</div><div class="day-dot" style="background:#FF5C5C"></div></div>
+        <div class="day-pill"><div class="day-name">Sáb</div><div class="day-type" style="color:#666">REST</div><div class="day-dot" style="background:#333"></div></div>
+        <div class="day-pill"><div class="day-name">Dom</div><div class="day-type" style="color:#666">REST</div><div class="day-dot" style="background:#333"></div></div>
+      </div>
+
+      <div class="macro-grid">
+        <div class="macro-box"><div class="macro-val" id="h-kcal" style="color:var(--text)">0</div><div class="macro-lbl">kcal</div></div>
+        <div class="macro-box"><div class="macro-val" id="h-prot" style="color:var(--blue)">0g</div><div class="macro-lbl">proteína</div></div>
+        <div class="macro-box"><div class="macro-val" id="h-carb" style="color:var(--orange)">0g</div><div class="macro-lbl">carbos</div></div>
+        <div class="macro-box"><div class="macro-val" id="h-fat" style="color:var(--green)">0g</div><div class="macro-lbl">grasas</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Objetivo diario</div>
+        <div class="prog-row">
+          <div class="prog-label">Proteína</div>
+          <div class="prog-track"><div class="prog-fill" id="bp-prot" style="width:0%;background:var(--blue)"></div></div>
+          <div class="prog-num" id="bn-prot" style="color:var(--blue)">0/175g</div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label">Carbos</div>
+          <div class="prog-track"><div class="prog-fill" id="bp-carb" style="width:0%;background:var(--orange)"></div></div>
+          <div class="prog-num" id="bn-carb" style="color:var(--orange)">0/170g</div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label">Grasas</div>
+          <div class="prog-track"><div class="prog-fill" id="bp-fat" style="width:0%;background:var(--green)"></div></div>
+          <div class="prog-num" id="bn-fat" style="color:var(--green)">0/65g</div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label">Kcal</div>
+          <div class="prog-track"><div class="prog-fill" id="bp-kcal" style="width:0%;background:var(--accent)"></div></div>
+          <div class="prog-num" id="bn-kcal" style="color:var(--accent)">0/1965</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Nota del día</div>
+        <textarea class="note-area" id="daily-note" placeholder="Energía, sueño, sensaciones..."></textarea>
+        <button class="note-save" onclick="saveNote()">Guardar nota</button>
+      </div>
+    </div>
+
+    <!-- ENTRENO -->
+    <div class="page" id="page-entreno">
+      <div class="sec-header">Push — Lunes <span style="font-size:13px;color:var(--accent);font-family:'Space Mono',monospace">SEM 1</span></div>
+
+      <div class="card">
+        <div class="card-title">Ejercicios de hoy</div>
+        <div id="ex-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Próxima semana</div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Press banca</div><div class="prog-ex-now">22kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">25kg</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Press militar</div><div class="prog-ex-now">14kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">16kg</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Press inclinado</div><div class="prog-ex-now">16kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">16kg ×3s</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Elevaciones lat.</div><div class="prog-ex-now">6kg·12r</div><div class="prog-arrow">→</div><div class="prog-ex-next">6kg·14r</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Tríceps polea</div><div class="prog-ex-now">9kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">11kg</div></div>
+      </div>
+    </div>
+
+    <!-- NUTRICIÓN -->
+    <div class="page" id="page-nutricion">
+      <div class="sec-header">Nutrición de hoy</div>
+      <div class="card">
+        <div class="card-title">Comidas</div>
+        <div id="meal-list"></div>
+      </div>
+    </div>
+
+    <!-- SUPLEMENTOS -->
+    <div class="page" id="page-suplem">
+      <div class="sec-header">Suplementos</div>
+      <div class="card">
+        <div class="card-title">Checklist semanal</div>
+        <div id="supp-list"></div>
+      </div>
+    </div>
+
+    <!-- PROGRESO -->
+    <div class="page" id="page-progreso">
+      <div class="sec-header">Progreso</div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-label">Peso actual</div>
+          <div class="stat-val" id="peso-actual">78.4<span style="font-size:14px">kg</span></div>
+          <div class="stat-sub">Objetivo: 73 kg</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Grasa corporal</div>
+          <div class="stat-val" style="color:var(--blue)">18.7<span style="font-size:14px">%</span></div>
+          <div class="stat-sub">Objetivo: 13-14%</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Registrar peso</div>
+        <div class="peso-input-row">
+          <input type="number" step="0.1" placeholder="78.4" id="peso-input">
+          <button class="save-btn" onclick="savePeso()">OK</button>
+        </div>
+        <div id="peso-log"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Cargas esta semana</div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Press banca</div><div class="prog-ex-now">22kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">25kg</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Press inclinado</div><div class="prog-ex-now">16kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">16kg×3</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Press militar</div><div class="prog-ex-now">14kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">16kg</div></div>
+        <div class="prog-ex-row"><div class="prog-ex-name">Tríceps polea</div><div class="prog-ex-now">9kg</div><div class="prog-arrow">→</div><div class="prog-ex-next">11kg</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('home',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Hoy</span><div class="nav-dot"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('entreno',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M6 4v16M18 4v16M2 9h4M18 9h4M2 15h4M18 15h4"/></svg>
+      <span>Entreno</span><div class="nav-dot"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('nutricion',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
+      <span>Nutrición</span><div class="nav-dot"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('suplem',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Suplem.</span><div class="nav-dot"></div>
+    </div>
+    <div class="nav-item" onclick="showPage('progreso',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Progreso</span><div class="nav-dot"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DB = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+const TODAY = new Date().toISOString().split('T')[0];
+
+// DATE
+const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const now = new Date();
+document.getElementById('header-date').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+
+// STREAK
+const startDate = new Date('2026-05-18');
+const diffDays = Math.floor((now - startDate) / 86400000) + 1;
+document.getElementById('streak-count').textContent = `Día ${Math.max(1,diffDays)}`;
+
+// EXERCISES
+const exercises = [
+  { name: 'Press banca barra', sets: '4 × 6-10 · RIR2', kg: 22 },
+  { name: 'Press inclinado mancuernas', sets: '3 × 10-12 · RIR2', kg: 16 },
+  { name: 'Press militar mancuernas', sets: '4 × 8-12 · RIR2', kg: 14 },
+  { name: 'Elevaciones laterales', sets: '4 × 15-20 · RIR3', kg: 6 },
+  { name: 'Extensión tríceps polea', sets: '3 × 12-15 · RIR2', kg: 9 },
+];
+let exState = DB.get('ex_'+TODAY) || exercises.map(e => ({done:true, kg:e.kg}));
+
+function renderExercises() {
+  const el = document.getElementById('ex-list');
+  el.innerHTML = '';
+  exercises.forEach((ex, i) => {
+    const s = exState[i];
+    const div = document.createElement('div');
+    div.className = 'ex-item';
+    div.innerHTML = `
+      <div class="ex-check ${s.done?'done':''}" onclick="toggleEx(${i})">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ex-info">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-sets">${ex.sets}</div>
+      </div>
+      <div class="ex-kg">
+        <div class="kg-btn" onclick="changeKg(${i},-2.5)">−</div>
+        <div class="kg-val">${s.kg}kg</div>
+        <div class="kg-btn" onclick="changeKg(${i},2.5)">+</div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function toggleEx(i) {
+  exState[i].done = !exState[i].done;
+  DB.set('ex_'+TODAY, exState);
+  renderExercises();
+}
+
+function changeKg(i, delta) {
+  exState[i].kg = Math.max(0, Math.round((exState[i].kg + delta) * 2) / 2);
+  DB.set('ex_'+TODAY, exState);
+  renderExercises();
+}
+
+renderExercises();
+
+// MEALS
+const meals = [
+  { icon:'🥚', name:'Desayuno', desc:'Claras de huevo + espinacas + tostada + café', time:'07:30', p:35, c:22, f:14, k:350 },
+  { icon:'🥗', name:'Comida', desc:'Garbanzos + caballa + aguacate', time:'13:30', p:32, c:48, f:26, k:590 },
+  { icon:'🍌', name:'Pre-entreno', desc:'Plátano + creatina 5g', time:'13:45', p:1, c:27, f:0, k:110 },
+  { icon:'🥤', name:'Post-entreno', desc:'30g Whey en agua — antes 30 min', time:'15:15', p:25, c:4, f:2, k:130 },
+  { icon:'🥩', name:'Cena', desc:'Carne picada + espárragos + yogur', time:'20:30', p:38, c:2, f:16, k:300 },
+];
+let mealState = DB.get('meals_'+TODAY) || [true,true,false,false,false];
+
+function renderMeals() {
+  const el = document.getElementById('meal-list');
+  el.innerHTML = '';
+  meals.forEach((m,i) => {
+    const done = mealState[i];
+    const div = document.createElement('div');
+    div.className = 'meal-item';
+    div.innerHTML = `
+      <div class="meal-dot-wrap ${done?'done':''}" onclick="toggleMeal(${i})">${m.icon}</div>
+      <div class="meal-body">
+        <div class="meal-name">${m.name}</div>
+        <div class="meal-desc">${m.desc}</div>
+        <div class="meal-macros">
+          <span class="mmac mmac-p">${m.p}g P</span>
+          <span class="mmac mmac-c">${m.c}g C</span>
+          <span class="mmac mmac-f">${m.f}g F</span>
+        </div>
+      </div>
+      <div class="meal-time">${m.time}</div>`;
+    el.appendChild(div);
+  });
+  updateMacros();
+}
+
+function toggleMeal(i) {
+  mealState[i] = !mealState[i];
+  DB.set('meals_'+TODAY, mealState);
+  renderMeals();
+}
+
+function updateMacros() {
+  let p=0,c=0,f=0,k=0;
+  meals.forEach((m,i) => { if(mealState[i]){p+=m.p;c+=m.c;f+=m.f;k+=m.k;} });
+  document.getElementById('h-kcal').textContent = k;
+  document.getElementById('h-prot').textContent = p+'g';
+  document.getElementById('h-carb').textContent = c+'g';
+  document.getElementById('h-fat').textContent = f+'g';
+  document.getElementById('bp-prot').style.width = Math.min(100,Math.round(p/175*100))+'%';
+  document.getElementById('bp-carb').style.width = Math.min(100,Math.round(c/170*100))+'%';
+  document.getElementById('bp-fat').style.width = Math.min(100,Math.round(f/65*100))+'%';
+  document.getElementById('bp-kcal').style.width = Math.min(100,Math.round(k/1965*100))+'%';
+  document.getElementById('bn-prot').textContent = p+'/175g';
+  document.getElementById('bn-carb').textContent = c+'/170g';
+  document.getElementById('bn-fat').textContent = f+'/65g';
+  document.getElementById('bn-kcal').textContent = k+'/1965';
+}
+
+renderMeals();
+
+// SUPPLEMENTS
+const supps = [
+  { name:'Creatina BioTech', dose:'5g · cada día sin falta' },
+  { name:'Vitamina D3+K2', dose:'1 cápsula · desayuno' },
+  { name:'Omega-3', dose:'1 softgel ×3 comidas' },
+  { name:'Whey post-entreno', dose:'30g · días de entreno' },
+  { name:'Magnesio', dose:'250mg · antes de dormir' },
+];
+const dayLabels = ['L','M','X','J','V','S','D'];
+let suppState = DB.get('supps') || supps.map(()=>Array(7).fill(false));
+
+function renderSupps() {
+  const el = document.getElementById('supp-list');
+  el.innerHTML = '';
+  supps.forEach((s,i) => {
+    const div = document.createElement('div');
+    div.className = 'supp-item';
+    const days = dayLabels.map((d,j) => `<div class="sday ${suppState[i][j]?'done':''}" onclick="toggleSupp(${i},${j})">${suppState[i][j]?'✓':d}</div>`).join('');
+    div.innerHTML = `
+      <div class="supp-info">
+        <div class="supp-name">${s.name}</div>
+        <div class="supp-dose">${s.dose}</div>
+      </div>
+      <div class="supp-days">${days}</div>`;
+    el.appendChild(div);
+  });
+}
+
+function toggleSupp(i,j) {
+  suppState[i][j] = !suppState[i][j];
+  DB.set('supps', suppState);
+  renderSupps();
+}
+
+renderSupps();
+
+// PESO LOG
+let pesoLog = DB.get('peso_log') || [{date:'18 may', val:78.4, diff:null}];
+
+function renderPesoLog() {
+  const el = document.getElementById('peso-log');
+  el.innerHTML = pesoLog.slice().reverse().map((p,i) => {
+    let diffStr = '';
+    if(p.diff !== null) {
+      const color = p.diff < 0 ? 'var(--green)' : p.diff > 0 ? 'var(--red)' : 'var(--muted)';
+      diffStr = `<span class="peso-log-diff" style="color:${color}">${p.diff>0?'+':''}${p.diff.toFixed(1)}kg</span>`;
+    }
+    return `<div class="peso-log-item"><span class="peso-log-date">${p.date}</span><span class="peso-log-val">${p.val}kg</span>${diffStr}</div>`;
+  }).join('');
+  if(pesoLog.length > 0) {
+    document.getElementById('peso-actual').innerHTML = pesoLog[pesoLog.length-1].val+'<span style="font-size:14px">kg</span>';
+  }
+}
+
+function savePeso() {
+  const v = parseFloat(document.getElementById('peso-input').value);
+  if(isNaN(v)||v<40||v>200) return;
+  const last = pesoLog[pesoLog.length-1];
+  const d = new Date();
+  const diff = last ? Math.round((v - last.val)*10)/10 : null;
+  pesoLog.push({ date: d.getDate()+' '+months[d.getMonth()].slice(0,3), val:v, diff });
+  DB.set('peso_log', pesoLog);
+  document.getElementById('peso-input').value = '';
+  renderPesoLog();
+}
+
+renderPesoLog();
+
+// NOTE
+const savedNote = DB.get('note_'+TODAY);
+if(savedNote) document.getElementById('daily-note').value = savedNote;
+
+function saveNote() {
+  DB.set('note_'+TODAY, document.getElementById('daily-note').value);
+  const btn = document.querySelector('.note-save');
+  btn.textContent = '✓ Guardado';
+  setTimeout(()=>btn.textContent='Guardar nota', 1500);
+}
+
+// NAV
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+</script>
+</body>
+</html>
