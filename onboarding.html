@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0A0F">
+<title>FitSync — Configuración</title>
+<style>
+:root{
+  --bg:#0A0A0F;--card:#1C1C26;--border:rgba(255,255,255,0.08);
+  --text:#F0EFE8;--muted:#666;--accent:#C8F135;
+  --accent-dim:rgba(200,241,53,0.12);--accent-border:rgba(200,241,53,0.35);
+  --safe-top:env(safe-area-inset-top,44px);
+  --safe-bottom:env(safe-area-inset-bottom,34px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'DM Sans',sans-serif;}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+.top{padding:var(--safe-top) 20px 0;flex-shrink:0;}
+.progress-bar{height:3px;background:#1A1A1A;border-radius:2px;overflow:hidden;margin-bottom:16px;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.4s cubic-bezier(0.4,0,0.2,1);}
+.back-btn{font-size:15px;color:var(--accent);cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;margin-bottom:8px;}
+.content{flex:1;overflow-y:auto;padding:0 24px;-webkit-overflow-scrolling:touch;}
+.step{display:none;}
+.step.active{display:block;}
+.step-title{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;margin-top:16px;line-height:1.2;}
+.step-sub{font-size:15px;color:var(--muted);margin-bottom:32px;line-height:1.5;}
+.option-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:12px;cursor:pointer;transition:all 0.15s;}
+.option-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.option-card:active{transform:scale(0.98);}
+.option-title{font-size:16px;font-weight:600;}
+.option-sub{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.option-card.selected .option-sub{color:rgba(200,241,53,0.7);}
+.days-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.day-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;text-align:center;font-size:15px;font-weight:600;transition:all 0.15s;}
+.day-card.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+.day-card:active{transform:scale(0.97);}
+.wheel-wrap{display:flex;justify-content:center;gap:0;margin:20px 0;}
+.wheel{width:100px;height:200px;overflow:hidden;position:relative;cursor:ns-resize;}
+.wheel::before,.wheel::after{content:'';position:absolute;left:0;right:0;height:70px;z-index:2;pointer-events:none;}
+.wheel::before{top:0;background:linear-gradient(to bottom,#0A0A0F,transparent);}
+.wheel::after{bottom:0;background:linear-gradient(to top,#0A0A0F,transparent);}
+.wheel-inner{transition:transform 0.1s;}
+.wheel-item{height:50px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:var(--muted);transition:color 0.1s,font-size 0.1s;}
+.wheel-item.selected{color:var(--text);font-size:28px;}
+.wheel-selector{position:absolute;top:50%;left:0;right:0;height:50px;transform:translateY(-50%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);pointer-events:none;z-index:1;}
+.wheel-label{font-size:13px;color:var(--muted);text-align:center;margin-top:4px;}
+.muscles-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.muscle-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all 0.15s;text-align:center;}
+.muscle-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.muscle-icon{font-size:24px;margin-bottom:6px;}
+.muscle-name{font-size:13px;font-weight:600;}
+.injury-area{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;width:100%;min-height:100px;color:var(--text);font-size:15px;font-family:inherit;resize:none;outline:none;margin-bottom:12px;}
+.injury-area:focus{border-color:var(--accent-border);}
+.no-injury-btn{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;width:100%;color:var(--text);font-size:15px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.15s;}
+.no-injury-btn.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+.bottom{padding:16px 24px;padding-bottom:calc(16px + var(--safe-bottom));flex-shrink:0;}
+.continue-btn{width:100%;padding:18px;background:var(--accent);color:#0A0A0F;border:none;border-radius:16px;font-size:17px;font-weight:700;cursor:pointer;transition:opacity 0.15s;letter-spacing:-0.2px;}
+.continue-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.continue-btn:active{opacity:0.85;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.summary-row:last-child{border-bottom:none;}
+.summary-label{font-size:14px;color:var(--muted);}
+.summary-val{font-size:14px;font-weight:600;color:var(--accent);}
+.logo{font-size:28px;font-weight:800;color:var(--accent);letter-spacing:-1.5px;text-align:center;margin:24px 0 8px;}
+.tagline{font-size:15px;color:var(--muted);text-align:center;margin-bottom:40px;line-height:1.5;}
+.start-icon{font-size:64px;text-align:center;margin:20px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <div class="back-btn" id="back-btn" onclick="prevStep()" style="visibility:hidden">‹ Atrás</div>
+  </div>
+
+  <div class="content">
+
+    <!-- STEP 0: BIENVENIDA -->
+    <div class="step active" id="step-0">
+      <div class="start-icon">💪</div>
+      <div class="logo">FitSync</div>
+      <div class="tagline">Tu plan de entrenamiento y nutrición 100% personalizado. Vamos a conocerte.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+        <div style="background:var(--card);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:24px">🏋️</div>
+          <div><div style="font-size:14px;font-weight:600">Plan de entreno personalizado</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Adaptado a tu nivel, objetivo y horario</div></div>
+        </div>
+        <div style="background:var(--card);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:24px">🍽️</div>
+          <div><div style="font-size:14px;font-weight:600">Nutrición y macros calculados</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Calorías y proteínas exactas para tu objetivo</div></div>
+        </div>
+        <div style="background:var(--card);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:24px">📈</div>
+          <div><div style="font-size:14px;font-weight:600">Seguimiento de progreso</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Pesos, medidas y composición corporal</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: OBJETIVO -->
+    <div class="step" id="step-1">
+      <div class="step-title">¿Cuál es tu objetivo principal?</div>
+      <div class="step-sub">Esto define todo tu plan de entreno y nutrición.</div>
+      <div class="option-card" onclick="select(this,'goal','recomp')"><div class="option-title">⚡ Recomposición corporal</div><div class="option-sub">Perder grasa y ganar músculo al mismo tiempo</div></div>
+      <div class="option-card" onclick="select(this,'goal','fat')"><div class="option-title">🔥 Perder grasa</div><div class="option-sub">Reducir % grasa y definir el cuerpo</div></div>
+      <div class="option-card" onclick="select(this,'goal','muscle')"><div class="option-title">💪 Ganar músculo</div><div class="option-sub">Aumentar masa muscular y fuerza</div></div>
+      <div class="option-card" onclick="select(this,'goal','strength')"><div class="option-title">🏋️ Ganar fuerza</div><div class="option-sub">Mejorar rendimiento y cargas máximas</div></div>
+    </div>
+
+    <!-- STEP 2: NIVEL -->
+    <div class="step" id="step-2">
+      <div class="step-title">¿Cuánto tiempo llevas entrenando?</div>
+      <div class="step-sub">Esto ajusta la intensidad y volumen de tu plan.</div>
+      <div class="option-card" onclick="select(this,'level','beginner')"><div class="option-title">🌱 Principiante</div><div class="option-sub">Menos de 6 meses entrenando</div></div>
+      <div class="option-card" onclick="select(this,'level','intermediate')"><div class="option-title">📈 Intermedio</div><div class="option-sub">Entre 6 meses y 2 años</div></div>
+      <div class="option-card" onclick="select(this,'level','advanced')"><div class="option-title">🔥 Avanzado</div><div class="option-sub">Más de 2 años entrenando con constancia</div></div>
+    </div>
+
+    <!-- STEP 3: LUGAR -->
+    <div class="step" id="step-3">
+      <div class="step-title">¿Dónde entrenas habitualmente?</div>
+      <div class="step-sub">Adaptamos los ejercicios al material disponible.</div>
+      <div class="option-card" onclick="select(this,'place','gym')"><div class="option-title">🏛️ Gimnasio completo</div><div class="option-sub">Acceso a barras, mancuernas, poleas y máquinas</div></div>
+      <div class="option-card" onclick="select(this,'place','basicgym')"><div class="option-title">🏋️ Gym básico</div><div class="option-sub">Mancuernas, barras y material básico</div></div>
+      <div class="option-card" onclick="select(this,'place','home')"><div class="option-title">🏠 Casa</div><div class="option-sub">Sin material o material limitado</div></div>
+      <div class="option-card" onclick="select(this,'place','both')"><div class="option-title">🔄 Gym + Casa</div><div class="option-sub">Combino según el día</div></div>
+    </div>
+
+    <!-- STEP 4: DÍAS -->
+    <div class="step" id="step-4">
+      <div class="step-title">¿Qué días puedes entrenar?</div>
+      <div class="step-sub">Selecciona entre 3 y 6 días por semana.</div>
+      <div class="days-grid">
+        <div class="day-card" onclick="toggleDay(this,'lun')">Lunes</div>
+        <div class="day-card" onclick="toggleDay(this,'mar')">Martes</div>
+        <div class="day-card" onclick="toggleDay(this,'mie')">Miércoles</div>
+        <div class="day-card" onclick="toggleDay(this,'jue')">Jueves</div>
+        <div class="day-card" onclick="toggleDay(this,'vie')">Viernes</div>
+        <div class="day-card" onclick="toggleDay(this,'sab')">Sábado</div>
+        <div class="day-card" onclick="toggleDay(this,'dom')">Domingo</div>
+      </div>
+      <div id="days-count" style="font-size:13px;color:var(--muted);text-align:center"></div>
+    </div>
+
+    <!-- STEP 5: HORARIO -->
+    <div class="step" id="step-5">
+      <div class="step-title">¿A qué hora sueles entrenar?</div>
+      <div class="step-sub">Ajustamos la nutrición pre y post-entreno a tu horario.</div>
+      <div class="option-card" onclick="select(this,'time','morning')"><div class="option-title">🌅 Mañana temprano</div><div class="option-sub">6:00 – 9:00h</div></div>
+      <div class="option-card" onclick="select(this,'time','midday')"><div class="option-title">☀️ Mediodía</div><div class="option-sub">11:00 – 14:00h</div></div>
+      <div class="option-card" onclick="select(this,'time','afternoon')"><div class="option-title">🌆 Tarde</div><div class="option-sub">17:00 – 20:00h</div></div>
+      <div class="option-card" onclick="select(this,'time','night')"><div class="option-title">🌙 Noche</div><div class="option-sub">20:00 – 23:00h</div></div>
+      <div class="option-card" onclick="select(this,'time','varies')"><div class="option-title">🔄 Varía según el día</div><div class="option-sub">Diferentes horarios cada día</div></div>
+    </div>
+
+    <!-- STEP 6: SEXO -->
+    <div class="step" id="step-6">
+      <div class="step-title">¿Cuál es tu sexo biológico?</div>
+      <div class="step-sub">Necesario para calcular tus calorías y hormonas correctamente.</div>
+      <div class="option-card" onclick="select(this,'sex','male')"><div class="option-title">♂ Hombre</div></div>
+      <div class="option-card" onclick="select(this,'sex','female')"><div class="option-title">♀ Mujer</div></div>
+      <div class="option-card" onclick="select(this,'sex','other')"><div class="option-title">Prefiero no decirlo</div></div>
+    </div>
+
+    <!-- STEP 7: MEDIDAS -->
+    <div class="step" id="step-7">
+      <div class="step-title">Tus medidas</div>
+      <div class="step-sub">Para calcular tus calorías y macros exactos.</div>
+      <div style="display:flex;gap:16px;margin-bottom:20px">
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center">Edad</div>
+          <div class="wheel" id="wheel-age" data-key="age" data-min="16" data-max="70" data-val="30"></div>
+          <div class="wheel-label">años</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center">Altura</div>
+          <div class="wheel" id="wheel-height" data-key="height" data-min="150" data-max="210" data-val="175"></div>
+          <div class="wheel-label">cm</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-align:center">Peso actual</div>
+        <div class="wheel" id="wheel-weight" data-key="weight" data-min="40" data-max="150" data-val="78" style="width:120px;margin:0 auto"></div>
+        <div class="wheel-label">kg</div>
+      </div>
+    </div>
+
+    <!-- STEP 8: PESO OBJETIVO -->
+    <div class="step" id="step-8">
+      <div class="step-title">¿Cuál es tu peso objetivo?</div>
+      <div class="step-sub">Esto define la duración y agresividad de tu plan.</div>
+      <div class="wheel" id="wheel-target" data-key="target" data-min="40" data-max="150" data-val="73" style="width:140px;margin:0 auto 8px"></div>
+      <div class="wheel-label">kg objetivo</div>
+      <div id="target-info" style="margin-top:20px;background:var(--card);border-radius:14px;padding:16px;font-size:13px;color:var(--muted);line-height:1.6;text-align:center"></div>
+    </div>
+
+    <!-- STEP 9: MÚSCULOS PRIORITARIOS -->
+    <div class="step" id="step-9">
+      <div class="step-title">¿Qué zonas quieres priorizar?</div>
+      <div class="step-sub">Selecciona las que más te importan. Puedes elegir varias.</div>
+      <div class="muscles-grid">
+        <div class="muscle-card" onclick="toggleMuscle(this,'pecho')"><div class="muscle-icon">🫁</div><div class="muscle-name">Pecho</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'espalda')"><div class="muscle-icon">🔙</div><div class="muscle-name">Espalda</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'hombros')"><div class="muscle-icon">🤸</div><div class="muscle-name">Hombros</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'brazos')"><div class="muscle-icon">💪</div><div class="muscle-name">Brazos</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'abdomen')"><div class="muscle-icon">⬛</div><div class="muscle-name">Abdomen</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'gluteo')"><div class="muscle-icon">🍑</div><div class="muscle-name">Glúteo</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'piernas')"><div class="muscle-icon">🦵</div><div class="muscle-name">Piernas</div></div>
+        <div class="muscle-card" onclick="toggleMuscle(this,'equilibrado')"><div class="muscle-icon">⚖️</div><div class="muscle-name">Equilibrado</div></div>
+      </div>
+    </div>
+
+    <!-- STEP 10: LESIONES -->
+    <div class="step" id="step-10">
+      <div class="step-title">¿Tienes lesiones o limitaciones?</div>
+      <div class="step-sub">Adaptamos los ejercicios para protegerte. Es importante que seas honesto.</div>
+      <div class="no-injury-btn" id="no-injury-btn" onclick="toggleNoInjury()">✓ No tengo lesiones ni limitaciones</div>
+      <div style="margin:16px 0;text-align:center;font-size:13px;color:var(--muted)">o descríbelas aquí</div>
+      <textarea class="injury-area" id="injury-text" placeholder="Ej: rodilla derecha (pata de ganso), lumbar, hombro..."></textarea>
+    </div>
+
+    <!-- STEP 11: RESUMEN -->
+    <div class="step" id="step-11">
+      <div class="step-title">Tu plan está listo 🎉</div>
+      <div class="step-sub">Esto es lo que hemos configurado para ti.</div>
+      <div style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px">
+        <div class="summary-row"><span class="summary-label">Objetivo</span><span class="summary-val" id="s-goal">—</span></div>
+        <div class="summary-row"><span class="summary-label">Nivel</span><span class="summary-val" id="s-level">—</span></div>
+        <div class="summary-row"><span class="summary-label">Lugar</span><span class="summary-val" id="s-place">—</span></div>
+        <div class="summary-row"><span class="summary-label">Días</span><span class="summary-val" id="s-days">—</span></div>
+        <div class="summary-row"><span class="summary-label">Horario</span><span class="summary-val" id="s-time">—</span></div>
+        <div class="summary-row"><span class="summary-label">Peso actual → objetivo</span><span class="summary-val" id="s-weight">—</span></div>
+        <div class="summary-row"><span class="summary-label">Calorías/día</span><span class="summary-val" id="s-kcal">—</span></div>
+        <div class="summary-row"><span class="summary-label">Proteína/día</span><span class="summary-val" id="s-prot">—</span></div>
+        <div class="summary-row"><span class="summary-label">Lesiones</span><span class="summary-val" id="s-injury">—</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom">
+    <button class="continue-btn" id="continue-btn" onclick="nextStep()">Comenzar</button>
+  </div>
+</div>
+
+<script>
+const TOTAL=12;
+let current=0;
+const data={goal:'',level:'',place:'',days:[],time:'',sex:'',age:30,height:175,weight:78,target:73,muscles:[],injury:'',noInjury:false};
+
+const goalLabels={recomp:'Recomposición',fat:'Perder grasa',muscle:'Ganar músculo',strength:'Ganar fuerza'};
+const levelLabels={beginner:'Principiante',intermediate:'Intermedio',advanced:'Avanzado'};
+const placeLabels={gym:'Gym completo',basicgym:'Gym básico',home:'Casa',both:'Gym + Casa'};
+const timeLabels={morning:'Mañana (6-9h)',midday:'Mediodía (11-14h)',afternoon:'Tarde (17-20h)',night:'Noche (20-23h)',varies:'Varía'};
+
+function updateProgress(){
+  document.getElementById('prog').style.width=(current/TOTAL*100)+'%';
+  document.getElementById('back-btn').style.visibility=current>0?'visible':'hidden';
+  const btn=document.getElementById('continue-btn');
+  btn.textContent=current===0?'Empezar':current===TOTAL-1?'¡Ir a entrenar!':'Continuar';
+}
+
+function select(el,key,val){
+  el.closest('.step').querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  data[key]=val;
+  setTimeout(()=>nextStep(),300);
+}
+
+function toggleDay(el,day){
+  el.classList.toggle('selected');
+  if(data.days.includes(day)) data.days=data.days.filter(d=>d!==day);
+  else data.days.push(day);
+  const count=data.days.length;
+  document.getElementById('days-count').textContent=count>0?`${count} día${count>1?'s':''} seleccionado${count>1?'s':''}`:'Selecciona al menos 3 días';
+}
+
+function toggleMuscle(el,muscle){
+  el.classList.toggle('selected');
+  if(data.muscles.includes(muscle)) data.muscles=data.muscles.filter(m=>m!==muscle);
+  else data.muscles.push(muscle);
+}
+
+function toggleNoInjury(){
+  data.noInjury=!data.noInjury;
+  document.getElementById('no-injury-btn').classList.toggle('selected',data.noInjury);
+  document.getElementById('injury-text').disabled=data.noInjury;
+  if(data.noInjury) document.getElementById('injury-text').value='';
+}
+
+function canContinue(){
+  if(current===4&&data.days.length<3) return false;
+  if(current===9&&data.muscles.length===0) return false;
+  return true;
+}
+
+function buildSummary(){
+  document.getElementById('s-goal').textContent=goalLabels[data.goal]||'—';
+  document.getElementById('s-level').textContent=levelLabels[data.level]||'—';
+  document.getElementById('s-place').textContent=placeLabels[data.place]||'—';
+  document.getElementById('s-days').textContent=data.days.length+' días/semana';
+  document.getElementById('s-time').textContent=timeLabels[data.time]||'—';
+  document.getElementById('s-weight').textContent=`${data.weight}kg → ${data.target}kg`;
+  const bmr=data.sex==='female'?
+    (10*data.weight+6.25*data.height-5*data.age-161):
+    (10*data.weight+6.25*data.height-5*data.age+5);
+  const tdee=Math.round(bmr*1.55);
+  const deficit=data.goal==='muscle'?Math.round(tdee*1.1):Math.round(tdee*0.82);
+  const prot=Math.round(data.weight*2.2);
+  document.getElementById('s-kcal').textContent=deficit+' kcal/día';
+  document.getElementById('s-prot').textContent=prot+'g/día';
+  const injTxt=data.noInjury?'Ninguna':document.getElementById('injury-text').value||'Ninguna';
+  document.getElementById('s-injury').textContent=injTxt.length>25?injTxt.substring(0,25)+'...':injTxt;
+}
+
+function nextStep(){
+  if(!canContinue()){
+    if(current===4) alert('Selecciona al menos 3 días');
+    if(current===9) alert('Selecciona al menos una zona');
+    return;
+  }
+  if(current===10){
+    data.injury=document.getElementById('injury-text').value;
+    buildSummary();
+  }
+  if(current===TOTAL-1){
+    localStorage.setItem('fitsync_profile',JSON.stringify(data));
+    window.location.href='index.html';
+    return;
+  }
+  document.getElementById('step-'+current).classList.remove('active');
+  current++;
+  document.getElementById('step-'+current).classList.add('active');
+  updateProgress();
+  if(current===7||current===8) initWheels();
+  if(current===8) updateTargetInfo();
+}
+
+function prevStep(){
+  if(current===0)return;
+  document.getElementById('step-'+current).classList.remove('active');
+  current--;
+  document.getElementById('step-'+current).classList.add('active');
+  updateProgress();
+  if(current===7||current===8) initWheels();
+}
+
+function updateTargetInfo(){
+  const diff=data.weight-data.target;
+  const weeks=Math.round(diff/0.5);
+  const el=document.getElementById('target-info');
+  if(!el)return;
+  if(diff>0) el.textContent=`Perder ${diff}kg a ritmo saludable → aprox. ${weeks} semanas`;
+  else if(diff<0) el.textContent=`Ganar ${Math.abs(diff)}kg de masa muscular → proceso largo y constante`;
+  else el.textContent='Mantener el peso actual mientras mejoras la composición corporal';
+}
+
+// WHEEL
+function initWheels(){
+  document.querySelectorAll('.wheel').forEach(w=>{
+    if(w.dataset.init) return;
+    w.dataset.init='1';
+    const min=parseInt(w.dataset.min);
+    const max=parseInt(w.dataset.max);
+    const key=w.dataset.key;
+    let val=parseInt(w.dataset.val);
+    const inner=document.createElement('div');
+    inner.className='wheel-inner';
+    const items=[];
+    for(let i=min-2;i<=max+2;i++){
+      const item=document.createElement('div');
+      item.className='wheel-item'+(i===val?' selected':'');
+      item.textContent=i>=min&&i<=max?i:'';
+      inner.appendChild(item);
+      items.push(item);
+    }
+    w.appendChild(inner);
+    const sel=document.createElement('div');
+    sel.className='wheel-selector';
+    w.appendChild(sel);
+
+    function setVal(v){
+      v=Math.max(min,Math.min(max,v));
+      val=v;
+      data[key]=v;
+      const idx=v-min+2;
+      items.forEach((it,i)=>it.classList.toggle('selected',i===idx));
+      const offset=(2-(v-min))*50+75;
+      inner.style.transform=`translateY(${offset}px)`;
+      if(key==='target') updateTargetInfo();
+      if(key==='weight'&&current===8) updateTargetInfo();
+    }
+    setVal(val);
+
+    let startY=0,startVal=0;
+    w.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;startVal=val;},{passive:true});
+    w.addEventListener('touchmove',e=>{
+      const dy=startY-e.touches[0].clientY;
+      setVal(Math.round(startVal+dy/50));
+    },{passive:true});
+    w.addEventListener('wheel',e=>{e.preventDefault();setVal(val+(e.deltaY>0?1:-1));},{passive:false});
+  });
+}
+
+updateProgress();
+</script>
+</body>
+</html>
