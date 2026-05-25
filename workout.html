@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0A0F">
+<title>MikeFit — Entreno</title>
+<style>
+:root{
+  --bg:#0A0A0F;--surface:#13131A;--card:#1C1C26;
+  --border:rgba(255,255,255,0.08);--text:#F0EFE8;
+  --muted:#555;--accent:#C8F135;
+  --accent-dim:rgba(200,241,53,0.12);--accent-border:rgba(200,241,53,0.35);
+  --blue:#4A9EFF;--green:#3DD68C;--red:#FF5C5C;--orange:#FF8C42;
+  --safe-top:env(safe-area-inset-top,44px);
+  --safe-bottom:env(safe-area-inset-bottom,34px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,'DM Sans',sans-serif;}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+
+/* HEADER */
+.header{padding:var(--safe-top) 16px 10px;flex-shrink:0;background:var(--bg);}
+.header-top{display:flex;align-items:center;justify-content:space-between;}
+.header-back{font-size:15px;color:var(--accent);cursor:pointer;padding:4px 0;}
+.header-title{font-size:14px;font-weight:600;color:var(--muted);text-align:center;}
+.header-timer{font-size:15px;font-weight:700;color:var(--accent);font-family:monospace;}
+.ex-progress{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.ex-prog-bar{flex:1;height:3px;background:#1A1A1A;border-radius:2px;overflow:hidden;}
+.ex-prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s;}
+.ex-prog-text{font-size:11px;color:var(--muted);font-family:monospace;flex-shrink:0;}
+
+/* MAIN SCROLL */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* EXERCISE CARD */
+.ex-visual{position:relative;height:220px;background:linear-gradient(135deg,#0D1B2A,#1A2A3A);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.ex-visual-emoji{font-size:80px;opacity:0.9;}
+.ex-visual-muscles{position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;}
+.muscle-tag-main{background:rgba(255,92,92,0.25);border:1px solid rgba(255,92,92,0.5);color:#FF7A7A;padding:3px 8px;border-radius:8px;font-size:10px;font-weight:600;}
+.muscle-tag-sec{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--muted);padding:3px 8px;border-radius:8px;font-size:10px;}
+.ex-visual-nav{position:absolute;top:50%;right:0;display:flex;flex-direction:column;gap:8px;transform:translateY(-50%);padding-right:12px;}
+.nav-pill{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer;text-align:center;}
+.nav-pill-icon{font-size:16px;}
+.nav-pill-label{font-size:8px;color:var(--muted);margin-top:2px;}
+
+/* EX INFO */
+.ex-info{padding:14px 16px 0;}
+.ex-name{font-size:20px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+.ex-rec{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.ex-rec span{color:var(--accent);font-weight:600;}
+
+/* CIRCLES */
+.circles-row{display:flex;gap:10px;padding:0 16px 14px;}
+.circle-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.circle{width:72px;height:72px;border-radius:50%;border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.circle.rest-active{border-color:var(--accent);}
+.circle-val{font-size:20px;font-weight:700;line-height:1;}
+.circle-sub{font-size:9px;color:var(--muted);margin-top:2px;}
+.circle-label{font-size:10px;color:var(--muted);font-weight:500;}
+svg.ring{position:absolute;top:-2px;left:-2px;width:76px;height:76px;}
+
+/* SETS TABLE */
+.sets-section{padding:0 16px 14px;}
+.sets-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sets-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;font-family:monospace;}
+.weight-toggle{display:flex;background:var(--surface);border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.wt-btn{padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;color:var(--muted);transition:all 0.15s;}
+.wt-btn.active{background:var(--accent);color:#0A0A0F;}
+.set-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+.set-row:last-child{border-bottom:none;}
+.set-num{width:24px;height:24px;border-radius:50%;background:var(--surface);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);}
+.set-num.done{background:var(--accent);color:#0A0A0F;}
+.set-inputs{flex:1;display:flex;gap:6px;}
+.set-input-wrap{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.set-input-wrap.filled{border-color:var(--accent-border);background:var(--accent-dim);}
+.set-input-label{font-size:9px;color:var(--muted);}
+.set-input-val{font-size:16px;font-weight:700;color:var(--text);}
+.set-input-sub{font-size:9px;color:var(--muted);}
+.set-done-btn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;transition:all 0.15s;}
+.set-done-btn.done{background:var(--accent);border-color:var(--accent);}
+.add-set-btn{width:100%;padding:10px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;text-align:center;margin-top:6px;}
+
+/* HISTORY */
+.history-section{padding:0 16px 14px;}
+.history-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;font-family:monospace;margin-bottom:8px;}
+.history-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
+.history-row:last-child{border-bottom:none;}
+.history-date{font-size:11px;color:var(--muted);}
+.history-val{font-size:12px;font-weight:600;color:var(--accent);font-family:monospace;}
+
+/* BOTTOM */
+.bottom-bar{flex-shrink:0;padding:10px 16px;padding-bottom:calc(10px + var(--safe-bottom));background:var(--bg);border-top:1px solid var(--border);display:flex;gap:10px;}
+.btn-prev{flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;}
+.btn-next{flex:2;padding:14px;background:var(--accent);border:none;border-radius:14px;color:#0A0A0F;font-size:15px;font-weight:700;cursor:pointer;}
+.btn-finish{flex:1;padding:14px;background:var(--red);border:none;border-radius:14px;color:white;font-size:14px;font-weight:700;cursor:pointer;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:flex-end;backdrop-filter:blur(4px);}
+.modal-overlay.hidden{display:none;}
+.modal{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px;padding-bottom:calc(20px + var(--safe-bottom));width:100%;max-height:85vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.kg-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.kg-label{font-size:13px;color:var(--muted);width:80px;flex-shrink:0;}
+.kg-controls{display:flex;align-items:center;gap:10px;flex:1;}
+.kg-btn{width:40px;height:40px;border-radius:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.kg-val{flex:1;text-align:center;font-size:24px;font-weight:700;font-family:monospace;}
+.kg-total{background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;padding:10px 14px;text-align:center;margin-bottom:16px;}
+.kg-total-label{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.kg-total-val{font-size:22px;font-weight:700;color:var(--accent);}
+.reps-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.reps-btn{flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;color:var(--text);}
+.reps-btn.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);}
+.save-set-btn{width:100%;padding:16px;background:var(--accent);border:none;border-radius:14px;color:#0A0A0F;font-size:16px;font-weight:700;cursor:pointer;}
+
+/* HOW TO MODAL */
+.how-step{display:flex;gap:12px;margin-bottom:14px;}
+.how-num{width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.how-text{font-size:13px;color:var(--text);line-height:1.5;padding-top:3px;}
+
+/* ALTERNATIVES MODAL */
+.alt-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.alt-item:last-child{border-bottom:none;}
+.alt-icon{font-size:24px;width:40px;text-align:center;flex-shrink:0;}
+.alt-info{flex:1;}
+.alt-name{font-size:14px;font-weight:500;}
+.alt-muscle{font-size:11px;color:var(--muted);margin-top:2px;}
+.alt-select{font-size:12px;font-weight:600;color:var(--accent);}
+
+/* SUMMARY */
+.summary-screen{position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;padding:var(--safe-top) 20px 20px;}
+.summary-screen.hidden{display:none;}
+.sum-logo{font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-1px;margin-bottom:4px;}
+.sum-date{font-size:12px;color:var(--muted);margin-bottom:20px;font-family:monospace;}
+.sum-hero{text-align:center;margin-bottom:24px;}
+.sum-circle{width:100px;height:100px;border-radius:50%;border:3px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 12px;}
+.sum-pct{font-size:28px;font-weight:800;color:var(--accent);}
+.sum-day{font-size:13px;color:var(--muted);}
+.sum-type{font-size:16px;font-weight:600;margin-top:4px;}
+.sum-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.sum-stat{background:var(--card);border-radius:14px;padding:14px;text-align:center;border:1px solid var(--border);}
+.sum-stat-val{font-size:22px;font-weight:700;font-family:monospace;}
+.sum-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+.sum-ex-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.sum-ex-item:last-child{border-bottom:none;}
+.sum-ex-icon{font-size:20px;width:32px;text-align:center;}
+.sum-ex-info{flex:1;}
+.sum-ex-name{font-size:13px;font-weight:500;}
+.sum-ex-detail{font-size:11px;color:var(--muted);margin-top:2px;}
+.sum-share-btn{width:100%;padding:16px;background:var(--accent);border:none;border-radius:14px;color:#0A0A0F;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px;}
+.sum-back-btn{width:100%;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-back" onclick="goBack()">✕ Salir</div>
+      <div class="header-title" id="ex-counter">1 / 5</div>
+      <div class="header-timer" id="workout-timer">0:00</div>
+    </div>
+    <div class="ex-progress">
+      <div class="ex-prog-bar"><div class="ex-prog-fill" id="ex-prog-fill" style="width:20%"></div></div>
+      <div class="ex-prog-text" id="ex-prog-text">1/5</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="scroll">
+    <!-- VISUAL DEL EJERCICIO -->
+    <div class="ex-visual">
+      <div class="ex-visual-emoji" id="ex-emoji">🏋️</div>
+      <div class="ex-visual-muscles" id="ex-muscles"></div>
+      <div class="ex-visual-nav">
+        <div class="nav-pill" onclick="showHowTo()">
+          <div class="nav-pill-icon">📋</div>
+          <div class="nav-pill-label">Cómo</div>
+        </div>
+        <div class="nav-pill" onclick="showAlternatives()">
+          <div class="nav-pill-icon">↔️</div>
+          <div class="nav-pill-label">Altern.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO EJERCICIO -->
+    <div class="ex-info">
+      <div class="ex-name" id="ex-name">Press banca barra</div>
+      <div class="ex-rec">Peso recomendado: <span id="ex-rec-weight">22 kg</span> · <span id="ex-sets-info">4 series × 6-10 reps</span></div>
+    </div>
+
+    <!-- CÍRCULOS -->
+    <div class="circles-row">
+      <div class="circle-wrap">
+        <div class="circle" onclick="changeReps()">
+          <div class="circle-val" id="circle-reps">10</div>
+          <div class="circle-sub">objetivo</div>
+        </div>
+        <div class="circle-label">Reps</div>
+      </div>
+      <div class="circle-wrap">
+        <div class="circle" id="rest-circle" onclick="toggleRest()">
+          <svg class="ring"><circle cx="38" cy="38" r="34" fill="none" stroke="#C8F135" stroke-width="3" stroke-dasharray="214" id="rest-ring" stroke-dashoffset="214" stroke-linecap="round" transform="rotate(-90 38 38)"/></svg>
+          <div class="circle-val" id="rest-val">90s</div>
+          <div class="circle-sub">descanso</div>
+        </div>
+        <div class="circle-label">Descanso</div>
+      </div>
+      <div class="circle-wrap">
+        <div class="circle">
+          <div class="circle-val" id="circle-sets">0/4</div>
+          <div class="circle-sub">hechas</div>
+        </div>
+        <div class="circle-label">Series</div>
+      </div>
+    </div>
+
+    <!-- SERIES -->
+    <div class="sets-section">
+      <div class="sets-header">
+        <div class="sets-title">Series</div>
+        <div class="weight-toggle">
+          <div class="wt-btn active" id="wt-side" onclick="setWeightMode('side')">Por lado</div>
+          <div class="wt-btn" id="wt-total" onclick="setWeightMode('total')">Total</div>
+        </div>
+      </div>
+      <div id="sets-list"></div>
+      <div class="add-set-btn" onclick="addSet()">+ Añadir serie extra</div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="history-section">
+      <div class="history-title">Historial</div>
+      <div id="history-list">
+        <div style="font-size:12px;color:var(--muted)">Sin datos de semanas anteriores aún</div>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bottom-bar">
+    <button class="btn-prev" onclick="prevEx()">‹ Anterior</button>
+    <button class="btn-next" id="next-btn" onclick="nextEx()">Siguiente ›</button>
+    <button class="btn-finish" onclick="finishWorkout()">Fin</button>
+  </div>
+</div>
+
+<!-- MODAL: AÑADIR SERIE -->
+<div class="modal-overlay hidden" id="set-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Añadir serie <span id="modal-set-num"></span></div>
+    <div class="modal-sub" id="modal-ex-name"></div>
+
+    <div class="kg-row">
+      <div class="kg-label" id="kg-label">Kg por lado</div>
+      <div class="kg-controls">
+        <div class="kg-btn" onclick="changeKg(-2.5)">−</div>
+        <div class="kg-val" id="modal-kg">11</div>
+        <div class="kg-btn" onclick="changeKg(2.5)">+</div>
+      </div>
+    </div>
+
+    <div class="kg-total" id="kg-total-wrap">
+      <div class="kg-total-label">Total en barra</div>
+      <div class="kg-total-val" id="kg-total-val">22 kg</div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Repeticiones</div>
+    <div class="reps-row" id="reps-row"></div>
+
+    <button class="save-set-btn" onclick="saveSet()">✓ Guardar serie</button>
+  </div>
+</div>
+
+<!-- MODAL: CÓMO HACERLO -->
+<div class="modal-overlay hidden" id="howto-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="howto-ex-name"></div>
+    <div class="modal-sub" id="howto-muscles"></div>
+    <div id="howto-steps"></div>
+    <button class="save-set-btn" style="margin-top:16px" onclick="closeModal('howto-modal')">Entendido</button>
+  </div>
+</div>
+
+<!-- MODAL: ALTERNATIVOS -->
+<div class="modal-overlay hidden" id="alts-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Ejercicios alternativos</div>
+    <div class="modal-sub">Mismo músculo, diferente material</div>
+    <div id="alts-list"></div>
+    <button class="save-set-btn" style="margin-top:16px;background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="closeModal('alts-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- RESUMEN FINAL -->
+<div class="summary-screen hidden" id="summary-screen">
+  <div class="sum-logo">MikeFit</div>
+  <div class="sum-date" id="sum-date"></div>
+  <div class="sum-hero">
+    <div class="sum-circle">
+      <div class="sum-pct" id="sum-pct">0%</div>
+      <div class="sum-day">completado</div>
+    </div>
+    <div class="sum-type" id="sum-type"></div>
+  </div>
+  <div class="sum-stats">
+    <div class="sum-stat"><div class="sum-stat-val" id="sum-duration">0:00</div><div class="sum-stat-lbl">Duración</div></div>
+    <div class="sum-stat"><div class="sum-stat-val" id="sum-sets">0</div><div class="sum-stat-lbl">Series</div></div>
+    <div class="sum-stat"><div class="sum-stat-val" id="sum-reps">0</div><div class="sum-stat-lbl">Reps totales</div></div>
+    <div class="sum-stat"><div class="sum-stat-val" id="sum-kg">0 kg</div><div class="sum-stat-lbl">Kg levantados</div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="history-title" style="margin-bottom:10px">Ejercicios completados</div>
+    <div id="sum-ex-list"></div>
+  </div>
+  <button class="sum-share-btn" onclick="shareSummary()">📋 Enviar resumen al chat</button>
+  <button class="sum-back-btn" onclick="closeSummary()">Volver al inicio</button>
+</div>
+
+<script>
+// DATA
+const exercises=[
+  {id:'pb_barra',name:'Press banca barra',emoji:'🏋️',sets:4,reps:10,rest:90,recWeight:22,weightMode:'side',
+   muscles:['Pecho'],secondary:['Tríceps','Hombro ant.'],
+   how:['Túmbate en el banco con los pies en el suelo','Agarra la barra algo más ancho que los hombros','Baja la barra lentamente 2-3 segundos hasta el pecho','Sube explosivo sin bloquear los codos','Codos a 45° del cuerpo, no perpendiculares'],
+   alts:[{name:'Press banca mancuernas',emoji:'💪',muscle:'Pecho'},{name:'Press banca máquina',emoji:'🔧',muscle:'Pecho'},{name:'Aperturas en polea',emoji:'🎯',muscle:'Pecho'}]},
+  {id:'pb_inc',name:'Press inclinado mancuernas',emoji:'📐',sets:3,reps:12,rest:75,recWeight:16,weightMode:'side',
+   muscles:['Pecho sup.'],secondary:['Tríceps'],
+   how:['Banco a 30-45°','Mancuernas a altura de hombros','Baja controlado sintiendo el estiramiento','Sube sin llegar a bloquear arriba','Siente el pecho trabajar en cada rep'],
+   alts:[{name:'Press inclinado barra',emoji:'🏋️',muscle:'Pecho sup.'},{name:'Press inclinado máquina',emoji:'🔧',muscle:'Pecho sup.'}]},
+  {id:'pm_manc',name:'Press militar mancuernas',emoji:'🔼',sets:4,reps:10,rest:90,recWeight:10,weightMode:'side',
+   muscles:['Hombro'],secondary:['Tríceps','Trapecio'],
+   how:['De pie o sentado, espalda recta','Mancuernas a altura de hombros, codos a 90°','Sube hasta casi juntar las mancuernas arriba','Baja controlado 2-3 segundos','Sin arquear la espalda lumbar'],
+   alts:[{name:'Press Arnold',emoji:'🌀',muscle:'Hombro'},{name:'Press militar barra',emoji:'🏋️',muscle:'Hombro'},{name:'Press máquina hombro',emoji:'🔧',muscle:'Hombro'}]},
+  {id:'elev_lat',name:'Elevaciones laterales',emoji:'↔️',sets:4,reps:18,rest:60,recWeight:6,weightMode:'side',
+   muscles:['Hombro lat.'],secondary:['Trapecio'],
+   how:['De pie, codos ligeramente doblados','Sube los brazos lateralmente hasta altura del hombro','Aguanta 1 segundo arriba','Baja 2-3 segundos controlado','NO balancees el tronco para ayudarte'],
+   alts:[{name:'Elevaciones cable lateral',emoji:'🎯',muscle:'Hombro lat.'},{name:'Elevaciones máquina',emoji:'🔧',muscle:'Hombro lat.'}]},
+  {id:'tri_polea',name:'Extensión tríceps polea',emoji:'📏',sets:3,reps:14,rest:60,recWeight:9,weightMode:'total',
+   muscles:['Tríceps'],secondary:[],
+   how:['Codos pegados al cuerpo, fijos','Solo mueve el antebrazo hacia abajo','Extiende completamente el brazo','Controla la subida 2 segundos','Usa cuerda o barra recta'],
+   alts:[{name:'Press francés mancuerna',emoji:'💪',muscle:'Tríceps'},{name:'Fondos paralelas',emoji:'⬇️',muscle:'Tríceps'},{name:'Extensión sobre cabeza',emoji:'🔼',muscle:'Tríceps'}]},
+];
+
+let currentEx=0;
+let weightMode='side';
+let sets=[];
+let modalKg=0;
+let modalReps=0;
+let editingSetIdx=-1;
+let workoutSeconds=0;
+let workoutTimer=null;
+let restSeconds=0;
+let restTimer=null;
+let restTotal=90;
+const TODAY=new Date().toISOString().split('T')[0];
+
+// INIT
+function init(){
+  sets=exercises.map(ex=>Array(ex.sets).fill(null).map(()=>({kg:0,reps:0,done:false})));
+  startWorkoutTimer();
+  renderEx();
+}
+
+// WORKOUT TIMER
+function startWorkoutTimer(){
+  workoutTimer=setInterval(()=>{
+    workoutSeconds++;
+    const m=Math.floor(workoutSeconds/60);
+    const s=workoutSeconds%60;
+    document.getElementById('workout-timer').textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+
+// RENDER EXERCISE
+function renderEx(){
+  const ex=exercises[currentEx];
+  weightMode=ex.weightMode||'side';
+  document.getElementById('ex-counter').textContent=`${currentEx+1} / ${exercises.length}`;
+  document.getElementById('ex-prog-fill').style.width=((currentEx+1)/exercises.length*100)+'%';
+  document.getElementById('ex-prog-text').textContent=`${currentEx+1}/${exercises.length}`;
+  document.getElementById('ex-emoji').textContent=ex.emoji;
+  document.getElementById('ex-name').textContent=ex.name;
+  document.getElementById('ex-rec-weight').textContent=ex.recWeight+(weightMode==='side'?` kg × 2 = ${ex.recWeight*2} kg total`:' kg total');
+  document.getElementById('ex-sets-info').textContent=`${ex.sets} series × ${ex.reps} reps`;
+  document.getElementById('circle-reps').textContent=ex.reps;
+  restTotal=ex.rest;
+  document.getElementById('rest-val').textContent=ex.rest+'s';
+  resetRestRing();
+  updateCircleSets();
+  // muscles
+  const mEl=document.getElementById('ex-muscles');
+  mEl.innerHTML=ex.muscles.map(m=>`<span class="muscle-tag-main">${m}</span>`).join('')+
+    ex.secondary.map(m=>`<span class="muscle-tag-sec">${m}</span>`).join('');
+  // weight toggle
+  document.getElementById('wt-side').className='wt-btn'+(weightMode==='side'?' active':'');
+  document.getElementById('wt-total').className='wt-btn'+(weightMode==='total'?' active':'');
+  document.getElementById('kg-total-wrap').style.display=weightMode==='side'?'block':'none';
+  // next btn
+  document.getElementById('next-btn').textContent=currentEx===exercises.length-1?'Ver resumen ›':'Siguiente ›';
+  renderSets();
+  renderHistory();
+  document.querySelector('.scroll').scrollTo(0,0);
+}
+
+function updateCircleSets(){
+  const ex=exercises[currentEx];
+  const done=sets[currentEx].filter(s=>s.done).length;
+  document.getElementById('circle-sets').textContent=done+'/'+ex.sets;
+}
+
+// SETS
+function renderSets(){
+  const ex=exercises[currentEx];
+  const list=document.getElementById('sets-list');
+  list.innerHTML='';
+  sets[currentEx].forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='set-row';
+    const displayKg=s.kg>0?(weightMode==='side'?s.kg+' kg/lado':s.kg+' kg'):'—';
+    const totalKg=s.kg>0?(weightMode==='side'?s.kg*2:s.kg)+' kg total':'—';
+    div.innerHTML=`
+      <div class="set-num ${s.done?'done':''}">${i+1}</div>
+      <div class="set-inputs" onclick="openSetModal(${i})">
+        <div class="set-input-wrap ${s.kg>0?'filled':''}">
+          <div class="set-input-label">${weightMode==='side'?'Por lado':'Total'}</div>
+          <div class="set-input-val">${s.kg>0?s.kg:'—'}</div>
+          <div class="set-input-sub">kg</div>
+        </div>
+        <div class="set-input-wrap ${s.kg>0?'filled':''}">
+          <div class="set-input-label">Total barra</div>
+          <div class="set-input-val" style="font-size:13px">${s.kg>0?(weightMode==='side'?s.kg*2:s.kg):'—'}</div>
+          <div class="set-input-sub">kg</div>
+        </div>
+        <div class="set-input-wrap ${s.reps>0?'filled':''}">
+          <div class="set-input-label">Reps</div>
+          <div class="set-input-val">${s.reps||'—'}</div>
+          <div class="set-input-sub">reps</div>
+        </div>
+      </div>
+      <div class="set-done-btn ${s.done?'done':''}" onclick="toggleSetDone(${i})">${s.done?'✓':'○'}</div>`;
+    list.appendChild(div);
+  });
+}
+
+function addSet(){
+  sets[currentEx].push({kg:0,reps:0,done:false});
+  renderSets();
+}
+
+function toggleSetDone(i){
+  if(!sets[currentEx][i].kg){openSetModal(i);return;}
+  sets[currentEx][i].done=!sets[currentEx][i].done;
+  if(sets[currentEx][i].done) startRest();
+  updateCircleSets();
+  renderSets();
+  saveToday();
+}
+
+// SET MODAL
+function openSetModal(idx){
+  editingSetIdx=idx;
+  const ex=exercises[currentEx];
+  const s=sets[currentEx][idx];
+  modalKg=s.kg||ex.recWeight/2;
+  modalReps=s.reps||ex.reps;
+  document.getElementById('modal-set-num').textContent=`#${idx+1}`;
+  document.getElementById('modal-ex-name').textContent=ex.name;
+  document.getElementById('kg-label').textContent=weightMode==='side'?'Kg por lado':'Kg total';
+  document.getElementById('kg-total-wrap').style.display=weightMode==='side'?'block':'none';
+  updateModalKg();
+  renderRepsRow();
+  document.getElementById('set-modal').classList.remove('hidden');
+}
+
+function updateModalKg(){
+  document.getElementById('modal-kg').textContent=modalKg;
+  if(weightMode==='side') document.getElementById('kg-total-val').textContent=(modalKg*2)+' kg';
+}
+
+function changeKg(d){
+  modalKg=Math.max(0,Math.round((modalKg+d)*2)/2);
+  updateModalKg();
+}
+
+function renderRepsRow(){
+  const ex=exercises[currentEx];
+  const opts=[ex.reps-2,ex.reps-1,ex.reps,ex.reps+1,ex.reps+2].filter(r=>r>0);
+  const row=document.getElementById('reps-row');
+  row.innerHTML=opts.map(r=>`<div class="reps-btn ${r===modalReps?'active':''}" onclick="selectReps(${r})">${r}</div>`).join('');
+}
+
+function selectReps(r){
+  modalReps=r;
+  renderRepsRow();
+}
+
+function saveSet(){
+  sets[currentEx][editingSetIdx].kg=modalKg;
+  sets[currentEx][editingSetIdx].reps=modalReps;
+  sets[currentEx][editingSetIdx].done=true;
+  closeModal('set-modal');
+  startRest();
+  updateCircleSets();
+  renderSets();
+  saveToday();
+}
+
+// REST TIMER
+function startRest(){
+  if(restTimer) clearInterval(restTimer);
+  restSeconds=restTotal;
+  updateRestDisplay();
+  document.getElementById('rest-circle').classList.add('rest-active');
+  restTimer=setInterval(()=>{
+    restSeconds--;
+    updateRestDisplay();
+    if(restSeconds<=0){clearInterval(restTimer);restTimer=null;document.getElementById('rest-circle').classList.remove('rest-active');}
+  },1000);
+}
+
+function updateRestDisplay(){
+  document.getElementById('rest-val').textContent=restSeconds+'s';
+  const pct=1-(restSeconds/restTotal);
+  const circumference=214;
+  document.getElementById('rest-ring').style.strokeDashoffset=circumference*(1-pct);
+}
+
+function toggleRest(){
+  if(restTimer){clearInterval(restTimer);restTimer=null;document.getElementById('rest-circle').classList.remove('rest-active');}
+  else startRest();
+}
+
+function resetRestRing(){
+  document.getElementById('rest-ring').style.strokeDashoffset=214;
+  document.getElementById('rest-val').textContent=exercises[currentEx].rest+'s';
+}
+
+// WEIGHT MODE
+function setWeightMode(mode){
+  weightMode=mode;
+  exercises[currentEx].weightMode=mode;
+  document.getElementById('wt-side').className='wt-btn'+(mode==='side'?' active':'');
+  document.getElementById('wt-total').className='wt-btn'+(mode==='total'?' active':'');
+  document.getElementById('kg-total-wrap').style.display=mode==='side'?'block':'none';
+  document.getElementById('ex-rec-weight').textContent=exercises[currentEx].recWeight+(mode==='side'?` kg × 2 = ${exercises[currentEx].recWeight*2} kg total`:' kg total');
+  document.getElementById('kg-label').textContent=mode==='side'?'Kg por lado':'Kg total';
+  renderSets();
+}
+
+// HOW TO
+function showHowTo(){
+  const ex=exercises[currentEx];
+  document.getElementById('howto-ex-name').textContent=ex.name;
+  document.getElementById('howto-muscles').textContent='Principal: '+ex.muscles.join(', ')+(ex.secondary.length?' · Secundario: '+ex.secondary.join(', '):'');
+  document.getElementById('howto-steps').innerHTML=ex.how.map((h,i)=>`<div class="how-step"><div class="how-num">${i+1}</div><div class="how-text">${h}</div></div>`).join('');
+  document.getElementById('howto-modal').classList.remove('hidden');
+}
+
+// ALTERNATIVES
+function showAlternatives(){
+  const ex=exercises[currentEx];
+  document.getElementById('alts-list').innerHTML=ex.alts.map((a,i)=>`
+    <div class="alt-item" onclick="selectAlt(${i})">
+      <div class="alt-icon">${a.emoji}</div>
+      <div class="alt-info"><div class="alt-name">${a.name}</div><div class="alt-muscle">${a.muscle}</div></div>
+      <div class="alt-select">Elegir →</div>
+    </div>`).join('');
+  document.getElementById('alts-modal').classList.remove('hidden');
+}
+
+function selectAlt(i){
+  const alt=exercises[currentEx].alts[i];
+  exercises[currentEx].name=alt.name;
+  exercises[currentEx].emoji=alt.emoji;
+  exercises[currentEx].muscles=[alt.muscle];
+  closeModal('alts-modal');
+  renderEx();
+}
+
+// NAVIGATION
+function nextEx(){
+  if(currentEx===exercises.length-1){finishWorkout();return;}
+  currentEx++;
+  renderEx();
+}
+
+function prevEx(){
+  if(currentEx>0){currentEx--;renderEx();}
+}
+
+// HISTORY
+function renderHistory(){
+  const ex=exercises[currentEx];
+  const history=JSON.parse(localStorage.getItem('history_'+ex.id)||'[]');
+  const el=document.getElementById('history-list');
+  if(!history.length){el.innerHTML='<div style="font-size:12px;color:var(--muted)">Sin datos aún — ¡este es tu primer registro!</div>';return;}
+  el.innerHTML=history.slice(-5).reverse().map(h=>`
+    <div class="history-row">
+      <div class="history-date">${h.date}</div>
+      <div class="history-val">${h.sets} × ${h.reps}r · ${h.kg}kg/lado</div>
+    </div>`).join('');
+}
+
+// SAVE
+function saveToday(){
+  const data=exercises.map((ex,i)=>({id:ex.id,name:ex.name,sets:sets[i]}));
+  localStorage.setItem('workout_'+TODAY,JSON.stringify(data));
+  exercises.forEach((ex,i)=>{
+    const doneSets=sets[i].filter(s=>s.done&&s.kg>0);
+    if(doneSets.length>0){
+      const history=JSON.parse(localStorage.getItem('history_'+ex.id)||'[]');
+      const avgKg=Math.round(doneSets.reduce((a,s)=>a+s.kg,0)/doneSets.length*10)/10;
+      const avgReps=Math.round(doneSets.reduce((a,s)=>a+s.reps,0)/doneSets.length);
+      history.push({date:new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'}),sets:doneSets.length,reps:avgReps,kg:avgKg});
+      localStorage.setItem('history_'+ex.id,JSON.stringify(history.slice(-20)));
+    }
+  });
+}
+
+// FINISH
+function finishWorkout(){
+  clearInterval(workoutTimer);
+  const m=Math.floor(workoutSeconds/60);
+  const s=workoutSeconds%60;
+  const duration=m+'h '+s+'min';
+  let totalSets=0,totalReps=0,totalKg=0;
+  const donePct=Math.round(exercises.reduce((acc,ex,i)=>acc+sets[i].filter(s=>s.done).length,0)/
+    exercises.reduce((acc,ex)=>acc+ex.sets,0)*100);
+  const now=new Date();
+  document.getElementById('sum-date').textContent=now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})+' · '+now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('sum-pct').textContent=donePct+'%';
+  document.getElementById('sum-type').textContent=exercises[0].muscles[0]+' · '+exercises.length+' ejercicios';
+  document.getElementById('sum-duration').textContent=m+':'+( s<10?'0':'')+s;
+  exercises.forEach((ex,i)=>{
+    sets[i].filter(s=>s.done).forEach(s=>{
+      totalSets++;
+      totalReps+=s.reps;
+      totalKg+=(ex.weightMode==='side'?s.kg*2:s.kg)*s.reps;
+    });
+  });
+  document.getElementById('sum-sets').textContent=totalSets;
+  document.getElementById('sum-reps').textContent=totalReps;
+  document.getElementById('sum-kg').textContent=Math.round(totalKg)+' kg';
+  const exList=document.getElementById('sum-ex-list');
+  exList.innerHTML=exercises.map((ex,i)=>{
+    const done=sets[i].filter(s=>s.done);
+    if(!done.length)return '';
+    const avgKg=Math.round(done.reduce((a,s)=>a+s.kg,0)/done.length*10)/10;
+    return `<div class="sum-ex-item">
+      <div class="sum-ex-icon">${ex.emoji}</div>
+      <div class="sum-ex-info">
+        <div class="sum-ex-name">${ex.name}</div>
+        <div class="sum-ex-detail">${done.length} series · ${avgKg}kg/lado · ${done.reduce((a,s)=>a+s.reps,0)} reps</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('summary-screen').classList.remove('hidden');
+  saveToday();
+}
+
+function shareSummary(){
+  const now=new Date();
+  let txt=`💪 MIKEFIT — ENTRENO COMPLETADO\n${now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})}\n━━━━━━━━━━━━━━━━━━\n\n`;
+  const m=Math.floor(workoutSeconds/60);const s=workoutSeconds%60;
+  txt+=`⏱️ Duración: ${m}:${s<10?'0':''}${s}\n`;
+  exercises.forEach((ex,i)=>{
+    const done=sets[i].filter(s=>s.done&&s.kg>0);
+    if(!done.length)return;
+    txt+=`\n${ex.emoji} ${ex.name}\n`;
+    done.forEach((s,j)=>txt+=`   S${j+1}: ${s.kg}kg × ${s.reps}r${ex.weightMode==='side'?' ('+s.kg*2+'kg total)':''}\n`);
+  });
+  txt+=`\n━━━━━━━━━━━━━━━━━━`;
+  navigator.clipboard.writeText(txt).catch(()=>{});
+  alert('✓ Copiado. Pégalo en el chat con MikeFit 💪');
+}
+
+function closeSummary(){window.location.href='index.html';}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+function goBack(){if(confirm('¿Salir del entreno? Se guardará lo que llevas.'))window.location.href='index.html';}
+
+// REPS CHANGE
+function changeReps(){
+  const ex=exercises[currentEx];
+  const r=parseInt(prompt('Reps objetivo:',ex.reps));
+  if(r>0){ex.reps=r;document.getElementById('circle-reps').textContent=r;}
+}
+
+init();
+</script>
+</body>
+</html>
