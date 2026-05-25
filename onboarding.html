@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0A0A0F">
-<title>FitSync — Configuración</title>
+<title>MikeFit — Configuración</title>
 <style>
 :root{
   --bg:#0A0A0F;--card:#1C1C26;--border:rgba(255,255,255,0.08);
@@ -81,7 +81,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     <!-- STEP 0: BIENVENIDA -->
     <div class="step active" id="step-0">
       <div class="start-icon">💪</div>
-      <div class="logo">FitSync</div>
+      <div class="logo">MikeFit</div>
       <div class="tagline">Tu plan de entrenamiento y nutrición 100% personalizado. Vamos a conocerte.</div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
         <div style="background:var(--card);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
@@ -326,7 +326,7 @@ function nextStep(){
     buildSummary();
   }
   if(current===TOTAL-1){
-    localStorage.setItem('fitsync_profile',JSON.stringify(data));
+    localStorage.setItem('mikefit_profile',JSON.stringify(data));
     window.location.href='index.html';
     return;
   }
