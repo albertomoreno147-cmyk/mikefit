@@ -177,20 +177,66 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .meal-check-mini.done{background:var(--teal);border-color:var(--teal);color:white;}
 
 /* BIBLIOTECA */
-.muscle-filter{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.muscle-filter{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
 .muscle-filter::-webkit-scrollbar{display:none;}
-.mf-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);flex-shrink:0;}
+.mf-pill{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);flex-shrink:0;transition:all 0.15s;}
 .mf-pill.active{background:var(--teal);color:white;border-color:var(--teal);}
-.ex-lib-item{background:var(--surface);border-radius:14px;margin-bottom:8px;padding:14px 16px;box-shadow:var(--shadow);cursor:pointer;}
-.ex-lib-header{display:flex;align-items:center;gap:12px;}
-.ex-lib-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;background:var(--teal-dim);}
-.ex-lib-info{flex:1;}
-.ex-lib-name{font-size:14px;font-weight:600;}
-.ex-lib-muscle{font-size:11px;color:var(--muted);margin-top:2px;}
-.ex-lib-add{background:var(--teal-dim);border:1.5px solid var(--teal-border);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--teal);cursor:pointer;white-space:nowrap;}
-.ex-lib-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none;}
-.ex-lib-detail.open{display:block;}
-.ex-lib-how{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;}
+
+/* SECCIÓN HEADER */
+.ex-section-header{display:flex;align-items:center;gap:10px;margin:18px 0 10px;}
+.ex-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+.ex-section-line{flex:1;height:1px;background:var(--border);}
+.ex-section-count{font-size:11px;color:var(--muted);font-weight:500;}
+
+/* TARJETA EJERCICIO */
+.ex-card{background:var(--surface);border-radius:16px;margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden;transition:box-shadow 0.15s;}
+.ex-card:active{box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.ex-card-inner{display:flex;cursor:pointer;}
+.ex-card-bar{width:4px;flex-shrink:0;border-radius:0;background:var(--teal);}
+.ex-card-body{flex:1;padding:13px 14px;}
+.ex-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.ex-card-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.2;}
+.ex-card-chevron{color:var(--muted);font-size:16px;flex-shrink:0;margin-top:1px;transition:transform 0.2s;}
+.ex-card-chevron.open{transform:rotate(180deg);}
+.ex-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ex-badge-main{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:3px 8px;border-radius:6px;}
+.ex-badge-sec{font-size:10px;font-weight:500;color:var(--muted);padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);}
+.ex-sets-pill{font-size:10px;font-weight:600;color:var(--muted);margin-left:auto;}
+
+/* DETALLE EXPANDIDO */
+.ex-card-detail{display:none;padding:0 14px 14px;border-top:1px solid var(--border);margin-top:0;}
+.ex-card-detail.open{display:block;}
+.ex-detail-section{margin-top:12px;}
+.ex-detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
+.ex-detail-text{font-size:13px;color:var(--text);line-height:1.6;}
+.ex-detail-alts{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.ex-alt-chip{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;}
+.ex-add-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:10px;background:var(--teal-dim);border:1.5px solid var(--teal-border);border-radius:12px;font-size:13px;font-weight:600;color:var(--teal);cursor:pointer;}
+
+/* GUÍA RÁPIDA */
+.guia-header{margin-bottom:10px;}
+.guia-card{background:var(--surface);border-radius:16px;margin-bottom:8px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;}
+.guia-card-top{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.guia-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.guia-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+.guia-card-info{flex:1;}
+.guia-card-title{font-size:14px;font-weight:700;color:var(--text);}
+.guia-card-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.guia-chevron{font-size:16px;color:var(--muted);transition:transform 0.2s;}
+.guia-chevron.open{transform:rotate(180deg);}
+.guia-body{display:none;padding:0 16px 14px;border-top:1px solid var(--border);}
+.guia-body.open{display:block;}
+.guia-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.guia-item{background:var(--bg);border-radius:10px;padding:10px 12px;}
+.guia-item-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;}
+.guia-item-val{font-size:12px;color:var(--muted);line-height:1.4;}
+.guia-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.guia-row:last-child{border-bottom:none;}
+.guia-row-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;background:var(--teal);}
+.guia-row-text{font-size:12px;color:var(--text);line-height:1.5;}
+.guia-row-text strong{color:var(--text);font-weight:700;}
+
+/* TAGS */
 .muscle-tags{display:flex;flex-wrap:wrap;gap:4px;}
 .mtag{font-size:11px;padding:3px 9px;border-radius:8px;font-weight:500;}
 .mtag-main{background:var(--teal-dim);color:var(--teal);}
@@ -475,8 +521,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
     <!-- EJERCICIOS -->
     <div class="page" id="page-biblioteca">
-      <div class="muscle-filter" id="muscle-filter"></div>
-      <div id="ex-lib-list"></div>
+      <div class="muscle-filter" id="muscle-filter" style="padding:2px 0 4px;position:sticky;top:0;background:var(--bg);z-index:2;"></div>
+      <div id="ex-lib-list" style="padding-bottom:8px;"></div>
     </div>
 
     <!-- PERFIL -->
@@ -1018,39 +1064,179 @@ function renderMealList(){
 }
 
 // ---- BIBLIOTECA ----
+const muscleColors={
+  'Pecho':'#3B82F6','Hombro':'#00BEB8','Tríceps':'#F97316','Trapecio':'#F97316',
+  'Espalda':'#22C55E','Bíceps':'#8B5CF6','Braquial':'#8B5CF6','Romboides':'#22C55E',
+  'Cuádriceps':'#F59E0B','Isquios':'#EF4444','Glúteo':'#EC4899',
+  'Core':'#00BEB8','Lumbar':'#EF4444','Cardio':'#22C55E'
+};
+const muscleBg={
+  'Pecho':'rgba(59,130,246,0.12)','Hombro':'rgba(0,190,184,0.12)','Tríceps':'rgba(249,115,22,0.12)','Trapecio':'rgba(249,115,22,0.12)',
+  'Espalda':'rgba(34,197,94,0.12)','Bíceps':'rgba(139,92,246,0.12)','Braquial':'rgba(139,92,246,0.12)','Romboides':'rgba(34,197,94,0.12)',
+  'Cuádriceps':'rgba(245,158,11,0.12)','Isquios':'rgba(239,68,68,0.12)','Glúteo':'rgba(236,72,153,0.12)',
+  'Core':'rgba(0,190,184,0.12)','Lumbar':'rgba(239,68,68,0.12)','Cardio':'rgba(34,197,94,0.12)'
+};
+
+const exGroups=[
+  {label:'PUSH — Empuje',key:'push',musculos:['Pecho','Hombro','Tríceps']},
+  {label:'PULL — Tirón',key:'pull',musculos:['Espalda','Bíceps']},
+  {label:'LEGS — Piernas',key:'legs',musculos:['Cuádriceps','Isquios','Glúteo']},
+  {label:'CORE & CARDIO',key:'core',musculos:['Core','Cardio']},
+];
+
+const guiaContent=[
+  {
+    id:'terminologia',
+    title:'Terminología básica',
+    sub:'Rep · Serie · Volumen · Tempo · RIR',
+    color:'#3B82F6',
+    icon:`<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+    content:`<div class="guia-grid">
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#3B82F6">Repetición</div><div class="guia-item-val">Un movimiento completo del ejercicio, ida y vuelta.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#3B82F6">Serie</div><div class="guia-item-val">Grupo de repeticiones seguidas sin descanso.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#3B82F6">Volumen</div><div class="guia-item-val">Total de trabajo: series × reps × kg en una sesión.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#3B82F6">Tempo</div><div class="guia-item-val">Velocidad del movimiento. Controla la fase excéntrica.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#3B82F6">RIR</div><div class="guia-item-val">Reps en reserva — cuántas reps te quedan al acabar la serie.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#3B82F6">Descanso</div><div class="guia-item-val">60-90s en fuerza, 2-3min en ejercicios compuestos pesados.</div></div>
+    </div>`
+  },
+  {
+    id:'agarre',
+    title:'Tipos de agarre',
+    sub:'Supino · Prono · Neutro · Ancho · Estrecho',
+    color:'#F97316',
+    icon:`<svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>`,
+    content:`<div style="margin-top:8px">
+      <div class="guia-row"><div class="guia-row-dot" style="background:#F97316"></div><div class="guia-row-text"><strong>Supino (palmas arriba)</strong> — Activa más el bíceps. Curl barra, press supino.</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#F97316"></div><div class="guia-row-text"><strong>Prono (palmas abajo)</strong> — Activa más el braquial y braquiorradial. Jalón pronado.</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#F97316"></div><div class="guia-row-text"><strong>Neutro (palmas enfrentadas)</strong> — Posición más natural, menor estrés en muñeca.</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#F97316"></div><div class="guia-row-text"><strong>Ancho</strong> — Mayor rango en pecho, más activación del dorsal en remos anchos.</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#F97316"></div><div class="guia-row-text"><strong>Estrecho</strong> — Más tríceps en press cerrado, más bíceps en curl estrecho.</div></div>
+    </div>`
+  },
+  {
+    id:'respiracion',
+    title:'Respiración correcta',
+    sub:'Cuándo inspirar y cuándo espirar',
+    color:'#22C55E',
+    icon:`<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M20 2v4h-4"/></svg>`,
+    content:`<div style="margin-top:8px">
+      <div class="guia-row"><div class="guia-row-dot" style="background:#22C55E"></div><div class="guia-row-text"><strong>Inspira</strong> en la fase excéntrica (bajando el peso, alargando el músculo).</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#22C55E"></div><div class="guia-row-text"><strong>Espira</strong> en la fase concéntrica (subiendo el peso, contrayendo el músculo).</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#22C55E"></div><div class="guia-row-text"><strong>Core activo siempre</strong> — Abdominales contraídos durante todo el movimiento.</div></div>
+      <div class="guia-row"><div class="guia-row-dot" style="background:#22C55E"></div><div class="guia-row-text"><strong>Nunca aguantes la respiración</strong> en ejercicios ligeros-moderados. Solo en máximos.</div></div>
+    </div>`
+  },
+  {
+    id:'movimientos',
+    title:'Guía de movimientos',
+    sub:'Flexión · Extensión · Abducción · Rotación',
+    color:'#8B5CF6',
+    icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`,
+    content:`<div class="guia-grid">
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#8B5CF6">Flexión</div><div class="guia-item-val">Doblar la articulación, reducir el ángulo. Curl, sentadilla.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#8B5CF6">Extensión</div><div class="guia-item-val">Estirar la articulación, aumentar el ángulo. Press, extensión tríceps.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#8B5CF6">Abducción</div><div class="guia-item-val">Alejar el miembro del cuerpo. Elevaciones laterales.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#8B5CF6">Aducción</div><div class="guia-item-val">Acercar el miembro al cuerpo. Aperturas pecho, aductor.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#8B5CF6">Rotación</div><div class="guia-item-val">Girar sobre el eje. Clave en hombro y cadera.</div></div>
+      <div class="guia-item"><div class="guia-item-lbl" style="color:#8B5CF6">Flexión lat.</div><div class="guia-item-val">Doblar el tronco a un lado. Importante en Core.</div></div>
+    </div>`
+  }
+];
+let expandedGuia=null;
+
 function renderBiblioteca(){
   const filterEl=document.getElementById('muscle-filter');
   filterEl.innerHTML=muscles.map(m=>`<div class="mf-pill ${m===selectedMuscle?'active':''}" onclick="filterMuscle('${m}')">${m}</div>`).join('');
   const listEl=document.getElementById('ex-lib-list');
-  const filtered=selectedMuscle==='Todos'?ejerciciosBD:ejerciciosBD.filter(e=>e.musculo===selectedMuscle||e.secundarios.includes(selectedMuscle));
   listEl.innerHTML='';
-  filtered.forEach(ex=>{
-    const isExpanded=expandedEx===ex.id;
-    const div=document.createElement('div');
-    div.className='ex-lib-item';
-    div.innerHTML=`
-      <div class="ex-lib-header" onclick="toggleExDetail('${ex.id}')">
-        <div class="ex-lib-icon">${ex.icon}</div>
-        <div class="ex-lib-info">
-          <div class="ex-lib-name">${ex.name}</div>
-          <div class="ex-lib-muscle">${ex.musculo} · ${ex.sets}</div>
+
+  // Guía rápida solo cuando se ve "Todos"
+  if(selectedMuscle==='Todos'){
+    const guiaWrap=document.createElement('div');
+    guiaWrap.innerHTML=`<div class="ex-section-header"><div class="ex-section-title">Guía rápida</div><div class="ex-section-line"></div></div>`;
+    guiaContent.forEach(g=>{
+      const isOpen=expandedGuia===g.id;
+      const card=document.createElement('div');
+      card.className='guia-card';
+      card.innerHTML=`
+        <div class="guia-card-top" onclick="toggleGuia('${g.id}')">
+          <div class="guia-icon" style="background:${g.color}1a;color:${g.color}">${g.icon}</div>
+          <div class="guia-card-info">
+            <div class="guia-card-title">${g.title}</div>
+            <div class="guia-card-sub">${g.sub}</div>
+          </div>
+          <div class="guia-chevron ${isOpen?'open':''}">›</div>
         </div>
-        <div class="ex-lib-add" onclick="event.stopPropagation()">+ Añadir</div>
-      </div>
-      <div class="ex-lib-detail ${isExpanded?'open':''}">
-        <div class="ex-lib-how">${ex.como}</div>
-        <div class="muscle-tags">
-          <span class="mtag mtag-main">${ex.musculo}</span>
-          ${ex.secundarios.map(s=>`<span class="mtag mtag-sec">${s}</span>`).join('')}
-        </div>
-        ${ex.alts.length?`<div style="margin-top:8px;font-size:11px;color:var(--muted)">Alternativas: ${ex.alts.join(' · ')}</div>`:''}
-      </div>`;
-    listEl.appendChild(div);
-  });
+        <div class="guia-body ${isOpen?'open':''}">${g.content}</div>`;
+      guiaWrap.appendChild(card);
+    });
+    listEl.appendChild(guiaWrap);
+  }
+
+  // Ejercicios agrupados o filtrados
+  const filtered=selectedMuscle==='Todos'?null:ejerciciosBD.filter(e=>e.musculo===selectedMuscle||e.secundarios.includes(selectedMuscle));
+
+  if(selectedMuscle==='Todos'){
+    exGroups.forEach(group=>{
+      const exs=ejerciciosBD.filter(e=>group.musculos.includes(e.musculo));
+      if(!exs.length)return;
+      const sec=document.createElement('div');
+      sec.innerHTML=`<div class="ex-section-header"><div class="ex-section-title">${group.label}</div><div class="ex-section-line"></div><div class="ex-section-count">${exs.length}</div></div>`;
+      listEl.appendChild(sec);
+      exs.forEach(ex=>listEl.appendChild(buildExCard(ex)));
+    });
+  } else {
+    if(filtered.length){
+      const sec=document.createElement('div');
+      sec.innerHTML=`<div class="ex-section-header"><div class="ex-section-title">${selectedMuscle}</div><div class="ex-section-line"></div><div class="ex-section-count">${filtered.length}</div></div>`;
+      listEl.appendChild(sec);
+      filtered.forEach(ex=>listEl.appendChild(buildExCard(ex)));
+    }
+  }
 }
 
-function filterMuscle(m){selectedMuscle=m;renderBiblioteca();}
+function buildExCard(ex){
+  const isExpanded=expandedEx===ex.id;
+  const color=muscleColors[ex.musculo]||'var(--teal)';
+  const bg=muscleBg[ex.musculo]||'var(--teal-dim)';
+  const div=document.createElement('div');
+  div.className='ex-card';
+  div.innerHTML=`
+    <div class="ex-card-inner" onclick="toggleExDetail('${ex.id}')">
+      <div class="ex-card-bar" style="background:${color}"></div>
+      <div class="ex-card-body">
+        <div class="ex-card-top">
+          <div class="ex-card-name">${ex.name}</div>
+          <div class="ex-card-chevron ${isExpanded?'open':''}">›</div>
+        </div>
+        <div class="ex-card-meta">
+          <div class="ex-badge-main" style="background:${bg};color:${color}">${ex.musculo}</div>
+          ${ex.secundarios.map(s=>`<div class="ex-badge-sec">${s}</div>`).join('')}
+          <div class="ex-sets-pill">${ex.sets}</div>
+        </div>
+      </div>
+    </div>
+    <div class="ex-card-detail ${isExpanded?'open':''}">
+      <div class="ex-detail-section">
+        <div class="ex-detail-label">Técnica</div>
+        <div class="ex-detail-text">${ex.como}</div>
+      </div>
+      ${ex.alts.length?`<div class="ex-detail-section">
+        <div class="ex-detail-label">Alternativas</div>
+        <div class="ex-detail-alts">${ex.alts.map(a=>`<div class="ex-alt-chip">${a}</div>`).join('')}</div>
+      </div>`:''}
+      <div class="ex-add-btn" onclick="event.stopPropagation()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Añadir al día
+      </div>
+    </div>`;
+  return div;
+}
+
+function filterMuscle(m){selectedMuscle=m;expandedEx=null;renderBiblioteca();}
 function toggleExDetail(id){expandedEx=expandedEx===id?null:id;renderBiblioteca();}
+function toggleGuia(id){expandedGuia=expandedGuia===id?null:id;renderBiblioteca();}
 
 // ---- SUPPS ----
 const supps=[
