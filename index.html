@@ -220,6 +220,31 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .row-header-title{font-size:16px;font-weight:700;}
 .row-header-link{font-size:13px;color:var(--teal);font-weight:600;}
 
+/* HERO MEJORADO */
+.hero-greeting{font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:4px;}
+.hero-day-pill{display:inline-flex;align-items:center;background:rgba(255,255,255,0.13);border-radius:20px;padding:5px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.15);}
+.hero-day-pill-txt{font-size:14px;font-weight:700;color:#fff;}
+.hero-motivation{font-size:13px;color:rgba(255,255,255,0.72);margin-bottom:12px;line-height:1.45;font-style:italic;}
+.hero-stats-row{display:flex;gap:20px;}
+.hero-stat-val{font-size:16px;font-weight:700;color:#fff;line-height:1.2;}
+.hero-stat-lbl{font-size:9px;color:rgba(255,255,255,0.4);font-weight:600;letter-spacing:0.06em;margin-top:2px;}
+
+/* TODAY highlight en próximos entrenos */
+.wday-card.wday-today{border-left:3px solid var(--teal);padding-left:13px;}
+
+/* NUTRICIÓN SUSCRIPCIÓN */
+.nutr-sub-card{background:var(--surface);border-radius:18px;padding:20px 16px;margin-bottom:20px;box-shadow:var(--shadow);border:1.5px dashed rgba(0,190,184,0.3);}
+.nutr-sub-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.nutr-sub-icon-wrap{width:48px;height:48px;border-radius:14px;background:var(--teal-dim);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.nutr-sub-title{font-size:16px;font-weight:700;}
+.nutr-sub-badge{font-size:10px;font-weight:700;color:var(--teal);background:var(--teal-dim);border-radius:6px;padding:2px 8px;margin-top:3px;display:inline-block;}
+.nutr-sub-desc{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px;}
+.nutr-features-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.nutr-feat{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text);}
+.nutr-feat-check{width:20px;height:20px;border-radius:50%;background:var(--teal-dim);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--teal);font-weight:800;flex-shrink:0;}
+.nutr-sub-btn{background:var(--teal);color:white;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;}
+.nutr-sub-note{text-align:center;font-size:11px;color:var(--muted);margin-top:8px;}
+
 /* MONTHLY CALENDAR */
 .month-cal{background:var(--surface);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;}
 .month-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -256,7 +281,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
     <div class="top-tabs" id="top-tabs">
       <button class="top-tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
       <button class="top-tab" onclick="switchTab('semana',this)">Entrenos</button>
-      <button class="top-tab" onclick="switchTab('dieta',this)">Dieta</button>
     </div>
   </div>
 
@@ -265,29 +289,52 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
     <!-- ENTRENOS → Dashboard -->
     <div class="page active" id="page-home">
       <div class="sub-page active" id="sub-dashboard">
+
+        <!-- HERO -->
         <div class="hero-card">
-          <div class="hero-tag">🏋️ Para gym &nbsp;·&nbsp; ⭐⭐⭐⭐ Pro</div>
-          <div class="hero-title">Recomposición corporal</div>
-          <div class="hero-sub">Semana <span id="hero-week">1</span> &nbsp;·&nbsp; 5 días/semana &nbsp;·&nbsp; Completados: <span id="hero-done">0</span></div>
+          <div class="hero-greeting" id="hero-greeting">Buenos días, Mike 👋</div>
+          <div class="hero-day-pill"><span class="hero-day-pill-txt" id="hero-day-type">🏋️ PUSH hoy</span></div>
+          <div class="hero-motivation" id="hero-motivation">Cada rep te acerca más a tu objetivo</div>
+          <div class="hero-stats-row">
+            <div><div class="hero-stat-val">Sem <span id="hero-week">1</span></div><div class="hero-stat-lbl">SEMANA</div></div>
+            <div><div class="hero-stat-val"><span id="hero-done">0</span><span style="font-size:12px;opacity:.5">/5</span></div><div class="hero-stat-lbl">COMPLETADOS</div></div>
+            <div><div class="hero-stat-val" id="hero-streak-val">1</div><div class="hero-stat-lbl">RACHA DÍAS</div></div>
+          </div>
         </div>
 
+        <!-- PRÓXIMOS ENTRENOS -->
         <div class="row-header">
-          <div class="row-header-title">Próximo entreno</div>
-          <div class="row-header-link" onclick="switchTab('semana',document.querySelectorAll('.top-tab')[1])">Ver todo ›</div>
+          <div class="row-header-title">Próximos entrenos</div>
+          <div class="row-header-link" onclick="switchTab('semana',document.querySelectorAll('.top-tab')[1])">Ver semana ›</div>
         </div>
         <div id="next-training-list"></div>
 
-        <div class="row-header" style="margin-top:16px">
-          <div class="row-header-title">Calendario semanal</div>
-        </div>
-        <div class="week-strip" id="week-strip-dash"></div>
-        <div id="day-detail-dash"></div>
-
-        <!-- MONTHLY CALENDAR -->
-        <div class="row-header" style="margin-top:4px">
-          <div class="row-header-title">Calendario del mes</div>
+        <!-- CALENDARIO MENSUAL -->
+        <div class="row-header" style="margin-top:8px">
+          <div class="row-header-title">Calendario</div>
         </div>
         <div class="month-cal" id="month-calendar"></div>
+
+        <!-- NUTRICIÓN PREMIUM -->
+        <div class="nutr-sub-card">
+          <div class="nutr-sub-header">
+            <div class="nutr-sub-icon-wrap">🥗</div>
+            <div>
+              <div class="nutr-sub-title">Plan Nutricional</div>
+              <div class="nutr-sub-badge">PREMIUM</div>
+            </div>
+          </div>
+          <div class="nutr-sub-desc">Macros personalizados, plan de comidas y seguimiento diario diseñado para tu recomposición corporal.</div>
+          <div class="nutr-features-list">
+            <div class="nutr-feat"><div class="nutr-feat-check">✓</div>Macros diarios calculados para ti</div>
+            <div class="nutr-feat"><div class="nutr-feat-check">✓</div>Plan de comidas con recetas</div>
+            <div class="nutr-feat"><div class="nutr-feat-check">✓</div>Seguimiento proteína, carbos y grasas</div>
+            <div class="nutr-feat"><div class="nutr-feat-check">✓</div>Notas diarias de nutrición</div>
+          </div>
+          <button class="nutr-sub-btn" onclick="alert('Habla con tu coach Mike para activar el plan nutricional 💬')">🔒 Solicitar Plan Nutricional</button>
+          <div class="nutr-sub-note">Contacta con tu coach para activarlo</div>
+        </div>
+
       </div>
 
       <div class="sub-page" id="sub-semana">
@@ -410,7 +457,40 @@ const dayNames=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sáb
 const START=new Date('2026-05-18');
 const diffDays=Math.floor((now-START)/86400000);
 const streak=Math.max(1,diffDays+1);
-document.getElementById('hero-week').textContent=Math.max(1,Math.ceil(streak/7));
+
+const motivations=[
+  'Cada rep te acerca más a tu objetivo 💪',
+  'Sin excusas. Solo resultados.',
+  'El dolor de hoy es la fuerza de mañana.',
+  'Tú decides. Tú entrenas. Tú mejoras.',
+  'Consistencia > Intensidad.',
+  'Hoy es otro día para ganar.',
+  'El cuerpo logra lo que la mente cree.',
+  'No pares — Mike confía en ti.',
+  'Pequeñas mejoras cada día. Grande resultado final.',
+];
+
+function getGreeting(){
+  const h=now.getHours();
+  if(h>=6&&h<14) return 'Buenos días, Mike 👋';
+  if(h>=14&&h<21) return 'Buenas tardes, Mike 👋';
+  return 'Buenas noches, Mike 🌙';
+}
+
+function updateHero(){
+  const dow=now.getDay();
+  const plan=weekPlan[dow];
+  const g=document.getElementById('hero-greeting');
+  if(g) g.textContent=getGreeting();
+  const ht=document.getElementById('hero-day-type');
+  if(ht) ht.textContent=plan.name==='Descanso'?'😴 Descanso hoy':`🏋️ ${plan.name} hoy`;
+  const hm=document.getElementById('hero-motivation');
+  if(hm) hm.textContent=motivations[Math.abs(diffDays)%motivations.length];
+  const hw=document.getElementById('hero-week');
+  if(hw) hw.textContent=Math.max(1,Math.ceil(streak/7));
+  const hs=document.getElementById('hero-streak-val');
+  if(hs) hs.textContent=Math.max(1,diffDays+1);
+}
 
 const weekPlan={
   1:{name:'PUSH',color:'#00BEB8',short:'PUSH'},
@@ -511,8 +591,7 @@ function switchTab(tab, el){
   document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('sub-'+tab).classList.add('active');
   if(el)el.classList.add('active');
-  if(tab==='dieta')updateMacros();
-  if(tab==='dashboard'){buildWeekStrip('dash');renderNextTraining();renderMonthCalendar();}
+  if(tab==='dashboard'){renderNextTraining();renderMonthCalendar();updateHero();}
   if(tab==='semana'){buildWeekStrip('semana');}
 }
 
@@ -562,34 +641,57 @@ function selectDay(which,date,dow){
 function renderNextTraining(){
   const el=document.getElementById('next-training-list');
   if(!el)return;
-  let completed=0;
   el.innerHTML='';
+
+  // Contar completados esta semana
+  let completed=0;
   [1,2,3,4,5,6,0].forEach(dow=>{
     const p=weekPlan[dow];
     if(p.name==='Descanso')return;
     const date=getDateForDow(dow);
     const exS=DB.get('ex_'+date);
+    if(exS&&exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done))completed++;
+  });
+  const hdone=document.getElementById('hero-done');
+  if(hdone)hdone.textContent=completed;
+
+  // Próximos 3 entrenos a partir de hoy
+  const upcoming=[];
+  for(let offset=0;offset<14&&upcoming.length<3;offset++){
+    const d=new Date(now);
+    d.setDate(d.getDate()+offset);
+    const dow=d.getDay();
+    const p=weekPlan[dow];
+    if(p.name==='Descanso')continue;
+    const date=d.toISOString().split('T')[0];
+    const exS=DB.get('ex_'+date);
     const isDone=exS&&exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done);
-    if(isDone)completed++;
+    upcoming.push({dow,date,plan:p,isDone,isToday:date===TODAY});
+  }
+
+  upcoming.forEach(({dow,date,plan,isDone,isToday})=>{
     const div=document.createElement('div');
-    div.className='wday-card';
+    div.className='wday-card'+(isToday?' wday-today':'');
     const statusDiv=document.createElement('div');
     statusDiv.className='wday-status '+(isDone?'wday-done':'wday-locked');
     statusDiv.innerHTML=isDone?`<span class="wday-done-pct">100%</span>`:`<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+    const dateObj=new Date(date+'T12:00:00');
+    const dateLabel=isToday?'Hoy':dayNames[dateObj.getDay()];
     const infoDiv=document.createElement('div');
     infoDiv.className='wday-info';
-    infoDiv.innerHTML=`<div class="wday-num">${dayNames[dow=== 0?0:dow]} · Día de entreno</div><div class="wday-name">${p.name}</div>`;
+    infoDiv.innerHTML=`<div class="wday-num">${dateLabel} · ${dateObj.getDate()} ${months[dateObj.getMonth()]}</div><div class="wday-name" style="color:${plan.color}">${plan.name}</div>`;
     div.appendChild(statusDiv);
     div.appendChild(infoDiv);
-    if(date===TODAY&&!isDone){
-      const dot=document.createElement('div');
-      dot.className='wday-dot';
-      div.appendChild(dot);
+    if(isToday&&!isDone){
+      const btn=document.createElement('div');
+      btn.style.cssText='background:var(--teal);color:white;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;';
+      btn.textContent='Iniciar';
+      btn.onclick=(e)=>{e.stopPropagation();switchTab('semana',document.querySelectorAll('.top-tab')[1]);selectDay('semana',date,dow);};
+      div.appendChild(btn);
     }
     div.onclick=()=>{switchTab('semana',document.querySelectorAll('.top-tab')[1]);selectDay('semana',date,dow);};
     el.appendChild(div);
   });
-  document.getElementById('hero-done').textContent=completed;
 }
 
 // ---- DAY DETAIL ----
@@ -993,7 +1095,7 @@ function calDayTap(dateStr,dow){
 }
 
 // ---- INIT ----
-buildWeekStrip('dash');
+updateHero();
 renderNextTraining();
 renderMonthCalendar();
 updateMacros();
