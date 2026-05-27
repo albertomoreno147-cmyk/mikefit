@@ -23,6 +23,31 @@
   --safe-top:env(safe-area-inset-top,44px);
   --safe-bottom:env(safe-area-inset-bottom,34px);
 }
+/* DARK MODE */
+body.dark{
+  --bg:#0F1923;--surface:#1B2638;--card:#1B2638;
+  --border:rgba(255,255,255,0.08);--shadow:0 2px 14px rgba(0,0,0,0.4);
+  --text:#EEF2F7;--muted:#5B7499;
+  --teal-dim:rgba(0,190,184,0.15);--teal-border:rgba(0,190,184,0.25);
+  --blue-dim:rgba(59,130,246,0.15);--orange-dim:rgba(249,115,22,0.15);
+  --green-dim:rgba(34,197,94,0.15);--red-dim:rgba(239,68,68,0.15);
+}
+
+/* MENU DRAWER */
+.menu-overlay{position:fixed;inset:0;z-index:98;background:rgba(0,0,0,0.25);display:none;}
+.menu-drawer{position:fixed;top:calc(var(--safe-top) + 58px);right:12px;width:232px;background:var(--surface);border-radius:18px;box-shadow:0 8px 32px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.08);border:1.5px solid var(--border);z-index:99;overflow:hidden;display:none;transform-origin:top right;}
+.menu-drawer.open{display:block;animation:menuIn 0.15s ease;}
+@keyframes menuIn{from{opacity:0;transform:scale(0.95) translateY(-6px);}to{opacity:1;transform:none;}}
+.menu-section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;padding:12px 16px 6px;}
+.menu-item{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s;}
+.menu-item:last-child{border-bottom:none;}
+.menu-item:active{background:var(--bg);}
+.menu-item-icon{width:36px;height:36px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.menu-item-icon svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:1.8;}
+.menu-item-lbl{flex:1;font-size:14px;font-weight:500;color:var(--text);}
+.menu-item-chevron{font-size:18px;color:var(--muted);line-height:1;}
+.menu-divider{height:1px;background:var(--border);margin:4px 0;}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;background:var(--bg);}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text);}
@@ -283,6 +308,30 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 <div class="app">
   <div class="status-bar"></div>
 
+  <!-- MENU OVERLAY -->
+  <div class="menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
+
+  <!-- MENU DRAWER -->
+  <div class="menu-drawer" id="menu-drawer">
+    <div class="menu-section-lbl">Cuenta</div>
+    <div class="menu-item" onclick="openFromMenu('perfil','Perfil')">
+      <div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="menu-item-lbl">Perfil</div>
+      <div class="menu-item-chevron">›</div>
+    </div>
+    <div class="menu-item" onclick="openFromMenu('perfil','Ajustes')">
+      <div class="menu-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+      <div class="menu-item-lbl">Ajustes</div>
+      <div class="menu-item-chevron">›</div>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-item" onclick="toggleDark()">
+      <div class="menu-item-icon" id="theme-icon-wrap"><svg id="theme-icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
+      <div class="menu-item-lbl" id="theme-label">Modo oscuro</div>
+      <div class="toggle-sw off" id="dark-toggle" style="pointer-events:none"><div class="toggle-knob"></div></div>
+    </div>
+  </div>
+
   <!-- HEADER -->
   <div class="header">
     <div class="header-top">
@@ -290,7 +339,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </button>
       <div class="header-title" id="header-title">Entrenos</div>
-      <button class="header-btn">
+      <button class="header-btn" onclick="toggleMenu()">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
     </div>
@@ -1184,7 +1233,47 @@ function calDayTap(dateStr,dow){
   selectDay('semana',dateStr,dow);
 }
 
+// ---- MENÚ Y TEMA ----
+let isDark=DB.get('dark_mode')||false;
+
+function toggleMenu(){
+  const drawer=document.getElementById('menu-drawer');
+  const overlay=document.getElementById('menu-overlay');
+  const isOpen=drawer.classList.contains('open');
+  drawer.classList.toggle('open',!isOpen);
+  overlay.style.display=isOpen?'none':'block';
+}
+
+function closeMenu(){
+  document.getElementById('menu-drawer').classList.remove('open');
+  document.getElementById('menu-overlay').style.display='none';
+}
+
+function openFromMenu(page,title){
+  closeMenu();
+  const navEl=document.getElementById('nav-'+page);
+  gotoPage(page,navEl,title,false);
+  if(page==='perfil')renderSupps();
+}
+
+function toggleDark(){
+  isDark=!isDark;
+  DB.set('dark_mode',isDark);
+  applyTheme();
+}
+
+function applyTheme(){
+  document.body.classList.toggle('dark',isDark);
+  const toggle=document.getElementById('dark-toggle');
+  if(toggle){toggle.className='toggle-sw '+(isDark?'on':'off');const k=toggle.querySelector('.toggle-knob');if(k)k.className='toggle-knob';}
+  const icon=document.getElementById('theme-icon-svg');
+  if(icon){icon.innerHTML=isDark?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':`<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;}
+  const lbl=document.getElementById('theme-label');
+  if(lbl)lbl.textContent=isDark?'Modo claro':'Modo oscuro';
+}
+
 // ---- INIT ----
+applyTheme();
 updateHero();
 renderNextTraining();
 renderMonthCalendar();
