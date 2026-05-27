@@ -245,6 +245,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .nutr-sub-btn{background:var(--teal);color:white;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;}
 .nutr-sub-note{text-align:center;font-size:11px;color:var(--muted);margin-top:8px;}
 
+/* WEEK NAVIGATION */
+.week-nav{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.week-nav-btn{width:32px;height:32px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.week-nav-btn svg{width:16px;height:16px;stroke:var(--text);fill:none;stroke-width:2;}
+.week-nav-label{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--muted);}
+
+/* WORKOUT TYPE PICKER */
+.workout-picker{border-radius:14px;overflow:hidden;border:1.5px solid var(--border);margin:8px 0 4px;box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.workout-picker-item{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);background:var(--surface);}
+.workout-picker-item:last-child{border-bottom:none;}
+.workout-picker-item:active{background:var(--bg);}
+.workout-picker-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.workout-picker-name{font-size:14px;font-weight:600;flex:1;}
+.workout-picker-active{font-size:11px;color:var(--teal);font-weight:700;}
+.cambiar-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
 /* MONTHLY CALENDAR */
 .month-cal{background:var(--surface);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;}
 .month-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -338,6 +354,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       </div>
 
       <div class="sub-page" id="sub-semana">
+        <div class="week-nav">
+          <button class="week-nav-btn" onclick="changeWeek(-1)">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="week-nav-label" id="week-nav-label">Esta semana</div>
+          <button class="week-nav-btn" onclick="changeWeek(1)">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
         <div class="week-strip" id="week-strip-semana"></div>
         <div id="day-detail-semana"></div>
       </div>
@@ -596,11 +621,11 @@ function switchTab(tab, el){
 }
 
 // ---- WEEK STRIPS ----
-function getDateForDow(dow){
+function getDateForDow(dow,weekOffset=0){
   const d=new Date(now);
   const cur=now.getDay()===0?7:now.getDay();
   const tgt=dow===0?7:dow;
-  d.setDate(d.getDate()-(cur-tgt));
+  d.setDate(d.getDate()-(cur-tgt)+(weekOffset*7));
   return d.toISOString().split('T')[0];
 }
 
@@ -608,6 +633,66 @@ let selectedDateDash=TODAY;
 let selectedDowDash=now.getDay();
 let selectedDateSemana=TODAY;
 let selectedDowSemana=now.getDay();
+let weekOffsetSemana=0;
+
+// Opciones de tipo de entreno
+const workoutOptions=[
+  {name:'PUSH',color:'#00BEB8'},
+  {name:'PULL',color:'#3B82F6'},
+  {name:'Zona 2',color:'#22C55E'},
+  {name:'LEGS',color:'#F97316'},
+  {name:'Full+Core',color:'#EF4444'},
+  {name:'Descanso',color:'#94A3B8'},
+];
+
+// Devuelve el plan del día respetando override manual
+function getPlanForDate(date,dow){
+  const override=DB.get('plan_override_'+date);
+  if(override){const opt=workoutOptions.find(o=>o.name===override);if(opt)return opt;}
+  return weekPlan[dow];
+}
+
+function changeWeek(dir){
+  weekOffsetSemana+=dir;
+  const dow=now.getDay()===0?0:now.getDay();
+  selectedDateSemana=getDateForDow(dow,weekOffsetSemana);
+  selectedDowSemana=dow;
+  buildWeekStrip('semana');
+  updateWeekNavLabel();
+}
+
+function updateWeekNavLabel(){
+  const el=document.getElementById('week-nav-label');
+  if(!el)return;
+  if(weekOffsetSemana===0){el.textContent='Esta semana';return;}
+  const mon=new Date(getDateForDow(1,weekOffsetSemana)+'T12:00:00');
+  const sun=new Date(getDateForDow(0,weekOffsetSemana)+'T12:00:00');
+  el.textContent=`${mon.getDate()} ${months[mon.getMonth()].slice(0,3)} — ${sun.getDate()} ${months[sun.getMonth()].slice(0,3)}`;
+}
+
+function toggleWorkoutPicker(which){
+  const el=document.getElementById('workout-picker-'+which);
+  if(el)el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function setWorkoutOverride(date,dow,planName,which){
+  DB.set('plan_override_'+date,planName);
+  buildWeekStrip(which);
+}
+
+function restoreDefaultWorkout(date,which){
+  localStorage.removeItem('plan_override_'+date);
+  buildWeekStrip(which);
+}
+
+function saveNoteForDate(date,which){
+  const ta=document.getElementById('note-home-'+which);
+  if(!ta)return;
+  DB.set('note_'+date,ta.value);
+  const btn=ta.nextElementSibling;
+  btn.textContent='✓ Guardado';
+  setTimeout(()=>btn.textContent='Guardar nota',1500);
+}
 
 function buildWeekStrip(which){
   const stripId=which==='dash'?'week-strip-dash':'week-strip-semana';
@@ -617,7 +702,7 @@ function buildWeekStrip(which){
   strip.innerHTML='';
   [1,2,3,4,5,6,0].forEach((dow,i)=>{
     const p=weekPlan[dow];
-    const date=getDateForDow(dow);
+    const date=getDateForDow(dow,which==='semana'?weekOffsetSemana:0);
     const isToday=date===TODAY;
     const isSel=date===selDate;
     const exS=DB.get('ex_'+date);
@@ -700,7 +785,7 @@ function renderDayDetail(which){
   const selDow=which==='dash'?selectedDowDash:selectedDowSemana;
   const el=document.getElementById('day-detail-'+which);
   if(!el)return;
-  const plan=weekPlan[selDow];
+  const plan=getPlanForDate(selDate,selDow);
   const exList=allExercises[plan.name]||[];
   const isToday=selDate===TODAY;
   const dateObj=new Date(selDate+'T12:00:00');
@@ -711,10 +796,24 @@ function renderDayDetail(which){
   }
   const prevDate=new Date(dateObj.getTime()-7*86400000).toISOString().split('T')[0];
   const prevState=DB.get('ex_'+prevDate);
-  let html=`<div class="day-view"><div class="day-view-header">
-    <div class="day-view-title">${dateLabel}</div>
-    <div class="day-view-badge" style="background:${plan.color}22;color:${plan.color}">${plan.name}</div>
+  const pickerHtml=`<div id="workout-picker-${which}" style="display:none" class="workout-picker">
+    <div class="workout-picker-item" onclick="restoreDefaultWorkout('${selDate}','${which}')">
+      <div class="workout-picker-dot" style="background:var(--border)"></div>
+      <div class="workout-picker-name" style="color:var(--muted)">↩ Restaurar predeterminado</div>
+    </div>
+    ${workoutOptions.map(opt=>`<div class="workout-picker-item" onclick="setWorkoutOverride('${selDate}',${selDow},'${opt.name}','${which}')">
+      <div class="workout-picker-dot" style="background:${opt.color}"></div>
+      <div class="workout-picker-name">${opt.name}</div>
+      ${plan.name===opt.name?'<div class="workout-picker-active">✓ Activo</div>':''}
+    </div>`).join('')}
   </div>`;
+  let html=`<div class="day-view"><div class="day-view-header">
+    <div class="day-view-title">${isToday?'Hoy — '+dateLabel:dateLabel}</div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div class="day-view-badge" style="background:${plan.color}22;color:${plan.color}">${plan.name}</div>
+      <div class="cambiar-btn" onclick="toggleWorkoutPicker('${which}')">Cambiar ▾</div>
+    </div>
+  </div>${pickerHtml}`;
   if(plan.name==='Descanso'){
     html+=`<div class="day-section"><div class="rest-msg">😴 Día de descanso — recupera y come tus proteínas</div></div>`;
   } else {
@@ -731,20 +830,15 @@ function renderDayDetail(which){
         if(kgs.length)prevTxt=`<div style="font-size:10px;color:var(--muted);margin-top:2px">Sem anterior: ${kgs.join(' · ')}</div>`;
       }
       const seriesHtml=s.series.map((sr,j)=>{
-        if(isToday){
-          return `<div class="serie-box-input">
-            <div class="s-btn" onclick="chgKg('${selDate}',${i},${j},-2.5,'${which}')">−</div>
-            <span>S${j+1}</span>
-            <input type="number" value="${sr&&sr.kg||''}" placeholder="kg" onchange="setKg('${selDate}',${i},${j},this.value)">
-            <input type="number" value="${sr&&sr.reps||''}" placeholder="r" onchange="setReps('${selDate}',${i},${j},this.value)" style="width:28px">
-            <div class="s-btn" onclick="chgKg('${selDate}',${i},${j},2.5,'${which}')">+</div>
-          </div>`;
-        } else {
-          const txt=sr&&sr.kg>0?`${sr.kg}kg×${sr.reps||'?'}r`:`S${j+1}`;
-          return `<div class="serie-mini ${sr&&sr.kg>0?'':'empty'}">${txt}</div>`;
-        }
+        return `<div class="serie-box-input">
+          <div class="s-btn" onclick="chgKg('${selDate}',${i},${j},-2.5,'${which}')">−</div>
+          <span>S${j+1}</span>
+          <input type="number" value="${sr&&sr.kg||''}" placeholder="kg" onchange="setKg('${selDate}',${i},${j},this.value)">
+          <input type="number" value="${sr&&sr.reps||''}" placeholder="r" onchange="setReps('${selDate}',${i},${j},this.value)" style="width:28px">
+          <div class="s-btn" onclick="chgKg('${selDate}',${i},${j},2.5,'${which}')">+</div>
+        </div>`;
       }).join('');
-      const altsHtml=isToday&&alts&&alts.length?`<div class="alts-section"><div class="alts-title">Alternativas</div><div class="alts-list">${alts.map(a=>`<div class="alt-btn" onclick="swapEx('${selDate}',${i},'${a}','${which}')">↔ ${a}</div>`).join('')}</div></div>`:'';
+      const altsHtml=alts&&alts.length?`<div class="alts-section"><div class="alts-title">Alternativas</div><div class="alts-list">${alts.map(a=>`<div class="alt-btn" onclick="swapEx('${selDate}',${i},'${a}','${which}')">↔ ${a}</div>`).join('')}</div></div>`:'';
       html+=`<div class="ex-row-mini">
         <div class="ex-check-mini ${s.done?'done':''}" onclick="toggleExDay('${selDate}',${i},'${which}')">${s.done?'✓':''}</div>
         <div class="ex-info-mini">
@@ -756,25 +850,20 @@ function renderDayDetail(which){
         </div>
       </div>`;
     });
-    if(isToday){
-      html+=`<div onclick="addExtraEx('${selDate}','${which}')" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px dashed var(--border);border-radius:12px;cursor:pointer;color:var(--muted);font-size:13px;margin-top:8px">+ Añadir ejercicio</div>`;
-    }
+    html+=`<div onclick="addExtraEx('${selDate}','${which}')" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px dashed var(--border);border-radius:12px;cursor:pointer;color:var(--muted);font-size:13px;margin-top:8px">+ Añadir ejercicio</div>`;
     html+=`</div>`;
   }
-  const nota=DB.get('note_'+selDate)||'';
-  if(nota)html+=`<div class="day-section"><div class="day-section-title">Nota</div><div style="font-size:12px;color:var(--muted);line-height:1.5">${nota}</div></div>`;
-  if(isToday){
-    html+=`<div class="day-section"><div class="day-section-title">Nota del día</div>
-      <textarea class="note-area" id="note-home-${which}" placeholder="Energía, sueño, sensaciones...">${DB.get('note_'+TODAY)||''}</textarea>
-      <button class="note-save" onclick="saveNoteHome('${which}')">Guardar nota</button>
-    </div>`;
-  }
+  html+=`<div class="day-section"><div class="day-section-title">Nota del día</div>
+    <textarea class="note-area" id="note-home-${which}" placeholder="Energía, sueño, sensaciones...">${DB.get('note_'+selDate)||''}</textarea>
+    <button class="note-save" onclick="saveNoteForDate('${selDate}','${which}')">Guardar nota</button>
+  </div>`;
   html+=`</div>`;
   el.innerHTML=html;
 }
 
 function toggleExDay(date,i,which){
-  const plan=weekPlan[new Date(date+'T12:00:00').getDay()];
+  const dow=new Date(date+'T12:00:00').getDay();
+  const plan=getPlanForDate(date,dow);
   const exList=allExercises[plan.name]||[];
   let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
   if(!s[i])return;
@@ -785,7 +874,8 @@ function toggleExDay(date,i,which){
 }
 
 function chgKg(date,i,j,d,which){
-  const plan=weekPlan[new Date(date+'T12:00:00').getDay()];
+  const dow=new Date(date+'T12:00:00').getDay();
+  const plan=getPlanForDate(date,dow);
   const exList=allExercises[plan.name]||[];
   let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
   if(!s[i]||!s[i].series[j])return;
