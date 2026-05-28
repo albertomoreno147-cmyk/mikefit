@@ -363,6 +363,44 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
 /* BIBLIOTECA GLOBAL RESULTS */
 #bib-global-results .bib-lista-wrap{padding:0 16px;}
+
+/* MUSCLE GROUP CARD — imagen más grande y prominente */
+.bib-group-bg{height:130px!important;}
+.bib-group-img{height:138px!important;width:138px!important;right:-6px!important;opacity:1!important;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5))!important;}
+
+/* PROFILE HERO */
+.prof-hero{background:var(--card);border-radius:18px;margin-bottom:12px;padding:24px 16px 20px;text-align:center;box-shadow:var(--shadow);}
+.prof-name{font-size:20px;font-weight:700;margin-bottom:3px;color:var(--text);}
+.prof-sub{font-size:12px;color:var(--muted);}
+.prof-stats-row{display:flex;justify-content:center;gap:28px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.prof-stat{text-align:center;}
+.prof-stat-val{font-size:20px;font-weight:700;color:var(--text);}
+.prof-stat-lbl{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;}
+
+/* DATOS CORPORALES */
+.prof-data-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.prof-data-item{text-align:center;background:var(--bg);border-radius:12px;padding:10px 4px;}
+.prof-data-val{font-size:16px;font-weight:700;color:var(--text);}
+.prof-data-lbl{font-size:9px;color:var(--muted);margin-top:2px;font-weight:500;line-height:1.3;}
+.prof-goal-row{display:flex;align-items:center;gap:8px;}
+.prof-goal-lbl{font-size:11px;color:var(--muted);white-space:nowrap;}
+.prof-goal-bar{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.prof-goal-fill{height:100%;background:var(--teal);border-radius:3px;}
+.prof-goal-pct{font-size:11px;font-weight:700;color:var(--teal);white-space:nowrap;}
+
+/* SETTINGS LIST */
+.settings-section-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;padding:12px 4px 6px;display:block;}
+.settings-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;}
+.settings-item:last-child{border-bottom:none;}
+.settings-item:active{background:var(--bg);}
+.settings-icon{font-size:19px;width:30px;text-align:center;flex-shrink:0;}
+.settings-lbl{flex:1;font-size:14px;font-weight:500;color:var(--text);}
+.settings-val{font-size:13px;color:var(--muted);margin-right:2px;}
+.settings-chev{font-size:19px;color:var(--muted);line-height:1;}
+.settings-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px;margin-right:4px;}
+.settings-badge-teal{background:var(--teal-dim);color:var(--teal);}
+.btn-logout{width:100%;background:rgba(239,68,68,0.07);color:var(--red);border:1.5px solid rgba(239,68,68,0.2);border-radius:14px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;margin:4px 0 8px;font-family:inherit;}
+.btn-logout:active{background:rgba(239,68,68,0.14);}
 </style>
 </head>
 <body>
@@ -573,22 +611,109 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
     <!-- PERFIL -->
     <div class="page" id="page-perfil">
-      <div class="card" style="text-align:center;padding:24px 16px">
+
+      <!-- HERO -->
+      <div class="prof-hero">
         <div class="profile-avatar"><span>M</span></div>
-        <div style="font-size:19px;font-weight:700;margin-bottom:4px">Mike</div>
-        <div style="font-size:12px;color:var(--muted)">Recomposición corporal · Semana 1</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Ajustes</div>
-        <div class="toggle-row">
-          <div class="toggle-lbl">Notificaciones</div>
-          <div class="toggle-sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
+        <div class="prof-name">Mike</div>
+        <div class="prof-sub" id="prof-sub-lbl">Recomposición corporal · Semana 2</div>
+        <div class="prof-stats-row">
+          <div class="prof-stat">
+            <div class="prof-stat-val" id="prof-racha">—</div>
+            <div class="prof-stat-lbl">Racha</div>
+          </div>
+          <div class="prof-stat">
+            <div class="prof-stat-val" id="prof-sesiones">—</div>
+            <div class="prof-stat-lbl">Sesiones</div>
+          </div>
+          <div class="prof-stat">
+            <div class="prof-stat-val" id="prof-perdido">—</div>
+            <div class="prof-stat-lbl">Perdido</div>
+          </div>
         </div>
       </div>
+
+      <!-- DATOS CORPORALES -->
+      <div class="settings-section-lbl">Datos corporales</div>
       <div class="card">
-        <div class="card-title">Suplementos</div>
-        <div id="supp-list"></div>
+        <div class="prof-data-grid">
+          <div class="prof-data-item"><div class="prof-data-val" id="prof-peso">77.5</div><div class="prof-data-lbl">Peso kg</div></div>
+          <div class="prof-data-item"><div class="prof-data-val">180</div><div class="prof-data-lbl">Talla cm</div></div>
+          <div class="prof-data-item"><div class="prof-data-val">25</div><div class="prof-data-lbl">Edad</div></div>
+          <div class="prof-data-item"><div class="prof-data-val">18.2%</div><div class="prof-data-lbl">% Grasa</div></div>
+        </div>
+        <div class="prof-goal-row">
+          <div class="prof-goal-lbl">Objetivo: 73 kg</div>
+          <div class="prof-goal-bar"><div class="prof-goal-fill" id="prof-goal-fill" style="width:35%"></div></div>
+          <div class="prof-goal-pct" id="prof-goal-pct">35%</div>
+        </div>
       </div>
+
+      <!-- SUPLEMENTOS -->
+      <div class="settings-section-lbl">Suplementos</div>
+      <div class="card"><div id="supp-list"></div></div>
+
+      <!-- AJUSTES -->
+      <div class="settings-section-lbl">Ajustes</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="settings-item" onclick="alert('Correo: mike@mikefit.es')">
+          <div class="settings-icon">📧</div>
+          <div class="settings-lbl">Correo electrónico</div>
+          <div class="settings-val">mike@mikefit.es</div>
+          <div class="settings-chev">›</div>
+        </div>
+        <div class="settings-item" onclick="alert('Plan activo: Premium — gestionado por tu coach Mike')">
+          <div class="settings-icon">💳</div>
+          <div class="settings-lbl">Plan de pago</div>
+          <div class="settings-badge settings-badge-teal">Premium</div>
+          <div class="settings-chev">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon">🔔</div>
+          <div class="settings-lbl">Notificaciones</div>
+          <div class="toggle-sw off" id="notif-toggle" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-item" onclick="toggleDark()">
+          <div class="settings-icon" id="theme-prof-icon">🌙</div>
+          <div class="settings-lbl" id="theme-prof-lbl">Modo oscuro</div>
+          <div class="toggle-sw off" id="dark-toggle-prof" style="pointer-events:none"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="settings-item" onclick="alert('Ubicación: Madrid, España')">
+          <div class="settings-icon">📍</div>
+          <div class="settings-lbl">Ubicación</div>
+          <div class="settings-val">Madrid, España</div>
+          <div class="settings-chev">›</div>
+        </div>
+        <div class="settings-item" onclick="alert('Unidades: kilogramos y centímetros')">
+          <div class="settings-icon">⚖️</div>
+          <div class="settings-lbl">Unidades</div>
+          <div class="settings-val">kg / cm</div>
+          <div class="settings-chev">›</div>
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN -->
+      <div class="settings-section-lbl">Información</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="settings-item" onclick="alert('Tus datos se almacenan localmente en tu dispositivo. MikeFit no comparte ni transfiere tus datos personales a terceros.')">
+          <div class="settings-icon">🔒</div>
+          <div class="settings-lbl">Privacidad y datos</div>
+          <div class="settings-chev">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon">ℹ️</div>
+          <div class="settings-lbl">Versión de la app</div>
+          <div class="settings-val">v1.0.0</div>
+        </div>
+        <div class="settings-item" onclick="alert('Contacta con tu coach Mike para cualquier duda sobre tu entrenamiento o plan nutricional 💬')">
+          <div class="settings-icon">🎯</div>
+          <div class="settings-lbl">Contactar con Coach Mike</div>
+          <div class="settings-chev">›</div>
+        </div>
+      </div>
+
+      <button class="btn-logout" onclick="alert('Todos tus datos quedan guardados en el dispositivo.')">Cerrar sesión</button>
+
     </div>
 
   </div>
@@ -607,7 +732,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <span>Ejercicios</span>
     </div>
-    <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);renderSupps()">
+    <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);renderProfile()">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <span>Perfil</span>
     </div>
@@ -1256,8 +1381,8 @@ function renderBibLista(){
     const color=muscleColors[ex.musculo]||'var(--teal)';
     const imgSrc=wid?`https://wger.de/static/images/muscles/main/muscle-${wid}.svg`:'';
     row.innerHTML=`
-      <div class="bib-ex-thumb" style="background:${bg}">
-        ${imgSrc?`<img src="${imgSrc}" alt="${ex.musculo}" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:${color}\\'>${ex.name.charAt(0)}</div>'">`:''}
+      <div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;flex-direction:column;gap:2px;">
+        <div style="font-size:20px;font-weight:900;color:${color};line-height:1">${ex.musculo.substring(0,2)}</div>
       </div>
       <div class="bib-ex-info">
         <div class="bib-ex-name">${ex.name}</div>
@@ -1294,7 +1419,7 @@ function bibGlobalSearch(q){
       bibSelectedGroup=muscleGroups.find(g=>g.musculos.includes(ex.musculo))||muscleGroups[0];
       bibOpenDetalle(ex);
     };
-    row.innerHTML=`<div class="bib-ex-thumb" style="background:${bg}">${imgSrc?`<img src="${imgSrc}" alt="" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:${color}\\'>${ex.name.charAt(0)}</div>'">`:'<span></span>'}</div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
+    row.innerHTML=`<div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;"><div style="font-size:20px;font-weight:900;color:${color};line-height:1">${ex.musculo.substring(0,2)}</div></div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
     wrap.appendChild(row);
   });
 }
@@ -1610,7 +1735,7 @@ function openFromMenu(page,title){
   closeMenu();
   const navEl=document.getElementById('nav-'+page);
   gotoPage(page,navEl,title,false);
-  if(page==='perfil')renderSupps();
+  if(page==='perfil')renderProfile();
 }
 
 function toggleDark(){
@@ -1627,6 +1752,53 @@ function applyTheme(){
   if(icon){icon.innerHTML=isDark?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':`<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`;}
   const lbl=document.getElementById('theme-label');
   if(lbl)lbl.textContent=isDark?'Modo claro':'Modo oscuro';
+  // Sync perfil dark toggle
+  const profToggle=document.getElementById('dark-toggle-prof');
+  if(profToggle){profToggle.className='toggle-sw '+(isDark?'on':'off');const k=profToggle.querySelector('.toggle-knob');if(k)k.className='toggle-knob';}
+  const profIcon=document.getElementById('theme-prof-icon');
+  if(profIcon)profIcon.textContent=isDark?'☀️':'🌙';
+  const profLbl=document.getElementById('theme-prof-lbl');
+  if(profLbl)profLbl.textContent=isDark?'Modo claro':'Modo oscuro';
+}
+
+function renderProfile(){
+  // Racha
+  const rachaEl=document.getElementById('prof-racha');
+  if(rachaEl)rachaEl.textContent=Math.max(1,diffDays+1)+'d';
+  // Sesiones completadas desde el inicio
+  let sesiones=0;
+  for(let i=0;i<=diffDays;i++){
+    const d=new Date(START);d.setDate(d.getDate()+i);
+    const date=d.toISOString().split('T')[0];
+    const plan=weekPlan[d.getDay()];
+    if(plan.name==='Descanso')continue;
+    const exS=DB.get('ex_'+date);
+    if(exS&&exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done))sesiones++;
+  }
+  const sesEl=document.getElementById('prof-sesiones');
+  if(sesEl)sesEl.textContent=sesiones;
+  // Peso perdido
+  const pActual=(pesoLog[pesoLog.length-1]?.val)||77.5;
+  const pInicial=(pesoLog[0]?.val)||80.1;
+  const perdido=Math.round((pInicial-pActual)*10)/10;
+  const perdidoEl=document.getElementById('prof-perdido');
+  if(perdidoEl)perdidoEl.textContent=(perdido>0?'−':'')+Math.abs(perdido)+'kg';
+  // Peso actual
+  const pesoEl=document.getElementById('prof-peso');
+  if(pesoEl)pesoEl.textContent=pActual;
+  // Semana del programa
+  const semana=Math.max(1,Math.ceil((diffDays+1)/7));
+  const subLbl=document.getElementById('prof-sub-lbl');
+  if(subLbl)subLbl.textContent=`Recomposición corporal · Semana ${semana}`;
+  // Progreso al objetivo (peso inicial → 73kg)
+  const pesoObj=73;
+  const pct=Math.min(100,Math.max(0,Math.round((pInicial-pActual)/(pInicial-pesoObj)*100)));
+  const fillEl=document.getElementById('prof-goal-fill');
+  if(fillEl)fillEl.style.width=pct+'%';
+  const pctEl=document.getElementById('prof-goal-pct');
+  if(pctEl)pctEl.textContent=pct+'%';
+  applyTheme();
+  renderSupps();
 }
 
 function goToTodayWorkout(){
