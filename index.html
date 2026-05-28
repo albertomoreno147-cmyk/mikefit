@@ -372,7 +372,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
 /* PROFILE HERO */
 .prof-hero{background:var(--card);border-radius:18px;margin-bottom:12px;padding:24px 16px 20px;text-align:center;box-shadow:var(--shadow);}
-.prof-name{font-size:20px;font-weight:700;margin-bottom:3px;color:var(--text);}
+.prof-name{font-size:20px;font-weight:700;margin-bottom:3px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.prof-name-edit{font-size:13px;opacity:0.35;line-height:1;}
+.prof-name input{font-size:20px;font-weight:700;color:var(--text);border:none;border-bottom:2px solid var(--teal);background:transparent;text-align:center;width:160px;outline:none;font-family:inherit;}
 .prof-sub{font-size:12px;color:var(--muted);}
 .prof-stats-row{display:flex;justify-content:center;gap:28px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
 .prof-stat{text-align:center;}
@@ -621,7 +623,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
           <div class="avatar-cam-btn">📷</div>
         </div>
         <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
-        <div class="prof-name">Mike</div>
+        <div class="prof-name" id="prof-name" onclick="editName()">Mike <span class="prof-name-edit">✏️</span></div>
         <div class="prof-sub" id="prof-sub-lbl">Recomposición corporal · Semana 2</div>
         <div class="prof-stats-row">
           <div class="prof-stat">
@@ -769,9 +771,10 @@ const motivations=[
 
 function getGreeting(){
   const h=now.getHours();
-  if(h>=6&&h<14) return 'Buenos días, Mike 👋';
-  if(h>=14&&h<21) return 'Buenas tardes, Mike 👋';
-  return 'Buenas noches, Mike 🌙';
+  const name=DB.get('profile_name')||'Mike';
+  if(h>=6&&h<14) return `Buenos días, ${name} 👋`;
+  if(h>=14&&h<21) return `Buenas tardes, ${name} 👋`;
+  return `Buenas noches, ${name} 🌙`;
 }
 
 const planEmoji={'Zona 2':'🚴','Descanso':'😴'};
@@ -1778,6 +1781,26 @@ function applyTheme(){
   if(profLbl)profLbl.textContent=isDark?'Modo claro':'Modo oscuro';
 }
 
+function editName(){
+  const el=document.getElementById('prof-name');
+  if(!el||el.querySelector('input'))return;
+  const current=DB.get('profile_name')||'Mike';
+  el.innerHTML=`<input type="text" value="${current}" maxlength="24"
+    onblur="saveName(this.value)"
+    onkeydown="if(event.key==='Enter')this.blur()">`;
+  const input=el.querySelector('input');
+  input.focus();input.select();
+}
+
+function saveName(value){
+  const name=value.trim()||'Mike';
+  DB.set('profile_name',name);
+  const el=document.getElementById('prof-name');
+  if(el)el.innerHTML=`${name} <span class="prof-name-edit">✏️</span>`;
+  const g=document.getElementById('hero-greeting');
+  if(g)g.textContent=getGreeting();
+}
+
 function uploadAvatar(input){
   const file=input.files[0];
   if(!file)return;
@@ -1825,6 +1848,9 @@ function updateAvatarDisplay(src){
 }
 
 function renderProfile(){
+  // Nombre editable
+  const nameEl=document.getElementById('prof-name');
+  if(nameEl){const n=DB.get('profile_name')||'Mike';nameEl.innerHTML=`${n} <span class="prof-name-edit">✏️</span>`;}
   // Foto de perfil
   updateAvatarDisplay(DB.get('profile_photo')||null);
   // Racha
