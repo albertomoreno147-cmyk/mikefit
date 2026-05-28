@@ -347,6 +347,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .cal-today-wrap .cal-day-num{color:#fff;font-weight:700;font-size:13px;}
 .cal-gym-icon{font-size:13px;line-height:1;}
 .cal-done-badge{background:var(--teal);border-radius:8px;padding:1px 5px;font-size:9px;font-weight:800;color:white;margin-top:1px;}
+
+/* NAV ACTIVE PILL */
+.nav-icon{transition:background 0.18s,border-radius 0.18s;}
+.nav-item.active .nav-icon{background:var(--teal-dim);border-radius:14px;}
+
+/* TAB SLIDE ANIMATIONS */
+@keyframes slideFromRight{from{opacity:0;transform:translateX(26px);}to{opacity:1;transform:none;}}
+@keyframes slideFromLeft{from{opacity:0;transform:translateX(-26px);}to{opacity:1;transform:none;}}
+.sub-page.anim-right{animation:slideFromRight 0.22s ease;}
+.sub-page.anim-left{animation:slideFromLeft 0.22s ease;}
+
+/* HERO WORKOUT TYPE ACCENT */
+.hero-card-inner{position:relative;z-index:1;}
+
+/* BIBLIOTECA GLOBAL RESULTS */
+#bib-global-results .bib-lista-wrap{padding:0 16px;}
 </style>
 </head>
 <body>
@@ -380,7 +396,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
   <!-- HEADER -->
   <div class="header">
     <div class="header-top">
-      <button class="header-btn">
+      <button class="header-btn" onclick="goToTodayWorkout()" title="Entreno de hoy">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </button>
       <div class="header-title" id="header-title">Entrenos</div>
@@ -522,6 +538,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
     <div class="page" id="page-biblioteca">
       <!-- VISTA 1: Grupos musculares -->
       <div id="bib-v-grupos">
+        <div class="bib-search-wrap" style="margin-bottom:12px">
+          <div class="bib-search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+          <input type="text" id="bib-global-search" placeholder="Buscar cualquier ejercicio..." oninput="bibGlobalSearch(this.value)">
+        </div>
+        <div id="bib-global-results" style="display:none"></div>
         <div id="bib-groups-list"></div>
       </div>
       <!-- VISTA 2: Lista de ejercicios del grupo -->
@@ -588,7 +609,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
     </div>
     <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);renderSupps()">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <span>Más</span>
+      <span>Perfil</span>
     </div>
   </div>
 </div>
@@ -622,19 +643,27 @@ function getGreeting(){
   return 'Buenas noches, Mike 🌙';
 }
 
+const planEmoji={'Zona 2':'🚴','Descanso':'😴'};
+
 function updateHero(){
   const dow=now.getDay();
   const plan=weekPlan[dow];
   const g=document.getElementById('hero-greeting');
   if(g) g.textContent=getGreeting();
   const ht=document.getElementById('hero-day-type');
-  if(ht) ht.textContent=plan.name==='Descanso'?'😴 Descanso hoy':`🏋️ ${plan.name} hoy`;
+  const emoji=planEmoji[plan.name]||'🏋️';
+  if(ht) ht.textContent=plan.name==='Descanso'?'😴 Descanso hoy':`${emoji} ${plan.name} hoy`;
   const hm=document.getElementById('hero-motivation');
   if(hm) hm.textContent=motivations[Math.abs(diffDays)%motivations.length];
   const hw=document.getElementById('hero-week');
   if(hw) hw.textContent=Math.max(1,Math.ceil(streak/7));
   const hs=document.getElementById('hero-streak-val');
   if(hs) hs.textContent=Math.max(1,diffDays+1);
+  // Gradiente dinámico según tipo de entreno
+  const hero=document.querySelector('.hero-card');
+  if(hero&&plan.color){
+    hero.style.background=`linear-gradient(135deg,#0f1c2d 0%,${hexToRgba(plan.color,0.28)} 100%)`;
+  }
 }
 
 const weekPlan={
@@ -754,6 +783,8 @@ let bibDetallTab='info';
 // ---- NAV ----
 let currentPage='home';
 let currentTab='dashboard';
+const tabOrder=['dashboard','semana'];
+let prevTabIndex=0;
 
 function gotoPage(id, el, title, showTabs){
   currentPage=id;
@@ -769,10 +800,14 @@ function gotoPage(id, el, title, showTabs){
 }
 
 function switchTab(tab, el){
+  const newIdx=tabOrder.indexOf(tab);
+  const dir=newIdx>prevTabIndex?'right':'left';
+  prevTabIndex=newIdx;
   currentTab=tab;
-  document.querySelectorAll('.sub-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sub-page').forEach(p=>p.classList.remove('active','anim-right','anim-left'));
   document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('sub-'+tab).classList.add('active');
+  const sub=document.getElementById('sub-'+tab);
+  sub.classList.add('active',dir==='right'?'anim-right':'anim-left');
   if(el)el.classList.add('active');
   if(tab==='dashboard'){renderNextTraining();renderMonthCalendar();updateHero();}
   if(tab==='semana'){buildWeekStrip('semana');}
@@ -922,7 +957,9 @@ function renderNextTraining(){
     const dateLabel=isToday?'Hoy':dayNames[dateObj.getDay()];
     const infoDiv=document.createElement('div');
     infoDiv.className='wday-info';
-    infoDiv.innerHTML=`<div class="wday-num">${dateLabel} · ${dateObj.getDate()} ${months[dateObj.getMonth()]}</div><div class="wday-name" style="color:${plan.color}">${plan.name}</div>`;
+    const exCnt=(allExercises[plan.name]||[]).length;
+    infoDiv.innerHTML=`<div class="wday-num">${dateLabel} · ${dateObj.getDate()} ${months[dateObj.getMonth()]}</div><div class="wday-name" style="color:${plan.color}">${plan.name}</div>${exCnt>0?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${exCnt} ejercicios</div>`:''}`;
+
     div.appendChild(statusDiv);
     div.appendChild(infoDiv);
     if(isToday&&!isDone){
@@ -1154,6 +1191,12 @@ function bibShowView(v){
 
 function renderBiblioteca(){
   bibSelectedGroup=null; bibSelectedEx=null; bibSearchQ='';
+  const gs=document.getElementById('bib-global-search');
+  if(gs) gs.value='';
+  const res=document.getElementById('bib-global-results');
+  if(res) res.style.display='none';
+  const grp=document.getElementById('bib-groups-list');
+  if(grp) grp.style.display='block';
   bibShowView('grupos');
   renderBibGrupos();
 }
@@ -1223,6 +1266,35 @@ function renderBibLista(){
 }
 
 function bibFilterList(q){bibSearchQ=q;renderBibLista();}
+
+function bibGlobalSearch(q){
+  const res=document.getElementById('bib-global-results');
+  const grp=document.getElementById('bib-groups-list');
+  if(!q.trim()){res.style.display='none';grp.style.display='block';return;}
+  grp.style.display='none';res.style.display='block';
+  const ql=q.toLowerCase();
+  const matches=ejerciciosBD.filter(e=>e.name.toLowerCase().includes(ql)||e.musculo.toLowerCase().includes(ql)||e.secundarios.some(s=>s.toLowerCase().includes(ql)));
+  if(!matches.length){
+    res.innerHTML=`<div class="bib-empty"><div class="bib-empty-icon">🔍</div><div class="bib-empty-txt">Sin resultados para "${q}"</div></div>`;
+    return;
+  }
+  res.innerHTML='<div class="bib-lista-wrap"></div>';
+  const wrap=res.querySelector('.bib-lista-wrap');
+  matches.forEach(ex=>{
+    const color=muscleColors[ex.musculo]||'var(--teal)';
+    const bg=muscleBg[ex.musculo]||'var(--teal-dim)';
+    const wid=ex.wger||(muscleWgerId[ex.musculo]||6);
+    const imgSrc=wid?`https://wger.de/static/images/muscles/main/muscle-${wid}.svg`:'';
+    const row=document.createElement('div');
+    row.className='bib-ex-row';
+    row.onclick=()=>{
+      bibSelectedGroup=muscleGroups.find(g=>g.musculos.includes(ex.musculo))||muscleGroups[0];
+      bibOpenDetalle(ex);
+    };
+    row.innerHTML=`<div class="bib-ex-thumb" style="background:${bg}">${imgSrc?`<img src="${imgSrc}" alt="" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:${color}\\'>${ex.name.charAt(0)}</div>'">`:'<span></span>'}</div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
+    wrap.appendChild(row);
+  });
+}
 
 function bibOpenDetalle(ex){
   bibSelectedEx=ex; bibDetallTab='info';
@@ -1554,12 +1626,39 @@ function applyTheme(){
   if(lbl)lbl.textContent=isDark?'Modo claro':'Modo oscuro';
 }
 
+function goToTodayWorkout(){
+  const navEl=document.getElementById('nav-home');
+  gotoPage('home',navEl,'Entrenos',true);
+  navEl.classList.add('active');
+  switchTab('semana',document.querySelectorAll('.top-tab')[1]);
+  selectDay('semana',TODAY,now.getDay());
+}
+
+function hexToRgba(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
 // ---- INIT ----
 applyTheme();
 updateHero();
 renderNextTraining();
 renderMonthCalendar();
 updateMacros();
+
+// Swipe horizontal entre tabs (Dashboard ↔ Entrenos)
+let _sx=0,_sy=0;
+const _sc=document.querySelector('.scroll-content');
+_sc.addEventListener('touchstart',e=>{_sx=e.touches[0].clientX;_sy=e.touches[0].clientY;},{passive:true});
+_sc.addEventListener('touchend',e=>{
+  if(currentPage!=='home')return;
+  const dx=e.changedTouches[0].clientX-_sx;
+  const dy=Math.abs(e.changedTouches[0].clientY-_sy);
+  if(Math.abs(dx)<72||dy>Math.abs(dx)*0.75)return;
+  const tabs=document.querySelectorAll('.top-tab');
+  if(dx<0&&currentTab==='dashboard')switchTab('semana',tabs[1]);
+  else if(dx>0&&currentTab==='semana')switchTab('dashboard',tabs[0]);
+},{passive:true});
 </script>
 </body>
 </html>
