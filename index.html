@@ -1292,17 +1292,29 @@ function renderMealList(){
 }
 
 // ---- BIBLIOTECA v2 (3 niveles) ----
+const UNS='https://images.unsplash.com/photo-';
+const UNQ='?w=700&h=280&fit=crop&auto=format&q=82';
 const muscleGroups=[
-  {id:'pecho',    name:'Pecho',           wger:4,  color:'#3B82F6', musculos:['Pecho']},
-  {id:'espalda',  name:'Espalda',         wger:13, color:'#22C55E', musculos:['Espalda','Romboides','Lumbar']},
-  {id:'hombros',  name:'Hombros',         wger:2,  color:'#00BEB8', musculos:['Hombro','Trapecio']},
-  {id:'biceps',   name:'Bíceps',          wger:1,  color:'#8B5CF6', musculos:['Bíceps','Braquial']},
-  {id:'triceps',  name:'Tríceps',         wger:5,  color:'#F97316', musculos:['Tríceps']},
-  {id:'cuadri',   name:'Cuádriceps',      wger:9,  color:'#F59E0B', musculos:['Cuádriceps']},
-  {id:'isquios',  name:'Isquiotibiales',  wger:10, color:'#EF4444', musculos:['Isquios']},
-  {id:'gluteo',   name:'Glúteo',          wger:12, color:'#EC4899', musculos:['Glúteo']},
-  {id:'core',     name:'Core',            wger:6,  color:'#14B8A6', musculos:['Core']},
-  {id:'cardio',   name:'Cardio',          wger:null,color:'#22C55E',musculos:['Cardio']},
+  {id:'pecho',   name:'Pecho',          color:'#3B82F6', musculos:['Pecho'],
+   photo:UNS+'1605296867304-46d5465a13f1'+UNQ},
+  {id:'espalda', name:'Espalda',        color:'#22C55E', musculos:['Espalda','Romboides','Lumbar'],
+   photo:UNS+'1603287681836-b174ce5074c2'+UNQ},
+  {id:'hombros', name:'Hombros',        color:'#00BEB8', musculos:['Hombro','Trapecio'],
+   photo:UNS+'1581009137042-c552e485697a'+UNQ},
+  {id:'biceps',  name:'Bíceps',         color:'#8B5CF6', musculos:['Bíceps','Braquial'],
+   photo:UNS+'1581009146145-b5ef050c2e1e'+UNQ},
+  {id:'triceps', name:'Tríceps',        color:'#F97316', musculos:['Tríceps'],
+   photo:UNS+'1526506118085-60ce8714f8c5'+UNQ},
+  {id:'cuadri',  name:'Cuádriceps',     color:'#F59E0B', musculos:['Cuádriceps'],
+   photo:UNS+'1574680096145-d05b474e2155'+UNQ},
+  {id:'isquios', name:'Isquiotibiales', color:'#EF4444', musculos:['Isquios'],
+   photo:UNS+'1541534741688-6078c6bfb5c5'+UNQ},
+  {id:'gluteo',  name:'Glúteo',         color:'#EC4899', musculos:['Glúteo'],
+   photo:UNS+'1434682881908-b43d0467b798'+UNQ},
+  {id:'core',    name:'Core',           color:'#14B8A6', musculos:['Core'],
+   photo:UNS+'1520787497953-1985ca467702'+UNQ},
+  {id:'cardio',  name:'Cardio',         color:'#22C55E', musculos:['Cardio'],
+   photo:UNS+'1476480862126-209bfaa8edc8'+UNQ},
 ];
 
 function bibShowView(v){
@@ -1338,11 +1350,10 @@ function renderBibGrupos(){
     const card=document.createElement('div');
     card.className='bib-group-card';
     card.onclick=()=>bibOpenGroup(g);
-    const imgTag=g.wger
-      ?`<img class="bib-group-img" src="https://wger.de/static/images/muscles/main/muscle-${g.wger}.svg" alt="${g.name}" onerror="this.style.display='none'">`
-      :`<div style="position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:42px;opacity:0.25">♥</div>`;
-    card.innerHTML=`<div class="bib-group-bg" style="background:linear-gradient(120deg,#0D2137 55%,${g.color}28 100%)">
-      ${imgTag}
+    const bgStyle=g.photo
+      ?`background-image:linear-gradient(90deg,rgba(0,0,0,0.80) 0%,rgba(0,0,0,0.50) 50%,rgba(0,0,0,0.18) 100%),url('${g.photo}');background-size:cover;background-position:center;`
+      :`background:linear-gradient(120deg,#0D2137 60%,${g.color}30 100%)`;
+    card.innerHTML=`<div class="bib-group-bg" style="${bgStyle}">
       <div class="bib-group-info">
         <div class="bib-group-name">${g.name}</div>
         <div class="bib-group-count">${exCount} ejercicio${exCount!==1?'s':''}</div>
