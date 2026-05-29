@@ -531,29 +531,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 <div class="app">
   <div class="status-bar"></div>
 
-  <!-- MENU OVERLAY -->
-  <div class="menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
-
-  <!-- MENU DRAWER -->
-  <div class="menu-drawer" id="menu-drawer">
-    <div class="menu-section-lbl">Cuenta</div>
-    <div class="menu-item" onclick="openFromMenu('perfil','Perfil')">
-      <div class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <div class="menu-item-lbl">Perfil</div>
-      <div class="menu-item-chevron">›</div>
-    </div>
-    <div class="menu-item" onclick="openFromMenu('perfil','Ajustes')">
-      <div class="menu-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
-      <div class="menu-item-lbl">Ajustes</div>
-      <div class="menu-item-chevron">›</div>
-    </div>
-    <div class="menu-divider"></div>
-    <div class="menu-item" onclick="toggleDark()">
-      <div class="menu-item-icon" id="theme-icon-wrap"><svg id="theme-icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
-      <div class="menu-item-lbl" id="theme-label">Modo oscuro</div>
-      <div class="toggle-sw off" id="dark-toggle" style="pointer-events:none"><div class="toggle-knob"></div></div>
-    </div>
-  </div>
 
   <!-- HEADER -->
   <div class="header">
@@ -562,8 +539,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </button>
       <div class="header-title" id="header-title">Entrenos</div>
-      <button class="header-btn" onclick="toggleMenu()">
-        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <button class="header-btn" onclick="openSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </button>
     </div>
     <div class="top-tabs" id="top-tabs">
@@ -846,98 +823,84 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div class="settings-section-lbl">Suplementos</div>
         <div class="card"><div id="supp-list"></div></div>
 
-        <!-- ACCESO A AJUSTES -->
-        <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px">
-          <div class="settings-item" onclick="openAjustes()">
-            <div class="settings-icon si-dark">⚙️</div>
-            <div class="settings-lbl" style="font-weight:600">Ajustes</div>
-            <div class="settings-chev">›</div>
-          </div>
-        </div>
-
       </div><!-- /perfil-main -->
 
-      <!-- SUB-PÁGINA AJUSTES -->
-      <div id="perfil-ajustes" style="display:none">
+    </div><!-- /page-perfil -->
 
-        <div class="bib-back-row" style="margin-bottom:8px">
-          <button class="bib-back-btn" onclick="closeAjustes()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            Perfil
-          </button>
+    <!-- AJUSTES (página independiente) -->
+    <div class="page" id="page-ajustes">
+      <div class="bib-back-row" style="margin-bottom:8px">
+        <button class="bib-back-btn" onclick="closeSettings()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+      </div>
+
+      <div class="settings-section-lbl">Cuenta</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="settings-item" onclick="alert('Correo: mike@mikefit.es')">
+          <div class="settings-icon si-blue">📧</div>
+          <div class="settings-lbl">Correo electrónico</div>
+          <div class="settings-val">mike@mikefit.es</div>
+          <div class="settings-chev">›</div>
         </div>
-
-        <!-- CUENTA -->
-        <div class="settings-section-lbl">Cuenta</div>
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div class="settings-item" onclick="alert('Correo: mike@mikefit.es')">
-            <div class="settings-icon si-blue">📧</div>
-            <div class="settings-lbl">Correo electrónico</div>
-            <div class="settings-val">mike@mikefit.es</div>
-            <div class="settings-chev">›</div>
-          </div>
-          <div class="settings-item" onclick="alert('Plan activo: Premium — gestionado por tu coach Mike')">
-            <div class="settings-icon si-yellow">💳</div>
-            <div class="settings-lbl">Plan de pago</div>
-            <div class="settings-badge settings-badge-teal">Premium</div>
-            <div class="settings-chev">›</div>
-          </div>
+        <div class="settings-item" onclick="alert('Plan activo: Premium — gestionado por tu coach Mike')">
+          <div class="settings-icon si-yellow">💳</div>
+          <div class="settings-lbl">Plan de pago</div>
+          <div class="settings-badge settings-badge-teal">Premium</div>
+          <div class="settings-chev">›</div>
         </div>
+      </div>
 
-        <!-- PREFERENCIAS -->
-        <div class="settings-section-lbl">Preferencias</div>
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div class="settings-item">
-            <div class="settings-icon si-red">🔔</div>
-            <div class="settings-lbl">Notificaciones</div>
-            <div class="toggle-sw off" id="notif-toggle" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
-          </div>
-          <div class="settings-item" onclick="toggleDark()">
-            <div class="settings-icon si-dark" id="theme-prof-icon">🌙</div>
-            <div class="settings-lbl" id="theme-prof-lbl">Modo oscuro</div>
-            <div class="toggle-sw off" id="dark-toggle-prof" style="pointer-events:none"><div class="toggle-knob"></div></div>
-          </div>
-          <div class="settings-item" onclick="alert('Ubicación: Madrid, España')">
-            <div class="settings-icon si-blue">📍</div>
-            <div class="settings-lbl">Ubicación</div>
-            <div class="settings-val">Madrid, España</div>
-            <div class="settings-chev">›</div>
-          </div>
-          <div class="settings-item" onclick="alert('Unidades: kilogramos y centímetros')">
-            <div class="settings-icon si-orange">⚖️</div>
-            <div class="settings-lbl">Unidades</div>
-            <div class="settings-val">kg / cm</div>
-            <div class="settings-chev">›</div>
-          </div>
+      <div class="settings-section-lbl">Preferencias</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="settings-item">
+          <div class="settings-icon si-red">🔔</div>
+          <div class="settings-lbl">Notificaciones</div>
+          <div class="toggle-sw off" id="notif-toggle" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
         </div>
-
-        <!-- INFORMACIÓN -->
-        <div class="settings-section-lbl">Información</div>
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div class="settings-item" onclick="alert('Tus datos se almacenan localmente en tu dispositivo. MikeFit no comparte ni transfiere tus datos personales a terceros.')">
-            <div class="settings-icon si-green">🔒</div>
-            <div class="settings-lbl">Privacidad y datos</div>
-            <div class="settings-chev">›</div>
-          </div>
-          <div class="settings-item">
-            <div class="settings-icon si-dark">ℹ️</div>
-            <div class="settings-lbl">Versión de la app</div>
-            <div class="settings-val">v1.0.0</div>
-          </div>
-          <div class="settings-item" onclick="alert('Contacta con tu coach Mike para cualquier duda sobre tu entrenamiento o plan nutricional 💬')">
-            <div class="settings-icon si-teal">🎯</div>
-            <div class="settings-lbl">Contactar con Coach Mike</div>
-            <div class="settings-chev">›</div>
-          </div>
+        <div class="settings-item" onclick="toggleDark()">
+          <div class="settings-icon si-dark" id="theme-prof-icon">🌙</div>
+          <div class="settings-lbl" id="theme-prof-lbl">Modo oscuro</div>
+          <div class="toggle-sw off" id="dark-toggle-prof" style="pointer-events:none"><div class="toggle-knob"></div></div>
         </div>
+        <div class="settings-item" onclick="alert('Ubicación: Madrid, España')">
+          <div class="settings-icon si-blue">📍</div>
+          <div class="settings-lbl">Ubicación</div>
+          <div class="settings-val">Madrid, España</div>
+          <div class="settings-chev">›</div>
+        </div>
+        <div class="settings-item" onclick="alert('Unidades: kilogramos y centímetros')">
+          <div class="settings-icon si-orange">⚖️</div>
+          <div class="settings-lbl">Unidades</div>
+          <div class="settings-val">kg / cm</div>
+          <div class="settings-chev">›</div>
+        </div>
+      </div>
 
-        <button class="btn-logout" onclick="alert('Todos tus datos quedan guardados en el dispositivo.')">Cerrar sesión</button>
+      <div class="settings-section-lbl">Información</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="settings-item" onclick="alert('Tus datos se almacenan localmente en tu dispositivo. MikeFit no comparte ni transfiere tus datos personales a terceros.')">
+          <div class="settings-icon si-green">🔒</div>
+          <div class="settings-lbl">Privacidad y datos</div>
+          <div class="settings-chev">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon si-dark">ℹ️</div>
+          <div class="settings-lbl">Versión de la app</div>
+          <div class="settings-val">v1.0.0</div>
+        </div>
+        <div class="settings-item" onclick="alert('Contacta con tu coach Mike para cualquier duda sobre tu entrenamiento o plan nutricional 💬')">
+          <div class="settings-icon si-teal">🎯</div>
+          <div class="settings-lbl">Contactar con Coach Mike</div>
+          <div class="settings-chev">›</div>
+        </div>
+      </div>
 
-      </div><!-- /perfil-ajustes -->
+      <button class="btn-logout" onclick="alert('Todos tus datos quedan guardados en el dispositivo.')">Cerrar sesión</button>
+    </div><!-- /page-ajustes -->
 
-    </div>
-
-  </div>
+  </div><!-- /scroll-content -->
 
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
@@ -953,7 +916,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <span>Ejercicios</span>
     </div>
-    <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);closeAjustes();renderProfile()">
+    <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);renderProfile()">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <span>Perfil</span>
     </div>
@@ -2109,18 +2072,18 @@ function renderProfile(){
   renderTransformacion();
 }
 
-function openAjustes(){
-  document.getElementById('perfil-main').style.display='none';
-  const aj=document.getElementById('perfil-ajustes');
-  aj.style.display='';
-  aj.style.animation='slideFromRight 0.22s ease';
+function openSettings(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-ajustes').classList.add('active');
   document.getElementById('header-title').textContent='Ajustes';
+  document.getElementById('top-tabs').style.display='none';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  applyTheme();
 }
 
-function closeAjustes(){
-  document.getElementById('perfil-ajustes').style.display='none';
-  document.getElementById('perfil-main').style.display='';
-  document.getElementById('header-title').textContent='Perfil';
+function closeSettings(){
+  gotoPage('perfil',document.getElementById('nav-perfil'),'Perfil',false);
+  renderProfile();
 }
 
 function goToTodayWorkout(){
