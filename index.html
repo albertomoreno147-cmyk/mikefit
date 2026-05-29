@@ -94,6 +94,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
 /* HERO */
 .hero-card{border-radius:22px;margin-bottom:14px;background:linear-gradient(135deg,#091729 0%,#0f2744 45%,#0a3d62 100%);padding:22px;min-height:140px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:var(--shadow-lg);}
+.hero-inner{display:flex;align-items:flex-end;gap:14px;}
+.hero-left{flex:1;min-width:0;}
+.hero-ring-wrap{flex-shrink:0;}
+/* NUTRICIÓN PAGE */
+.nutri-macro-row{display:flex;gap:8px;margin-bottom:14px;}
+.nutri-macro-box{flex:1;background:var(--bg);border-radius:14px;padding:12px 8px;text-align:center;}
+.nutri-macro-val{font-size:22px;font-weight:800;color:var(--text);line-height:1;}
+.nutri-macro-val span{font-size:12px;font-weight:500;color:var(--muted);}
+.nutri-macro-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
 .hero-tag{font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
 .hero-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;}
 .hero-sub{font-size:12px;color:var(--teal);font-weight:600;}
@@ -557,13 +566,18 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
         <!-- HERO -->
         <div class="hero-card">
-          <div class="hero-greeting" id="hero-greeting">Buenos días, Mike 👋</div>
-          <div class="hero-day-pill"><span class="hero-day-pill-txt" id="hero-day-type">🏋️ PUSH hoy</span></div>
-          <div class="hero-motivation" id="hero-motivation">Cada rep te acerca más a tu objetivo</div>
-          <div class="hero-stats-row">
-            <div><div class="hero-stat-val">Sem <span id="hero-week">1</span></div><div class="hero-stat-lbl">SEMANA</div></div>
-            <div><div class="hero-stat-val"><span id="hero-done">0</span><span style="font-size:12px;opacity:.5">/5</span></div><div class="hero-stat-lbl">COMPLETADOS</div></div>
-            <div><div class="hero-stat-val" id="hero-streak-val">1</div><div class="hero-stat-lbl">RACHA DÍAS</div></div>
+          <div class="hero-inner">
+            <div class="hero-left">
+              <div class="hero-greeting" id="hero-greeting">Buenos días, Mike 👋</div>
+              <div class="hero-day-pill"><span class="hero-day-pill-txt" id="hero-day-type">🏋️ PUSH hoy</span></div>
+              <div class="hero-motivation" id="hero-motivation">Cada rep te acerca más a tu objetivo</div>
+              <div class="hero-stats-row">
+                <div><div class="hero-stat-val">Sem <span id="hero-week">1</span></div><div class="hero-stat-lbl">SEMANA</div></div>
+                <div><div class="hero-stat-val"><span id="hero-done">0</span><span style="font-size:12px;opacity:.5">/5</span></div><div class="hero-stat-lbl">COMPLETADOS</div></div>
+                <div><div class="hero-stat-val" id="hero-streak-val">1</div><div class="hero-stat-lbl">RACHA DÍAS</div></div>
+              </div>
+            </div>
+            <div class="hero-ring-wrap" id="hero-ring-wrap"></div>
           </div>
         </div>
 
@@ -616,26 +630,37 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div id="day-detail-semana"></div>
       </div>
 
-      <div class="sub-page" id="sub-dieta">
-        <div class="sec-title">Nutrición de hoy</div>
-        <div class="macro-grid">
-          <div class="macro-box"><div class="macro-val" id="h-kcal">0</div><div class="macro-lbl">kcal</div></div>
-          <div class="macro-box"><div class="macro-val" id="h-prot" style="color:var(--blue)">0g</div><div class="macro-lbl">proteína</div></div>
-          <div class="macro-box"><div class="macro-val" id="h-carb" style="color:var(--orange)">0g</div><div class="macro-lbl">carbos</div></div>
-          <div class="macro-box"><div class="macro-val" id="h-fat" style="color:var(--green)">0g</div><div class="macro-lbl">grasas</div></div>
+      <div class="sub-page" id="sub-semana-bib-link">
+        <div class="card" style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-top:4px" onclick="gotoPage('biblioteca',document.getElementById('nav-biblioteca'),'Ejercicios',false);renderBiblioteca()">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="settings-icon si-teal" style="font-size:15px">📚</div>
+            <span style="font-size:13px;font-weight:600">Biblioteca de ejercicios</span>
+          </div>
+          <span style="color:var(--muted)">›</span>
         </div>
-        <div class="card">
-          <div class="prog-row"><div class="prog-label">Proteína</div><div class="prog-track"><div class="prog-fill" id="bp-prot" style="width:0%;background:var(--blue)"></div></div><div class="prog-num" id="bn-prot" style="color:var(--blue)">0/175g</div></div>
-          <div class="prog-row"><div class="prog-label">Carbos</div><div class="prog-track"><div class="prog-fill" id="bp-carb" style="width:0%;background:var(--orange)"></div></div><div class="prog-num" id="bn-carb" style="color:var(--orange)">0/170g</div></div>
-          <div class="prog-row"><div class="prog-label">Grasas</div><div class="prog-track"><div class="prog-fill" id="bp-fat" style="width:0%;background:var(--green)"></div></div><div class="prog-num" id="bn-fat" style="color:var(--green)">0/65g</div></div>
-          <div class="prog-row"><div class="prog-label">Kcal</div><div class="prog-track"><div class="prog-fill" id="bp-kcal" style="width:0%;background:var(--teal)"></div></div><div class="prog-num" id="bn-kcal" style="color:var(--teal)">0/1965</div></div>
-        </div>
-        <div class="card"><div class="card-title">Comidas del día</div><div id="meal-list"></div></div>
-        <div class="card">
-          <div class="card-title">Nota del día</div>
-          <textarea class="note-area" id="daily-note" placeholder="Energía, sueño, sensaciones..."></textarea>
-          <button class="note-save" onclick="saveNote()">Guardar nota</button>
-        </div>
+      </div>
+    </div>
+
+    <!-- NUTRICIÓN -->
+    <div class="page" id="page-nutricion">
+      <div class="nutri-macro-row">
+        <div class="nutri-macro-box"><div class="nutri-macro-val" id="h-kcal">0<span> kcal</span></div><div class="nutri-macro-lbl">Energía</div></div>
+        <div class="nutri-macro-box"><div class="nutri-macro-val" style="color:var(--blue)" id="h-prot">0<span>g</span></div><div class="nutri-macro-lbl">Proteína</div></div>
+        <div class="nutri-macro-box"><div class="nutri-macro-val" style="color:var(--orange)" id="h-carb">0<span>g</span></div><div class="nutri-macro-lbl">Carbos</div></div>
+        <div class="nutri-macro-box"><div class="nutri-macro-val" style="color:var(--green)" id="h-fat">0<span>g</span></div><div class="nutri-macro-lbl">Grasas</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Objetivos del día</div>
+        <div class="prog-row"><div class="prog-label">Proteína</div><div class="prog-track"><div class="prog-fill" id="bp-prot" style="width:0%;background:var(--blue)"></div></div><div class="prog-num" id="bn-prot" style="color:var(--blue)">0/175g</div></div>
+        <div class="prog-row"><div class="prog-label">Carbos</div><div class="prog-track"><div class="prog-fill" id="bp-carb" style="width:0%;background:var(--orange)"></div></div><div class="prog-num" id="bn-carb" style="color:var(--orange)">0/170g</div></div>
+        <div class="prog-row"><div class="prog-label">Grasas</div><div class="prog-track"><div class="prog-fill" id="bp-fat" style="width:0%;background:var(--green)"></div></div><div class="prog-num" id="bn-fat" style="color:var(--green)">0/65g</div></div>
+        <div class="prog-row"><div class="prog-label">Kcal</div><div class="prog-track"><div class="prog-fill" id="bp-kcal" style="width:0%;background:var(--teal)"></div></div><div class="prog-num" id="bn-kcal" style="color:var(--teal)">0/1965</div></div>
+      </div>
+      <div class="card"><div class="card-title">Comidas del día</div><div id="meal-list"></div></div>
+      <div class="card">
+        <div class="card-title">Nota del día</div>
+        <textarea class="note-area" id="daily-note" placeholder="Energía, sueño, sensaciones..."></textarea>
+        <button class="note-save" onclick="saveNote()">Guardar nota</button>
       </div>
     </div>
 
@@ -912,10 +937,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <span>Progreso</span>
     </div>
-    <div class="nav-item" id="nav-biblioteca" onclick="gotoPage('biblioteca',this,'Ejercicios',false);renderBiblioteca()">
-      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-      <span>Ejercicios</span>
+    <div class="nav-item" id="nav-nutricion" onclick="gotoPage('nutricion',this,'Nutrición',false);updateMacros()">
+      <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.5-.5 3-1.5 4L12 22l-2.5-12C8.5 9 8 7.5 8 6a4 4 0 0 1 4-4z"/><path d="M8 6H4M16 6h4"/></svg></div>
+      <span>Nutrición</span>
     </div>
+    <div class="nav-item" id="nav-biblioteca" onclick="gotoPage('biblioteca',this,'Ejercicios',false);renderBiblioteca()" style="display:none"></div>
     <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);renderProfile()">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <span>Perfil</span>
@@ -955,6 +981,41 @@ function getGreeting(){
 
 const planEmoji={'Zona 2':'🚴','Descanso':'😴'};
 
+function buildWeekRing(){
+  const wrap=document.getElementById('hero-ring-wrap');
+  if(!wrap)return;
+  const todayObj=new Date(TODAY+'T12:00:00');
+  const dow=todayObj.getDay();
+  const mondayOff=dow===0?-6:1-dow;
+  const weekDays=[1,2,3,4,5,6,0].map((d,i)=>{
+    const dt=new Date(todayObj);dt.setDate(todayObj.getDate()+mondayOff+i);
+    const ds=dt.toISOString().slice(0,10);
+    const plan=getPlanForDate(ds,d);
+    const isRest=plan.name==='Descanso';
+    const isFuture=ds>TODAY;
+    const data=DB.get('ex_'+ds)||[];
+    const done=!isFuture&&data.some(s=>s.done||(s.series&&s.series.some(sr=>sr&&sr.kg>0)));
+    return{done,isRest,isFuture,ds};
+  });
+  const trainDays=weekDays.filter(d=>!d.isRest).length;
+  const doneDays=weekDays.filter(d=>d.done).length;
+  const r=38,cx=50,cy=50;
+  const circ=2*Math.PI*r;
+  const gap=5;
+  const seg=(circ-7*gap)/7;
+  const segs=weekDays.map((day,i)=>{
+    const col=day.done?'#00BEB8':day.isRest?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.2)';
+    const off=-(i*(seg+gap));
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${seg.toFixed(2)} ${(circ-seg).toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+  }).join('');
+  wrap.innerHTML=`<svg viewBox="0 0 100 100" width="88" height="88">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
+    ${segs}
+    <text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="18" font-weight="800" fill="#fff" font-family="Inter,sans-serif">${doneDays}</text>
+    <text x="${cx}" y="${cy+11}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.5)" font-family="Inter,sans-serif">DE ${trainDays}</text>
+  </svg>`;
+}
+
 function updateHero(){
   const dow=now.getDay();
   const plan=weekPlan[dow];
@@ -977,6 +1038,7 @@ function updateHero(){
     const end=`rgb(${Math.round(15*(1-t)+r*t)},${Math.round(28*(1-t)+g*t)},${Math.round(45*(1-t)+b*t)})`;
     hero.style.background=`linear-gradient(135deg,#0b1522 0%,${end} 100%)`;
   }
+  buildWeekRing();
 }
 
 const weekPlan={
