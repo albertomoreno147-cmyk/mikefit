@@ -286,6 +286,19 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .pr-chip.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
 .cargas-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
 .cargas-row:last-child{border-bottom:none;}
+/* HISTORIAL */
+.hist-entry{border-bottom:1px solid var(--border);}
+.hist-entry:last-child{border-bottom:none;}
+.hist-entry-hdr{display:flex;align-items:center;gap:10px;padding:11px 0;cursor:pointer;user-select:none;}
+.hist-plan-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:7px;flex-shrink:0;}
+.hist-arrow{font-size:16px;color:var(--muted);margin-left:auto;transition:transform 0.2s;flex-shrink:0;}
+.hist-entry.open .hist-arrow{transform:rotate(90deg);}
+.hist-entry-detail{display:none;padding-bottom:10px;padding-left:2px;}
+.hist-entry.open .hist-entry-detail{display:block;}
+.hist-ex-row{padding:5px 0 5px 10px;border-left:2px solid var(--border);margin-bottom:4px;}
+.hist-ex-row.done{border-left-color:var(--teal);}
+.hist-ex-nm{font-size:12px;font-weight:600;color:var(--text);}
+.hist-ex-sets{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5;}
 /* FOTOS DE PROGRESO */
 .prog-photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
 .prog-photo-tile{aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;position:relative;background:var(--bg);flex-shrink:0;}
@@ -632,6 +645,10 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="card">
         <div class="card-title">Cargas esta semana</div>
         <div id="cargas-semana"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Historial de entrenos</div>
+        <div id="historial-list"></div>
       </div>
       <div class="card">
         <div class="card-title">Resumen para el coach</div>
@@ -2186,6 +2203,57 @@ function renderPRChart(name){
   el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">Mejor marca: <strong style="color:var(--blue)">${best}kg</strong></span><span style="font-size:12px;color:var(--muted)">${data.length} sesión${data.length>1?'es':''}</span></div>`+buildSVGChart(data,'#3B82F6','kg');
 }
 
+function renderHistorial(){
+  const el=document.getElementById('historial-list');
+  if(!el)return;
+  const entries=[];
+  Object.keys(localStorage).forEach(k=>{
+    if(!k.startsWith('ex_'))return;
+    const dateStr=k.slice(3);
+    const data=DB.get(k);
+    if(!data||!data.length)return;
+    const dow=new Date(dateStr+'T12:00:00').getDay();
+    const plan=getPlanForDate(dateStr,dow);
+    if(plan.name==='Descanso')return;
+    const hasData=data.some(s=>s.done||(s.series&&s.series.some(sr=>sr&&sr.kg>0)));
+    if(!hasData)return;
+    const dateObj=new Date(dateStr+'T12:00:00');
+    const label=dayNames[dateObj.getDay()]+' '+dateObj.getDate()+' '+months[dateObj.getMonth()].slice(0,3);
+    entries.push({dateStr,label,plan,data,dateObj});
+  });
+  entries.sort((a,b)=>b.dateStr.localeCompare(a.dateStr));
+  const recent=entries.slice(0,30);
+  if(!recent.length){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Sin sesiones registradas aún</div>';return;}
+  el.innerHTML=recent.map(e=>{
+    const exList=allExercises[e.plan.name]||[];
+    const doneCount=e.data.filter(s=>s.done).length;
+    const detail=e.data.map((s,i)=>{
+      const name=s.customName||(i<exList.length?exList[i].name:'Ejercicio');
+      const sets=(s.series||[]).filter(sr=>sr&&sr.kg>0).map((sr,j)=>`S${j+1}: ${sr.kg}kg×${sr.reps||'?'}`).join(' · ');
+      return `<div class="hist-ex-row${s.done?' done':''}">
+        <div class="hist-ex-nm">${s.done?'✓ ':''}${name}</div>
+        ${sets?`<div class="hist-ex-sets">${sets}</div>`:''}
+      </div>`;
+    }).join('');
+    return `<div class="hist-entry" id="hist-${e.dateStr}">
+      <div class="hist-entry-hdr" onclick="toggleHistEntry('${e.dateStr}')">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">${e.label}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">${doneCount}/${e.data.length} ejercicios completados</div>
+        </div>
+        <div class="hist-plan-badge" style="background:${e.plan.color}22;color:${e.plan.color}">${e.plan.short}</div>
+        <div class="hist-arrow">›</div>
+      </div>
+      <div class="hist-entry-detail">${detail}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleHistEntry(dateStr){
+  const el=document.getElementById('hist-'+dateStr);
+  if(el)el.classList.toggle('open');
+}
+
 function renderCargasSemana(){
   const el=document.getElementById('cargas-semana');
   if(!el)return;
@@ -2229,6 +2297,7 @@ function renderProgreso(){
   renderPRChips();
   renderPhotoGrid();
   renderCargasSemana();
+  renderHistorial();
 }
 
 // ---- REST TIMER ----
