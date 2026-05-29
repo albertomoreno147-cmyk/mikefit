@@ -790,122 +790,144 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
     <!-- PERFIL -->
     <div class="page" id="page-perfil">
 
-      <!-- HERO -->
-      <div class="prof-hero">
-        <div class="profile-avatar" id="prof-avatar-wrap" onclick="document.getElementById('avatar-input').click()">
-          <span id="prof-avatar-letter">M</span>
-          <div class="avatar-cam-btn">📷</div>
-        </div>
-        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
-        <div class="prof-name" id="prof-name" onclick="editName()">Mike <span class="prof-name-edit">✏️</span></div>
-        <div class="prof-sub" id="prof-sub-lbl">Recomposición corporal · Semana 2</div>
-        <div class="prof-stats-row">
-          <div class="prof-stat">
-            <div class="prof-stat-val" id="prof-racha">—</div>
-            <div class="prof-stat-lbl">Racha</div>
+      <!-- VISTA PRINCIPAL DEL PERFIL -->
+      <div id="perfil-main">
+
+        <!-- HERO -->
+        <div class="prof-hero">
+          <div class="profile-avatar" id="prof-avatar-wrap" onclick="document.getElementById('avatar-input').click()">
+            <span id="prof-avatar-letter">M</span>
+            <div class="avatar-cam-btn">📷</div>
           </div>
-          <div class="prof-stat">
-            <div class="prof-stat-val" id="prof-sesiones">—</div>
-            <div class="prof-stat-lbl">Sesiones</div>
-          </div>
-          <div class="prof-stat">
-            <div class="prof-stat-val" id="prof-perdido">—</div>
-            <div class="prof-stat-lbl">Perdido</div>
+          <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+          <div class="prof-name" id="prof-name" onclick="editName()">Mike <span class="prof-name-edit">✏️</span></div>
+          <div class="prof-sub" id="prof-sub-lbl">Recomposición corporal · Semana 2</div>
+          <div class="prof-stats-row">
+            <div class="prof-stat"><div class="prof-stat-val" id="prof-racha">—</div><div class="prof-stat-lbl">Racha</div></div>
+            <div class="prof-stat"><div class="prof-stat-val" id="prof-sesiones">—</div><div class="prof-stat-lbl">Sesiones</div></div>
+            <div class="prof-stat"><div class="prof-stat-val" id="prof-perdido">—</div><div class="prof-stat-lbl">Perdido</div></div>
           </div>
         </div>
+
+        <!-- DATOS CORPORALES -->
+        <div class="settings-section-lbl">Datos corporales</div>
+        <div class="card">
+          <div class="prof-data-grid">
+            <div class="prof-data-item"><div class="prof-data-val" id="prof-peso">77.5</div><div class="prof-data-lbl">Peso kg</div></div>
+            <div class="prof-data-item"><div class="prof-data-val">180</div><div class="prof-data-lbl">Talla cm</div></div>
+            <div class="prof-data-item"><div class="prof-data-val">25</div><div class="prof-data-lbl">Edad</div></div>
+            <div class="prof-data-item"><div class="prof-data-val">18.2%</div><div class="prof-data-lbl">% Grasa</div></div>
+          </div>
+          <div class="prof-goal-row">
+            <div class="prof-goal-lbl">Objetivo: 73 kg</div>
+            <div class="prof-goal-bar"><div class="prof-goal-fill" id="prof-goal-fill" style="width:35%"></div></div>
+            <div class="prof-goal-pct" id="prof-goal-pct">35%</div>
+          </div>
+        </div>
+
+        <!-- TRANSFORMACIÓN -->
+        <div class="settings-section-lbl">Transformación</div>
+        <div class="card" id="transf-card">
+          <div id="transf-last-photo"></div>
+          <button class="btn-teal" style="width:100%;margin-top:0" onclick="document.getElementById('prog-photo-input').click()">📸 Añadir foto de progreso</button>
+          <div id="transf-gallery-link"></div>
+        </div>
+        <input type="file" id="prog-photo-input" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(this)">
+
+        <!-- SUPLEMENTOS -->
+        <div class="settings-section-lbl">Suplementos</div>
+        <div class="card"><div id="supp-list"></div></div>
+
+        <!-- ACCESO A AJUSTES -->
+        <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px">
+          <div class="settings-item" onclick="openAjustes()">
+            <div class="settings-icon">⚙️</div>
+            <div class="settings-lbl" style="font-weight:600">Ajustes</div>
+            <div class="settings-chev">›</div>
+          </div>
+        </div>
+
+      </div><!-- /perfil-main -->
+
+      <!-- SUB-PÁGINA AJUSTES -->
+      <div id="perfil-ajustes" style="display:none">
+
+        <div class="bib-back-row" style="margin-bottom:8px">
+          <button class="bib-back-btn" onclick="closeAjustes()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Perfil
+          </button>
+        </div>
+
+        <!-- CUENTA -->
+        <div class="settings-section-lbl">Cuenta</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="settings-item" onclick="alert('Correo: mike@mikefit.es')">
+            <div class="settings-icon">📧</div>
+            <div class="settings-lbl">Correo electrónico</div>
+            <div class="settings-val">mike@mikefit.es</div>
+            <div class="settings-chev">›</div>
+          </div>
+          <div class="settings-item" onclick="alert('Plan activo: Premium — gestionado por tu coach Mike')">
+            <div class="settings-icon">💳</div>
+            <div class="settings-lbl">Plan de pago</div>
+            <div class="settings-badge settings-badge-teal">Premium</div>
+            <div class="settings-chev">›</div>
+          </div>
+        </div>
+
+        <!-- PREFERENCIAS -->
+        <div class="settings-section-lbl">Preferencias</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="settings-item">
+            <div class="settings-icon">🔔</div>
+            <div class="settings-lbl">Notificaciones</div>
+            <div class="toggle-sw off" id="notif-toggle" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="settings-item" onclick="toggleDark()">
+            <div class="settings-icon" id="theme-prof-icon">🌙</div>
+            <div class="settings-lbl" id="theme-prof-lbl">Modo oscuro</div>
+            <div class="toggle-sw off" id="dark-toggle-prof" style="pointer-events:none"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="settings-item" onclick="alert('Ubicación: Madrid, España')">
+            <div class="settings-icon">📍</div>
+            <div class="settings-lbl">Ubicación</div>
+            <div class="settings-val">Madrid, España</div>
+            <div class="settings-chev">›</div>
+          </div>
+          <div class="settings-item" onclick="alert('Unidades: kilogramos y centímetros')">
+            <div class="settings-icon">⚖️</div>
+            <div class="settings-lbl">Unidades</div>
+            <div class="settings-val">kg / cm</div>
+            <div class="settings-chev">›</div>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN -->
+        <div class="settings-section-lbl">Información</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="settings-item" onclick="alert('Tus datos se almacenan localmente en tu dispositivo. MikeFit no comparte ni transfiere tus datos personales a terceros.')">
+            <div class="settings-icon">🔒</div>
+            <div class="settings-lbl">Privacidad y datos</div>
+            <div class="settings-chev">›</div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-icon">ℹ️</div>
+            <div class="settings-lbl">Versión de la app</div>
+            <div class="settings-val">v1.0.0</div>
+          </div>
+          <div class="settings-item" onclick="alert('Contacta con tu coach Mike para cualquier duda sobre tu entrenamiento o plan nutricional 💬')">
+            <div class="settings-icon">🎯</div>
+            <div class="settings-lbl">Contactar con Coach Mike</div>
+            <div class="settings-chev">›</div>
+          </div>
       </div>
 
-      <!-- DATOS CORPORALES -->
-      <div class="settings-section-lbl">Datos corporales</div>
-      <div class="card">
-        <div class="prof-data-grid">
-          <div class="prof-data-item"><div class="prof-data-val" id="prof-peso">77.5</div><div class="prof-data-lbl">Peso kg</div></div>
-          <div class="prof-data-item"><div class="prof-data-val">180</div><div class="prof-data-lbl">Talla cm</div></div>
-          <div class="prof-data-item"><div class="prof-data-val">25</div><div class="prof-data-lbl">Edad</div></div>
-          <div class="prof-data-item"><div class="prof-data-val">18.2%</div><div class="prof-data-lbl">% Grasa</div></div>
         </div>
-        <div class="prof-goal-row">
-          <div class="prof-goal-lbl">Objetivo: 73 kg</div>
-          <div class="prof-goal-bar"><div class="prof-goal-fill" id="prof-goal-fill" style="width:35%"></div></div>
-          <div class="prof-goal-pct" id="prof-goal-pct">35%</div>
-        </div>
-      </div>
 
-      <!-- TRANSFORMACIÓN -->
-      <div class="settings-section-lbl">Transformación</div>
-      <div class="card" id="transf-card">
-        <div id="transf-last-photo"></div>
-        <button class="btn-teal" style="width:100%;margin-top:0" onclick="document.getElementById('prog-photo-input').click()">
-          📸 Añadir foto de progreso
-        </button>
-        <div id="transf-gallery-link"></div>
-      </div>
-      <input type="file" id="prog-photo-input" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(this)">
+        <button class="btn-logout" onclick="alert('Todos tus datos quedan guardados en el dispositivo.')">Cerrar sesión</button>
 
-      <!-- SUPLEMENTOS -->
-      <div class="settings-section-lbl">Suplementos</div>
-      <div class="card"><div id="supp-list"></div></div>
-
-      <!-- AJUSTES -->
-      <div class="settings-section-lbl">Ajustes</div>
-      <div class="card" style="padding:0;overflow:hidden;">
-        <div class="settings-item" onclick="alert('Correo: mike@mikefit.es')">
-          <div class="settings-icon">📧</div>
-          <div class="settings-lbl">Correo electrónico</div>
-          <div class="settings-val">mike@mikefit.es</div>
-          <div class="settings-chev">›</div>
-        </div>
-        <div class="settings-item" onclick="alert('Plan activo: Premium — gestionado por tu coach Mike')">
-          <div class="settings-icon">💳</div>
-          <div class="settings-lbl">Plan de pago</div>
-          <div class="settings-badge settings-badge-teal">Premium</div>
-          <div class="settings-chev">›</div>
-        </div>
-        <div class="settings-item">
-          <div class="settings-icon">🔔</div>
-          <div class="settings-lbl">Notificaciones</div>
-          <div class="toggle-sw off" id="notif-toggle" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
-        </div>
-        <div class="settings-item" onclick="toggleDark()">
-          <div class="settings-icon" id="theme-prof-icon">🌙</div>
-          <div class="settings-lbl" id="theme-prof-lbl">Modo oscuro</div>
-          <div class="toggle-sw off" id="dark-toggle-prof" style="pointer-events:none"><div class="toggle-knob"></div></div>
-        </div>
-        <div class="settings-item" onclick="alert('Ubicación: Madrid, España')">
-          <div class="settings-icon">📍</div>
-          <div class="settings-lbl">Ubicación</div>
-          <div class="settings-val">Madrid, España</div>
-          <div class="settings-chev">›</div>
-        </div>
-        <div class="settings-item" onclick="alert('Unidades: kilogramos y centímetros')">
-          <div class="settings-icon">⚖️</div>
-          <div class="settings-lbl">Unidades</div>
-          <div class="settings-val">kg / cm</div>
-          <div class="settings-chev">›</div>
-        </div>
-      </div>
-
-      <!-- INFORMACIÓN -->
-      <div class="settings-section-lbl">Información</div>
-      <div class="card" style="padding:0;overflow:hidden;">
-        <div class="settings-item" onclick="alert('Tus datos se almacenan localmente en tu dispositivo. MikeFit no comparte ni transfiere tus datos personales a terceros.')">
-          <div class="settings-icon">🔒</div>
-          <div class="settings-lbl">Privacidad y datos</div>
-          <div class="settings-chev">›</div>
-        </div>
-        <div class="settings-item">
-          <div class="settings-icon">ℹ️</div>
-          <div class="settings-lbl">Versión de la app</div>
-          <div class="settings-val">v1.0.0</div>
-        </div>
-        <div class="settings-item" onclick="alert('Contacta con tu coach Mike para cualquier duda sobre tu entrenamiento o plan nutricional 💬')">
-          <div class="settings-icon">🎯</div>
-          <div class="settings-lbl">Contactar con Coach Mike</div>
-          <div class="settings-chev">›</div>
-        </div>
-      </div>
-
-      <button class="btn-logout" onclick="alert('Todos tus datos quedan guardados en el dispositivo.')">Cerrar sesión</button>
+      </div><!-- /perfil-ajustes -->
 
     </div>
 
@@ -925,7 +947,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <span>Ejercicios</span>
     </div>
-    <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);renderProfile()">
+    <div class="nav-item" id="nav-perfil" onclick="gotoPage('perfil',this,'Perfil',false);closeAjustes();renderProfile()">
       <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <span>Perfil</span>
     </div>
@@ -2079,6 +2101,20 @@ function renderProfile(){
   applyTheme();
   renderSupps();
   renderTransformacion();
+}
+
+function openAjustes(){
+  document.getElementById('perfil-main').style.display='none';
+  const aj=document.getElementById('perfil-ajustes');
+  aj.style.display='';
+  aj.style.animation='slideFromRight 0.22s ease';
+  document.getElementById('header-title').textContent='Ajustes';
+}
+
+function closeAjustes(){
+  document.getElementById('perfil-ajustes').style.display='none';
+  document.getElementById('perfil-main').style.display='';
+  document.getElementById('header-title').textContent='Perfil';
 }
 
 function goToTodayWorkout(){
