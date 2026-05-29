@@ -160,6 +160,24 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .alts-title{font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;}
 .alts-list{display:flex;flex-wrap:wrap;gap:4px;}
 .alt-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--muted);}
+.serie-box-input.sdone{background:var(--teal-dim);border-color:var(--teal-border);}
+.s-check{color:var(--muted);font-size:11px;font-weight:700;}
+.s-check.sdone{background:var(--teal);border-color:var(--teal);color:#fff;}
+/* REST TIMER PANEL */
+.rest-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:24px 24px 0 0;padding:0 20px calc(var(--safe-bottom) + 76px);z-index:200;box-shadow:0 -6px 40px rgba(0,0,0,0.18);transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.34,1.2,0.64,1);}
+.rest-panel.open{transform:translateY(0);}
+.rest-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:14px auto 18px;}
+.rest-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.rest-label{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;}
+.rest-ex-name{font-size:16px;font-weight:700;color:var(--text);}
+.rest-close-btn{width:34px;height:34px;border-radius:50%;background:var(--bg);border:none;color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rest-ring-wrap{display:flex;justify-content:center;margin-bottom:16px;}
+.rest-presets{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
+.rest-preset-btn{flex:1;max-width:72px;padding:8px 0;border-radius:11px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.15s;}
+.rest-preset-btn.active{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.rest-actions{display:flex;gap:10px;}
+.rest-pause-btn{flex:1;padding:14px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.rest-skip-btn{flex:1;padding:14px;border-radius:14px;border:none;background:var(--teal);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
 
 /* MEALS */
 .meal-row-mini{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;}
@@ -408,6 +426,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 </style>
 </head>
 <body>
+<script>try{if(JSON.parse(localStorage.getItem('dark_mode')))document.body.classList.add('dark')}catch(e){}</script>
 <div class="app">
   <div class="status-bar"></div>
 
@@ -1162,12 +1181,14 @@ function renderDayDetail(which){
         if(kgs.length)prevTxt=`<div style="font-size:10px;color:var(--muted);margin-top:2px">Sem anterior: ${kgs.join(' · ')}</div>`;
       }
       const seriesHtml=s.series.map((sr,j)=>{
-        return `<div class="serie-box-input">
+        const sd=sr&&sr.done;
+        return `<div class="serie-box-input${sd?' sdone':''}">
           <div class="s-btn" onclick="chgKg('${selDate}',${i},${j},-2.5,'${which}')">−</div>
           <span>S${j+1}</span>
           <input type="number" value="${sr&&sr.kg||''}" placeholder="kg" onchange="setKg('${selDate}',${i},${j},this.value)">
           <input type="number" value="${sr&&sr.reps||''}" placeholder="r" onchange="setReps('${selDate}',${i},${j},this.value)" style="width:28px">
           <div class="s-btn" onclick="chgKg('${selDate}',${i},${j},2.5,'${which}')">+</div>
+          <div class="s-btn s-check${sd?' sdone':''}" onclick="checkSerie('${selDate}',${i},${j},'${which}')">✓</div>
         </div>`;
       }).join('');
       const altsHtml=alts&&alts.length?`<div class="alts-section"><div class="alts-title">Alternativas</div><div class="alts-list">${alts.map(a=>`<div class="alt-btn" onclick="swapEx('${selDate}',${i},'${a}','${which}')">↔ ${a}</div>`).join('')}</div></div>`:'';
@@ -1905,6 +1926,87 @@ function hexToRgba(hex,a){
   return `rgba(${r},${g},${b},${a})`;
 }
 
+// ---- REST TIMER ----
+const restState={active:false,paused:false,remaining:90,total:90,interval:null,exName:''};
+
+function checkSerie(date,i,j,which){
+  const dow=new Date(date+'T12:00:00').getDay();
+  const plan=getPlanForDate(date,dow);
+  const exList=allExercises[plan.name]||[];
+  let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
+  if(!s[i]||!s[i].series[j])return;
+  const wasDone=s[i].series[j].done;
+  s[i].series[j].done=!wasDone;
+  DB.set('ex_'+date,s);
+  renderDayDetail(which);
+  if(!wasDone){
+    const ex=i<exList.length?exList[i]:null;
+    const name=s[i].customName||(ex?ex.name:'Ejercicio');
+    const secs=DB.get('rest_timer_secs')||90;
+    startRestTimer(name,secs);
+  }
+}
+
+function startRestTimer(name,secs){
+  clearInterval(restState.interval);
+  restState.active=true;
+  restState.paused=false;
+  restState.remaining=secs;
+  restState.total=secs;
+  restState.exName=name;
+  document.getElementById('rest-ex-name').textContent=name;
+  document.getElementById('rest-pause-btn').textContent='⏸ Pausa';
+  document.getElementById('rest-panel').classList.add('open');
+  updateTimerUI();
+  restState.interval=setInterval(tickRestTimer,1000);
+}
+
+function tickRestTimer(){
+  if(restState.paused)return;
+  restState.remaining=Math.max(0,restState.remaining-1);
+  updateTimerUI();
+  if(restState.remaining<=0){stopRestTimer(true);}
+}
+
+function updateTimerUI(){
+  const r=restState.remaining;
+  const mins=Math.floor(r/60),secs=r%60;
+  const txt=mins>0?mins+':'+String(secs).padStart(2,'0'):secs+'s';
+  document.getElementById('rest-timer-txt').textContent=txt;
+  const sub=document.querySelector('#rest-panel .rest-ring-wrap text:last-child');
+  if(sub)sub.textContent=mins>0?'min':'segundos';
+  const offset=427*(1-restState.remaining/restState.total);
+  document.getElementById('rest-ring').style.strokeDashoffset=offset;
+  [60,90,120,180].forEach(s=>{
+    const btn=document.getElementById('preset-'+s);
+    if(btn)btn.classList.toggle('active',s===restState.total);
+  });
+}
+
+function stopRestTimer(vibrate){
+  clearInterval(restState.interval);
+  restState.active=false;
+  document.getElementById('rest-panel').classList.remove('open');
+  if(vibrate&&navigator.vibrate)navigator.vibrate([200,100,200]);
+}
+
+function skipRestTimer(){stopRestTimer(false);}
+
+function togglePauseTimer(){
+  restState.paused=!restState.paused;
+  const btn=document.getElementById('rest-pause-btn');
+  if(btn)btn.textContent=restState.paused?'▶ Continuar':'⏸ Pausa';
+}
+
+function changeRestPreset(secs){
+  DB.set('rest_timer_secs',secs);
+  restState.remaining=secs;
+  restState.total=secs;
+  restState.paused=false;
+  document.getElementById('rest-pause-btn').textContent='⏸ Pausa';
+  updateTimerUI();
+}
+
 // ---- INIT ----
 applyTheme();
 updateHero();
@@ -1926,5 +2028,36 @@ _sc.addEventListener('touchend',e=>{
   else if(dx>0&&currentTab==='semana')switchTab('dashboard',tabs[0]);
 },{passive:true});
 </script>
+<!-- REST TIMER PANEL -->
+<div id="rest-panel" class="rest-panel">
+  <div class="rest-handle"></div>
+  <div class="rest-header">
+    <div>
+      <div class="rest-label">⏱ Descansando</div>
+      <div class="rest-ex-name" id="rest-ex-name"></div>
+    </div>
+    <button class="rest-close-btn" onclick="skipRestTimer()">✕</button>
+  </div>
+  <div class="rest-ring-wrap">
+    <svg width="160" height="160" viewBox="0 0 160 160">
+      <circle cx="80" cy="80" r="68" fill="none" stroke="var(--border)" stroke-width="10"/>
+      <circle id="rest-ring" cx="80" cy="80" r="68" fill="none" stroke="var(--teal)" stroke-width="10"
+        stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="0"
+        transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 0.95s linear;"/>
+      <text x="80" y="76" text-anchor="middle" font-size="44" font-weight="800" fill="var(--text)" id="rest-timer-txt" font-family="Inter,sans-serif">1:30</text>
+      <text x="80" y="100" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">segundos</text>
+    </svg>
+  </div>
+  <div class="rest-presets">
+    <div class="rest-preset-btn" id="preset-60" onclick="changeRestPreset(60)">1 min</div>
+    <div class="rest-preset-btn active" id="preset-90" onclick="changeRestPreset(90)">1:30</div>
+    <div class="rest-preset-btn" id="preset-120" onclick="changeRestPreset(120)">2 min</div>
+    <div class="rest-preset-btn" id="preset-180" onclick="changeRestPreset(180)">3 min</div>
+  </div>
+  <div class="rest-actions">
+    <button class="rest-pause-btn" id="rest-pause-btn" onclick="togglePauseTimer()">⏸ Pausa</button>
+    <button class="rest-skip-btn" onclick="skipRestTimer()">Saltar →</button>
+  </div>
+</div>
 </body>
 </html>
