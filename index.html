@@ -302,6 +302,31 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .medidas-log-item:last-child{border-bottom:none;}
 .medidas-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;}
 .medida-chip{font-size:10px;background:var(--bg);border-radius:6px;padding:2px 7px;color:var(--muted);font-weight:500;}
+/* CALCULADORAS */
+.calc-tabs{display:flex;background:var(--bg);border-radius:11px;padding:3px;margin-bottom:16px;}
+.calc-tab{flex:1;padding:8px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:all 0.15s;}
+.calc-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,0.1);}
+.calc-input-row{display:flex;gap:8px;margin-bottom:12px;}
+.calc-input-box{flex:1;display:flex;flex-direction:column;gap:4px;}
+.calc-input-box label{font-size:11px;font-weight:600;color:var(--muted);}
+.calc-input-box input{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;font-weight:600;outline:none;font-family:inherit;width:100%;box-sizing:border-box;text-align:center;}
+.calc-input-box input:focus{border-color:var(--teal);}
+.calc-result-big{text-align:center;padding:14px 0 8px;}
+.calc-result-val{font-size:44px;font-weight:800;color:var(--teal);line-height:1;}
+.calc-result-lbl{font-size:13px;color:var(--muted);margin-top:4px;}
+.calc-pct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px;}
+.calc-pct-box{background:var(--bg);border-radius:10px;padding:8px 6px;text-align:center;}
+.calc-pct-val{font-size:14px;font-weight:700;color:var(--text);}
+.calc-pct-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+.calc-barra-sel{display:flex;gap:8px;margin-bottom:12px;}
+.calc-barra-btn{flex:1;padding:9px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.15s;font-family:inherit;}
+.calc-barra-btn.active{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.disc-result{margin-top:12px;}
+.disc-side-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+.disc-bar-wrap{display:flex;align-items:center;gap:4px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px;}
+.disc-barra{height:14px;width:80px;background:var(--muted);border-radius:3px;flex-shrink:0;opacity:0.5;}
+.disc-chip{height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;min-width:28px;padding:0 5px;}
+.disc-list{font-size:13px;color:var(--text);line-height:1.8;}
 /* HISTORIAL */
 .hist-entry{border-bottom:1px solid var(--border);}
 .hist-entry:last-child{border-bottom:none;}
@@ -672,6 +697,40 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
           <button class="save-btn-sm" style="width:100%" onclick="saveMedidas()">Guardar medidas</button>
         </div>
         <div id="medidas-log" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Calculadoras</div>
+        <div class="calc-tabs">
+          <div class="calc-tab active" id="ctab-1rm" onclick="switchCalcTab('1rm')">1RM</div>
+          <div class="calc-tab" id="ctab-discos" onclick="switchCalcTab('discos')">Discos</div>
+        </div>
+        <!-- 1RM -->
+        <div id="calc-1rm">
+          <div class="calc-input-row">
+            <div class="calc-input-box"><label>Peso (kg)</label><input type="number" step="0.5" id="c1rm-peso" placeholder="80" oninput="calc1RM()"></div>
+            <div class="calc-input-box"><label>Reps</label><input type="number" step="1" id="c1rm-reps" placeholder="6" oninput="calc1RM()"></div>
+          </div>
+          <div id="c1rm-result" style="display:none">
+            <div class="calc-result-big">
+              <div class="calc-result-val" id="c1rm-val">—</div>
+              <div class="calc-result-lbl">Máximo teórico (1RM)</div>
+            </div>
+            <div class="calc-pct-grid" id="c1rm-grid"></div>
+          </div>
+        </div>
+        <!-- DISCOS -->
+        <div id="calc-discos" style="display:none">
+          <div class="calc-barra-sel">
+            <div class="calc-barra-btn active" id="cbarra-20" onclick="selectBarra(20)">Barra 20 kg</div>
+            <div class="calc-barra-btn" id="cbarra-10" onclick="selectBarra(10)">Barra 10 kg</div>
+          </div>
+          <div class="calc-input-row">
+            <div class="calc-input-box"><label>Peso objetivo (kg)</label><input type="number" step="0.5" id="c-disco-peso" placeholder="100" oninput="calcDiscos()"></div>
+          </div>
+          <div id="c-disco-result" style="display:none">
+            <div class="disc-result" id="disc-result-wrap"></div>
+          </div>
+        </div>
       </div>
       <div class="card">
         <div class="card-title">Cargas esta semana</div>
@@ -2232,6 +2291,66 @@ function renderPRChart(name){
   }
   const best=Math.max(...data.map(d=>d.val));
   el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">Mejor marca: <strong style="color:var(--blue)">${best}kg</strong></span><span style="font-size:12px;color:var(--muted)">${data.length} sesión${data.length>1?'es':''}</span></div>`+buildSVGChart(data,'#3B82F6','kg');
+}
+
+// ---- CALCULADORAS ----
+let calcBarraKg=20;
+
+function switchCalcTab(tab){
+  document.getElementById('ctab-1rm').classList.toggle('active',tab==='1rm');
+  document.getElementById('ctab-discos').classList.toggle('active',tab==='discos');
+  document.getElementById('calc-1rm').style.display=tab==='1rm'?'':'none';
+  document.getElementById('calc-discos').style.display=tab==='discos'?'':'none';
+}
+
+function calc1RM(){
+  const peso=parseFloat(document.getElementById('c1rm-peso').value);
+  const reps=parseInt(document.getElementById('c1rm-reps').value);
+  const res=document.getElementById('c1rm-result');
+  if(!peso||!reps||reps<1||reps>30){res.style.display='none';return;}
+  const orm=Math.round(peso*(1+reps/30)*10)/10;
+  document.getElementById('c1rm-val').textContent=orm+'kg';
+  res.style.display='';
+  const pcts=[100,95,90,85,80,75,70,65,60];
+  document.getElementById('c1rm-grid').innerHTML=pcts.map(p=>{
+    const v=Math.round(orm*(p/100)*2)/2;
+    return `<div class="calc-pct-box"><div class="calc-pct-val">${v}kg</div><div class="calc-pct-lbl">${p}%</div></div>`;
+  }).join('');
+}
+
+function selectBarra(kg){
+  calcBarraKg=kg;
+  document.getElementById('cbarra-20').classList.toggle('active',kg===20);
+  document.getElementById('cbarra-10').classList.toggle('active',kg===10);
+  calcDiscos();
+}
+
+function calcDiscos(){
+  const target=parseFloat(document.getElementById('c-disco-peso').value);
+  const res=document.getElementById('c-disco-result');
+  const wrap=document.getElementById('disc-result-wrap');
+  if(!target||target<=calcBarraKg){res.style.display='none';return;}
+  const available=[20,15,10,5,2.5,1.25];
+  const discColors={20:'#3B82F6',15:'#EAB308',10:'#22C55E',5:'#EF4444',2.5:'#8B5CF6',1.25:'#94A3B8'};
+  let perSide=(target-calcBarraKg)/2;
+  const discs=[];
+  available.forEach(d=>{
+    while(Math.round(perSide*100)>=Math.round(d*100)){
+      discs.push(d);
+      perSide=Math.round((perSide-d)*100)/100;
+    }
+  });
+  if(Math.round(perSide*100)>0){
+    res.style.display='none';
+    wrap.innerHTML=`<div style="text-align:center;color:var(--muted);font-size:13px">No se puede hacer exacto con discos estándar.<br>Más cercano: ${target-perSide*2}kg</div>`;
+    res.style.display='';
+    return;
+  }
+  const barHtml=`<div class="disc-bar-wrap">${discs.map(d=>`<div class="disc-chip" style="background:${discColors[d]};width:${Math.max(28,d*2)}px">${d}</div>`).join('')}<div class="disc-barra"></div>${discs.slice().reverse().map(d=>`<div class="disc-chip" style="background:${discColors[d]};width:${Math.max(28,d*2)}px">${d}</div>`).join('')}</div>`;
+  const grouped={};discs.forEach(d=>{grouped[d]=(grouped[d]||0)+1;});
+  const listHtml=`<div class="disc-list">${Object.entries(grouped).map(([d,n])=>`<span style="color:${discColors[d]};font-weight:700">${n}×${d}kg</span>`).join(' + ')} <span style="color:var(--muted)">por lado</span></div>`;
+  wrap.innerHTML=`<div class="disc-side-lbl">Cada lado</div>${barHtml}${listHtml}<div style="font-size:12px;color:var(--muted);margin-top:8px">Barra ${calcBarraKg}kg + ${(target-calcBarraKg)/2}kg × 2 lados = ${target}kg total</div>`;
+  res.style.display='';
 }
 
 function renderMedidas(){
