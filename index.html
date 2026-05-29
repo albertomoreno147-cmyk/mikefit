@@ -681,7 +681,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="card">
         <div class="card-title">Fotos de progreso</div>
         <div class="prog-photo-grid" id="prog-photo-grid"></div>
-        <input type="file" id="prog-photo-input" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(this)">
       </div>
       <div class="card">
         <div class="card-title">Medidas corporales</div>
@@ -831,6 +830,17 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
           <div class="prof-goal-pct" id="prof-goal-pct">35%</div>
         </div>
       </div>
+
+      <!-- TRANSFORMACIÓN -->
+      <div class="settings-section-lbl">Transformación</div>
+      <div class="card" id="transf-card">
+        <div id="transf-last-photo"></div>
+        <button class="btn-teal" style="width:100%;margin-top:0" onclick="document.getElementById('prog-photo-input').click()">
+          📸 Añadir foto de progreso
+        </button>
+        <div id="transf-gallery-link"></div>
+      </div>
+      <input type="file" id="prog-photo-input" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(this)">
 
       <!-- SUPLEMENTOS -->
       <div class="settings-section-lbl">Suplementos</div>
@@ -2068,6 +2078,7 @@ function renderProfile(){
   if(pctEl)pctEl.textContent=pct+'%';
   applyTheme();
   renderSupps();
+  renderTransformacion();
 }
 
 function goToTodayWorkout(){
@@ -2091,9 +2102,26 @@ function renderPhotoGrid(){
   const el=document.getElementById('prog-photo-grid');
   if(!el)return;
   const photos=DB.get('progress_photos')||[];
-  const addTile=`<div class="prog-photo-add" onclick="document.getElementById('prog-photo-input').click()"><div class="prog-photo-add-icon">+</div><div class="prog-photo-add-lbl">Añadir</div></div>`;
-  const tiles=photos.slice().reverse().map(p=>`<div class="prog-photo-tile${compareSelection.includes(p.id)?' selected':''}" onclick="openPhotoViewer('${p.id}')"><img src="${p.dataUrl}" loading="lazy"><div class="prog-photo-label">${p.label}</div></div>`).join('');
-  el.innerHTML=addTile+tiles;
+  if(!photos.length){
+    el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px 16px;color:var(--muted);font-size:13px;line-height:1.6">Sin fotos aún<br><span style="font-size:12px">Añádelas desde tu <strong>Perfil → Transformación</strong></span></div>';
+    return;
+  }
+  el.innerHTML=photos.slice().reverse().map(p=>`<div class="prog-photo-tile${compareSelection.includes(p.id)?' selected':''}" onclick="openPhotoViewer('${p.id}')"><img src="${p.dataUrl}" loading="lazy"><div class="prog-photo-label">${p.label}</div></div>`).join('');
+}
+
+function renderTransformacion(){
+  const lastEl=document.getElementById('transf-last-photo');
+  const linkEl=document.getElementById('transf-gallery-link');
+  if(!lastEl)return;
+  const photos=DB.get('progress_photos')||[];
+  if(!photos.length){
+    lastEl.innerHTML='<div style="text-align:center;padding:16px 0 14px;color:var(--muted);font-size:13px">Aún no tienes fotos de progreso.<br><span style="font-size:12px">Añade la primera para empezar a ver tu transformación.</span></div>';
+    if(linkEl)linkEl.innerHTML='';
+    return;
+  }
+  const last=photos[photos.length-1];
+  lastEl.innerHTML=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><img src="${last.dataUrl}" style="width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0"><div><div style="font-size:13px;font-weight:700">Última foto</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${last.label}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${photos.length} foto${photos.length>1?'s':''} en total</div></div></div>`;
+  if(linkEl)linkEl.innerHTML=`<div onclick="gotoPage('progreso',document.getElementById('nav-progreso'),'Progreso',false);renderProgreso()" style="text-align:center;margin-top:10px;font-size:13px;font-weight:600;color:var(--teal);cursor:pointer">Ver galería completa →</div>`;
 }
 
 function addProgressPhoto(input){
