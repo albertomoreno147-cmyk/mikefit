@@ -13,7 +13,7 @@
 <style>
 :root{
   --bg:#F2F5F8;--surface:#FFFFFF;--card:#FFFFFF;
-  --border:rgba(0,0,0,0.07);--shadow:0 2px 10px rgba(0,0,0,0.06);
+  --border:rgba(0,0,0,0.07);--shadow:0 2px 18px rgba(0,0,0,0.07);--shadow-lg:0 8px 32px rgba(0,0,0,0.10);
   --text:#1A2332;--muted:#8A9BB0;
   --teal:#00BEB8;--teal-dim:rgba(0,190,184,0.12);--teal-border:rgba(0,190,184,0.35);
   --blue:#3B82F6;--blue-dim:rgba(59,130,246,0.12);
@@ -88,12 +88,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .sub-page.active{display:block;}
 
 /* CARDS */
-.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);}
 .card-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;}
 .sec-title{font-size:16px;font-weight:700;margin-bottom:8px;}
 
 /* HERO */
-.hero-card{border-radius:18px;margin-bottom:14px;background:linear-gradient(135deg,#1a2332 0%,#2d4060 100%);padding:20px;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;}
+.hero-card{border-radius:22px;margin-bottom:14px;background:linear-gradient(135deg,#091729 0%,#0f2744 45%,#0a3d62 100%);padding:22px;min-height:140px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:var(--shadow-lg);}
 .hero-tag{font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
 .hero-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;}
 .hero-sub{font-size:12px;color:var(--teal);font-weight:600;}
@@ -271,14 +271,14 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
 /* PROGRESO */
 .stat-row{display:flex;gap:10px;margin-bottom:10px;}
-.stat-box{flex:1;background:var(--surface);border-radius:14px;padding:14px 12px;box-shadow:var(--shadow);}
+.stat-box{flex:1;background:var(--surface);border-radius:18px;padding:16px 12px;box-shadow:var(--shadow);}
 .stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;}
 .stat-val{font-size:22px;font-weight:700;letter-spacing:-0.5px;}
 .stat-sub{font-size:11px;color:var(--muted);margin-top:3px;}
 .peso-input-row{display:flex;gap:10px;margin-bottom:10px;}
 .peso-input-row input{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;font-family:inherit;}
 .peso-input-row input:focus{border-color:var(--teal);}
-.save-btn-sm{background:var(--teal);color:white;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;}
+.save-btn-sm{background:linear-gradient(135deg,#00BEB8,#009e99);color:white;border:none;border-radius:14px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;}
 .peso-log-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
 .peso-log-item:last-child{border-bottom:none;}
 .pr-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
@@ -396,7 +396,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .note-area{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:13px;font-family:inherit;resize:none;outline:none;min-height:80px;line-height:1.6;}
 .note-area:focus{border-color:var(--teal);}
 .note-save{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:10px;width:100%;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;font-family:inherit;}
-.btn-teal{background:var(--teal);color:white;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px;font-family:inherit;}
+.btn-teal{background:linear-gradient(135deg,#00BEB8,#009e99);color:white;border:none;border-radius:14px;padding:14px 20px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-bottom:8px;font-family:inherit;letter-spacing:0.01em;}
 .btn-green{background:var(--green);color:white;border:none;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;}
 .rest-msg{text-align:center;padding:32px 20px;color:var(--muted);font-size:14px;line-height:1.7;}
 .row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -463,7 +463,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
 /* NAV ACTIVE PILL */
 .nav-icon{transition:background 0.18s,border-radius 0.18s;}
-.nav-item.active .nav-icon{background:var(--teal-dim);border-radius:14px;}
+.nav-item.active .nav-icon{background:var(--teal-dim);border-radius:16px;width:54px;transition:all 0.2s;}
 
 /* TAB SLIDE ANIMATIONS */
 @keyframes slideFromRight{from{opacity:0;transform:translateX(26px);}to{opacity:1;transform:none;}}
@@ -482,7 +482,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .bib-group-img{height:138px!important;width:138px!important;right:-6px!important;opacity:1!important;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5))!important;}
 
 /* PROFILE HERO */
-.prof-hero{background:var(--card);border-radius:18px;margin-bottom:12px;padding:24px 16px 20px;text-align:center;box-shadow:var(--shadow);}
+.prof-hero{background:linear-gradient(160deg,rgba(0,190,184,0.08) 0%,var(--card) 55%);border-radius:22px;margin-bottom:12px;padding:28px 16px 22px;text-align:center;box-shadow:var(--shadow-lg);border:1px solid rgba(0,190,184,0.1);}
 .prof-name{font-size:20px;font-weight:700;margin-bottom:3px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
 .prof-name-edit{font-size:13px;opacity:0.35;line-height:1;}
 .prof-name input{font-size:20px;font-weight:700;color:var(--text);border:none;border-bottom:2px solid var(--teal);background:transparent;text-align:center;width:160px;outline:none;font-family:inherit;}
@@ -508,7 +508,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .settings-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;}
 .settings-item:last-child{border-bottom:none;}
 .settings-item:active{background:var(--bg);}
-.settings-icon{font-size:19px;width:30px;text-align:center;flex-shrink:0;}
+.settings-icon{font-size:17px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);}
+.si-blue{background:rgba(59,130,246,0.15);}
+.si-green{background:rgba(34,197,94,0.15);}
+.si-red{background:rgba(239,68,68,0.15);}
+.si-purple{background:rgba(139,92,246,0.15);}
+.si-orange{background:rgba(249,115,22,0.15);}
+.si-teal{background:var(--teal-dim);}
+.si-dark{background:rgba(15,23,42,0.08);}
+.si-yellow{background:rgba(234,179,8,0.15);}
 .settings-lbl{flex:1;font-size:14px;font-weight:500;color:var(--text);}
 .settings-val{font-size:13px;color:var(--muted);margin-right:2px;}
 .settings-chev{font-size:19px;color:var(--muted);line-height:1;}
@@ -841,7 +849,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <!-- ACCESO A AJUSTES -->
         <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px">
           <div class="settings-item" onclick="openAjustes()">
-            <div class="settings-icon">⚙️</div>
+            <div class="settings-icon si-dark">⚙️</div>
             <div class="settings-lbl" style="font-weight:600">Ajustes</div>
             <div class="settings-chev">›</div>
           </div>
@@ -863,13 +871,13 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div class="settings-section-lbl">Cuenta</div>
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="settings-item" onclick="alert('Correo: mike@mikefit.es')">
-            <div class="settings-icon">📧</div>
+            <div class="settings-icon si-blue">📧</div>
             <div class="settings-lbl">Correo electrónico</div>
             <div class="settings-val">mike@mikefit.es</div>
             <div class="settings-chev">›</div>
           </div>
           <div class="settings-item" onclick="alert('Plan activo: Premium — gestionado por tu coach Mike')">
-            <div class="settings-icon">💳</div>
+            <div class="settings-icon si-yellow">💳</div>
             <div class="settings-lbl">Plan de pago</div>
             <div class="settings-badge settings-badge-teal">Premium</div>
             <div class="settings-chev">›</div>
@@ -880,23 +888,23 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div class="settings-section-lbl">Preferencias</div>
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="settings-item">
-            <div class="settings-icon">🔔</div>
+            <div class="settings-icon si-red">🔔</div>
             <div class="settings-lbl">Notificaciones</div>
             <div class="toggle-sw off" id="notif-toggle" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="toggle-knob"></div></div>
           </div>
           <div class="settings-item" onclick="toggleDark()">
-            <div class="settings-icon" id="theme-prof-icon">🌙</div>
+            <div class="settings-icon si-dark" id="theme-prof-icon">🌙</div>
             <div class="settings-lbl" id="theme-prof-lbl">Modo oscuro</div>
             <div class="toggle-sw off" id="dark-toggle-prof" style="pointer-events:none"><div class="toggle-knob"></div></div>
           </div>
           <div class="settings-item" onclick="alert('Ubicación: Madrid, España')">
-            <div class="settings-icon">📍</div>
+            <div class="settings-icon si-blue">📍</div>
             <div class="settings-lbl">Ubicación</div>
             <div class="settings-val">Madrid, España</div>
             <div class="settings-chev">›</div>
           </div>
           <div class="settings-item" onclick="alert('Unidades: kilogramos y centímetros')">
-            <div class="settings-icon">⚖️</div>
+            <div class="settings-icon si-orange">⚖️</div>
             <div class="settings-lbl">Unidades</div>
             <div class="settings-val">kg / cm</div>
             <div class="settings-chev">›</div>
@@ -907,17 +915,17 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div class="settings-section-lbl">Información</div>
         <div class="card" style="padding:0;overflow:hidden;">
           <div class="settings-item" onclick="alert('Tus datos se almacenan localmente en tu dispositivo. MikeFit no comparte ni transfiere tus datos personales a terceros.')">
-            <div class="settings-icon">🔒</div>
+            <div class="settings-icon si-green">🔒</div>
             <div class="settings-lbl">Privacidad y datos</div>
             <div class="settings-chev">›</div>
           </div>
           <div class="settings-item">
-            <div class="settings-icon">ℹ️</div>
+            <div class="settings-icon si-dark">ℹ️</div>
             <div class="settings-lbl">Versión de la app</div>
             <div class="settings-val">v1.0.0</div>
           </div>
           <div class="settings-item" onclick="alert('Contacta con tu coach Mike para cualquier duda sobre tu entrenamiento o plan nutricional 💬')">
-            <div class="settings-icon">🎯</div>
+            <div class="settings-icon si-teal">🎯</div>
             <div class="settings-lbl">Contactar con Coach Mike</div>
             <div class="settings-chev">›</div>
           </div>
