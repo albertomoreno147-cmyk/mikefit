@@ -286,6 +286,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .pr-chip.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
 .cargas-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
 .cargas-row:last-child{border-bottom:none;}
+/* MEDIDAS CORPORALES */
+.medidas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.medida-box{background:var(--bg);border-radius:13px;padding:12px 14px;}
+.medida-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+.medida-val{font-size:22px;font-weight:800;color:var(--text);line-height:1;}
+.medida-val span{font-size:13px;font-weight:500;}
+.medida-diff{font-size:11px;font-weight:700;margin-top:3px;}
+.medidas-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.medida-input-wrap{display:flex;flex-direction:column;gap:4px;}
+.medida-input-wrap label{font-size:11px;font-weight:600;color:var(--muted);}
+.medida-input-wrap input{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit;width:100%;box-sizing:border-box;}
+.medida-input-wrap input:focus{border-color:var(--teal);}
+.medidas-log-item{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);gap:8px;}
+.medidas-log-item:last-child{border-bottom:none;}
+.medidas-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;}
+.medida-chip{font-size:10px;background:var(--bg);border-radius:6px;padding:2px 7px;color:var(--muted);font-weight:500;}
 /* HISTORIAL */
 .hist-entry{border-bottom:1px solid var(--border);}
 .hist-entry:last-child{border-bottom:none;}
@@ -641,6 +657,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div class="card-title">Fotos de progreso</div>
         <div class="prog-photo-grid" id="prog-photo-grid"></div>
         <input type="file" id="prog-photo-input" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(this)">
+      </div>
+      <div class="card">
+        <div class="card-title">Medidas corporales</div>
+        <div class="medidas-grid" id="medidas-grid"></div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em">Registrar medidas</div>
+          <div class="medidas-inputs">
+            <div class="medida-input-wrap"><label>Pecho (cm)</label><input type="number" step="0.5" id="m-pecho" placeholder="96"></div>
+            <div class="medida-input-wrap"><label>Cintura (cm)</label><input type="number" step="0.5" id="m-cintura" placeholder="83"></div>
+            <div class="medida-input-wrap"><label>Brazos (cm)</label><input type="number" step="0.5" id="m-brazos" placeholder="34"></div>
+            <div class="medida-input-wrap"><label>Muslos (cm)</label><input type="number" step="0.5" id="m-muslos" placeholder="57"></div>
+          </div>
+          <button class="save-btn-sm" style="width:100%" onclick="saveMedidas()">Guardar medidas</button>
+        </div>
+        <div id="medidas-log" style="margin-top:12px"></div>
       </div>
       <div class="card">
         <div class="card-title">Cargas esta semana</div>
@@ -2203,6 +2234,61 @@ function renderPRChart(name){
   el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">Mejor marca: <strong style="color:var(--blue)">${best}kg</strong></span><span style="font-size:12px;color:var(--muted)">${data.length} sesión${data.length>1?'es':''}</span></div>`+buildSVGChart(data,'#3B82F6','kg');
 }
 
+function renderMedidas(){
+  const log=DB.get('medidas_log')||[];
+  const grid=document.getElementById('medidas-grid');
+  const logEl=document.getElementById('medidas-log');
+  if(!grid)return;
+  const last=log[log.length-1]||null;
+  const prev=log[log.length-2]||null;
+  const fields=[
+    {key:'pecho',lbl:'Pecho',good:1},
+    {key:'cintura',lbl:'Cintura',good:-1},
+    {key:'brazos',lbl:'Brazos',good:1},
+    {key:'muslos',lbl:'Muslos',good:1}
+  ];
+  if(!last){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:12px;color:var(--muted);font-size:13px">Registra tus primeras medidas para ver el progreso</div>';
+  } else {
+    grid.innerHTML=fields.map(f=>{
+      const val=last[f.key];
+      if(!val)return '';
+      let diffHtml='';
+      if(prev&&prev[f.key]){
+        const d=Math.round((val-prev[f.key])*10)/10;
+        if(d!==0){
+          const good=(d>0&&f.good>0)||(d<0&&f.good<0);
+          const col=good?'var(--green)':'var(--red)';
+          diffHtml=`<div class="medida-diff" style="color:${col}">${d>0?'+':''}${d} cm</div>`;
+        }else{diffHtml=`<div class="medida-diff" style="color:var(--muted)">sin cambios</div>`;}
+      }
+      return `<div class="medida-box"><div class="medida-lbl">${f.lbl}</div><div class="medida-val">${val}<span> cm</span></div>${diffHtml}</div>`;
+    }).join('');
+  }
+  if(!logEl)return;
+  if(!log.length){logEl.innerHTML='';return;}
+  logEl.innerHTML=`<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Historial</div>`+
+    log.slice().reverse().slice(0,5).map(e=>{
+      const chips=fields.filter(f=>e[f.key]).map(f=>`<div class="medida-chip">${f.lbl.slice(0,1)}: ${e[f.key]}cm</div>`).join('');
+      return `<div class="medidas-log-item"><span style="font-size:12px;color:var(--muted);flex-shrink:0">${e.label}</span><div class="medidas-chips">${chips}</div></div>`;
+    }).join('');
+}
+
+function saveMedidas(){
+  const vals={};
+  ['pecho','cintura','brazos','muslos'].forEach(k=>{
+    const v=parseFloat(document.getElementById('m-'+k).value);
+    if(!isNaN(v)&&v>0)vals[k]=v;
+  });
+  if(!Object.keys(vals).length)return;
+  const log=DB.get('medidas_log')||[];
+  const d=new Date();
+  log.push({...vals,date:d.toISOString().slice(0,10),label:d.getDate()+' '+months[d.getMonth()].slice(0,3)+' '+d.getFullYear()});
+  DB.set('medidas_log',log);
+  ['pecho','cintura','brazos','muslos'].forEach(k=>{document.getElementById('m-'+k).value='';});
+  renderMedidas();
+}
+
 function renderHistorial(){
   const el=document.getElementById('historial-list');
   if(!el)return;
@@ -2296,6 +2382,7 @@ function renderProgreso(){
   renderPesoLog();
   renderPRChips();
   renderPhotoGrid();
+  renderMedidas();
   renderCargasSemana();
   renderHistorial();
 }
