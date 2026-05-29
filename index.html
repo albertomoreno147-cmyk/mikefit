@@ -286,6 +286,40 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .pr-chip.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
 .cargas-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
 .cargas-row:last-child{border-bottom:none;}
+/* FOTOS DE PROGRESO */
+.prog-photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
+.prog-photo-tile{aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;position:relative;background:var(--bg);flex-shrink:0;}
+.prog-photo-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.prog-photo-label{position:absolute;bottom:0;left:0;right:0;padding:5px 6px;background:linear-gradient(transparent,rgba(0,0,0,0.65));font-size:10px;font-weight:600;color:#fff;text-align:center;}
+.prog-photo-tile.selected::after{content:'✓';position:absolute;top:6px;right:6px;width:22px;height:22px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700;line-height:22px;text-align:center;}
+.prog-photo-add{aspect-ratio:1;border-radius:12px;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--muted);background:var(--bg);}
+.prog-photo-add-icon{font-size:24px;line-height:1;}
+.prog-photo-add-lbl{font-size:11px;font-weight:600;}
+/* PHOTO VIEWER OVERLAY */
+.photo-viewer{position:fixed;inset:0;background:rgba(0,0,0,0.94);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;transform:translateY(100%);transition:transform 0.3s ease;}
+.photo-viewer.open{transform:translateY(0);}
+.photo-viewer-img{max-width:100%;max-height:62vh;object-fit:contain;border-radius:10px;}
+.photo-viewer-date{color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;margin-top:14px;}
+.photo-viewer-btns{display:flex;gap:10px;margin-top:16px;width:100%;}
+.pv-btn{flex:1;padding:13px;border-radius:13px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.pv-btn-compare{background:rgba(255,255,255,0.12);color:#fff;}
+.pv-btn-compare.active{background:var(--teal);color:#fff;}
+.pv-btn-delete{background:rgba(239,68,68,0.15);color:#EF4444;}
+.pv-btn-close{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);}
+.pv-compare-bar{position:fixed;bottom:calc(var(--safe-bottom)+76px);left:16px;right:16px;background:var(--teal);border-radius:16px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:301;transform:translateY(200%);transition:transform 0.3s ease;}
+.pv-compare-bar.show{transform:translateY(0);}
+.pv-compare-bar-txt{color:#fff;font-size:14px;font-weight:700;}
+.pv-compare-bar-btn{background:rgba(255,255,255,0.25);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+/* COMPARATIVA OVERLAY */
+.comp-overlay{position:fixed;inset:0;background:#000;z-index:310;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.3s ease;}
+.comp-overlay.open{transform:translateY(0);}
+.comp-header{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top)+10px) 20px 12px;color:#fff;}
+.comp-title{font-size:16px;font-weight:700;}
+.comp-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:16px;cursor:pointer;}
+.comp-photos{display:flex;flex:1;gap:2px;overflow:hidden;}
+.comp-half{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.comp-half img{flex:1;width:100%;object-fit:cover;min-height:0;}
+.comp-half-date{padding:10px;text-align:center;font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;background:#000;flex-shrink:0;}
 .hist-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
 .hist-row:last-child{border-bottom:none;}
 
@@ -589,6 +623,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         <div class="card-title">PR por ejercicio</div>
         <div id="pr-chips-wrap" class="pr-chips"></div>
         <div id="pr-chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Fotos de progreso</div>
+        <div class="prog-photo-grid" id="prog-photo-grid"></div>
+        <input type="file" id="prog-photo-input" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(this)">
       </div>
       <div class="card">
         <div class="card-title">Cargas esta semana</div>
@@ -1937,6 +1976,125 @@ function hexToRgba(hex,a){
   return `rgba(${r},${g},${b},${a})`;
 }
 
+// ---- FOTOS DE PROGRESO ----
+let compareSelection=[];
+let viewerPhotoId=null;
+
+function renderPhotoGrid(){
+  const el=document.getElementById('prog-photo-grid');
+  if(!el)return;
+  const photos=DB.get('progress_photos')||[];
+  const addTile=`<div class="prog-photo-add" onclick="document.getElementById('prog-photo-input').click()"><div class="prog-photo-add-icon">+</div><div class="prog-photo-add-lbl">Añadir</div></div>`;
+  const tiles=photos.slice().reverse().map(p=>`<div class="prog-photo-tile${compareSelection.includes(p.id)?' selected':''}" onclick="openPhotoViewer('${p.id}')"><img src="${p.dataUrl}" loading="lazy"><div class="prog-photo-label">${p.label}</div></div>`).join('');
+  el.innerHTML=addTile+tiles;
+}
+
+function addProgressPhoto(input){
+  const file=input.files[0];
+  if(!file)return;
+  input.value='';
+  const photos=DB.get('progress_photos')||[];
+  if(photos.length>=20){alert('Máximo 20 fotos de progreso. Elimina alguna antes de añadir.');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const tmpImg=new Image();
+    tmpImg.onload=()=>{
+      const maxW=800,maxH=1200;
+      let w=tmpImg.width,h=tmpImg.height;
+      const ratio=Math.min(maxW/w,maxH/h,1);
+      w=Math.round(w*ratio);h=Math.round(h*ratio);
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(tmpImg,0,0,w,h);
+      const url=canvas.toDataURL('image/jpeg',0.70);
+      const d=new Date();
+      const label=d.getDate()+' '+months[d.getMonth()].slice(0,3)+' '+d.getFullYear();
+      photos.push({id:Date.now().toString(36),date:d.toISOString().slice(0,10),label,dataUrl:url});
+      DB.set('progress_photos',photos);
+      renderPhotoGrid();
+    };
+    tmpImg.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function openPhotoViewer(id){
+  const photos=DB.get('progress_photos')||[];
+  const p=photos.find(x=>x.id===id);
+  if(!p)return;
+  viewerPhotoId=id;
+  document.getElementById('pv-img').src=p.dataUrl;
+  document.getElementById('pv-date').textContent=p.label;
+  const isSelected=compareSelection.includes(id);
+  const btn=document.getElementById('pv-compare-btn');
+  btn.textContent=(isSelected?'✓':'☐')+' Comparar';
+  btn.className='pv-btn pv-btn-compare'+(isSelected?' active':'');
+  document.getElementById('photo-viewer').classList.add('open');
+}
+
+function closePhotoViewer(){
+  document.getElementById('photo-viewer').classList.remove('open');
+  document.getElementById('pv-img').src='';
+  viewerPhotoId=null;
+}
+
+function deleteProgressPhoto(){
+  if(!viewerPhotoId)return;
+  if(!confirm('¿Eliminar esta foto?'))return;
+  let photos=DB.get('progress_photos')||[];
+  photos=photos.filter(p=>p.id!==viewerPhotoId);
+  DB.set('progress_photos',photos);
+  compareSelection=compareSelection.filter(id=>id!==viewerPhotoId);
+  updateCompareBar();
+  closePhotoViewer();
+  renderPhotoGrid();
+}
+
+function togglePhotoCompare(){
+  if(!viewerPhotoId)return;
+  const idx=compareSelection.indexOf(viewerPhotoId);
+  if(idx>=0){compareSelection.splice(idx,1);}
+  else{
+    if(compareSelection.length>=2)compareSelection.shift();
+    compareSelection.push(viewerPhotoId);
+  }
+  const isSelected=compareSelection.includes(viewerPhotoId);
+  const btn=document.getElementById('pv-compare-btn');
+  btn.textContent=(isSelected?'✓':'☐')+' Comparar';
+  btn.className='pv-btn pv-btn-compare'+(isSelected?' active':'');
+  updateCompareBar();
+  renderPhotoGrid();
+}
+
+function updateCompareBar(){
+  const bar=document.getElementById('pv-compare-bar');
+  const txt=document.getElementById('pv-compare-txt');
+  if(compareSelection.length===0){bar.classList.remove('show');return;}
+  bar.classList.add('show');
+  if(compareSelection.length===1)txt.textContent='1 foto — elige otra para comparar';
+  else txt.textContent='2 fotos listas para comparar';
+}
+
+function openComparativa(){
+  if(compareSelection.length<2)return;
+  const photos=DB.get('progress_photos')||[];
+  const a=photos.find(p=>p.id===compareSelection[0]);
+  const b=photos.find(p=>p.id===compareSelection[1]);
+  if(!a||!b)return;
+  document.getElementById('comp-img-a').src=a.dataUrl;
+  document.getElementById('comp-date-a').textContent=a.label;
+  document.getElementById('comp-img-b').src=b.dataUrl;
+  document.getElementById('comp-date-b').textContent=b.label;
+  document.getElementById('comp-overlay').classList.add('open');
+  closePhotoViewer();
+}
+
+function closeComparativa(){
+  document.getElementById('comp-overlay').classList.remove('open');
+  document.getElementById('comp-img-a').src='';
+  document.getElementById('comp-img-b').src='';
+}
+
 // ---- CHARTS & PROGRESO ----
 function buildSVGChart(pts, color, unit) {
   if (!pts || pts.length < 2) return '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Sin suficientes datos aún<br><span style="font-size:11px">Registra más mediciones para ver la curva</span></div>';
@@ -2069,6 +2227,7 @@ function renderProgreso(){
   renderPesoChart();
   renderPesoLog();
   renderPRChips();
+  renderPhotoGrid();
   renderCargasSemana();
 }
 
@@ -2174,6 +2333,37 @@ _sc.addEventListener('touchend',e=>{
   else if(dx>0&&currentTab==='semana')switchTab('dashboard',tabs[0]);
 },{passive:true});
 </script>
+<!-- PROGRESS PHOTO VIEWER -->
+<div id="photo-viewer" class="photo-viewer">
+  <img id="pv-img" class="photo-viewer-img" src="" alt="">
+  <div id="pv-date" class="photo-viewer-date"></div>
+  <div class="photo-viewer-btns">
+    <button class="pv-btn pv-btn-compare" id="pv-compare-btn" onclick="togglePhotoCompare()">☐ Comparar</button>
+    <button class="pv-btn pv-btn-delete" onclick="deleteProgressPhoto()">Eliminar</button>
+    <button class="pv-btn pv-btn-close" onclick="closePhotoViewer()">Cerrar</button>
+  </div>
+</div>
+<div id="pv-compare-bar" class="pv-compare-bar">
+  <span class="pv-compare-bar-txt" id="pv-compare-txt">1 foto seleccionada</span>
+  <button class="pv-compare-bar-btn" onclick="openComparativa()">Ver comparativa →</button>
+</div>
+<!-- COMPARATIVA OVERLAY -->
+<div id="comp-overlay" class="comp-overlay">
+  <div class="comp-header">
+    <div class="comp-title">Comparativa</div>
+    <button class="comp-close" onclick="closeComparativa()">✕</button>
+  </div>
+  <div class="comp-photos">
+    <div class="comp-half">
+      <img id="comp-img-a" src="" alt="">
+      <div id="comp-date-a" class="comp-half-date"></div>
+    </div>
+    <div class="comp-half">
+      <img id="comp-img-b" src="" alt="">
+      <div id="comp-date-b" class="comp-half-date"></div>
+    </div>
+  </div>
+</div>
 <!-- REST TIMER PANEL -->
 <div id="rest-panel" class="rest-panel">
   <div class="rest-handle"></div>
