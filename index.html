@@ -226,8 +226,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .bib-ex-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity 0.1s;}
 .bib-ex-row:last-child{border-bottom:none;}
 .bib-ex-row:active{opacity:0.6;}
-.bib-ex-thumb{width:58px;height:58px;border-radius:13px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);}
-.bib-ex-thumb img{width:100%;height:100%;object-fit:contain;}
 .bib-ex-info{flex:1;}
 .bib-ex-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:2px;}
 .bib-ex-sub{font-size:11px;color:var(--muted);}
@@ -271,17 +269,16 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .bib-ex-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity 0.1s;}
 .bib-ex-row:last-child{border-bottom:none;}
 .bib-ex-row:active{opacity:0.6;}
-.bib-ex-thumb{width:58px;height:58px;border-radius:13px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);}
-.bib-ex-thumb img{width:100%;height:100%;object-fit:contain;}
+.bib-ex-thumb{width:54px;height:54px;border-radius:13px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.bib-ex-thumb svg{width:38px;height:38px;}
 .bib-ex-info{flex:1;min-width:0;}
 .bib-ex-name{font-size:15px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:3px;}
 .bib-ex-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;}
 .bib-ex-chev{font-size:20px;line-height:1;flex-shrink:0;}
-/* Detalle imagen real */
-.bib-det-img-wrap{background:linear-gradient(135deg,#0D1B2A,#162840);border-radius:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;height:230px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
-.bib-det-img{max-height:220px;max-width:100%;object-fit:contain;}
-.bib-det-img-anatomy{height:190px;width:auto;object-fit:contain;opacity:0.75;}
-.bib-det-yt-overlay{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);border:none;border-radius:20px;color:white;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
+/* Detalle imagen */
+.bib-det-img-wrap{border-radius:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;height:220px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
+.bib-det-yt-overlay{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:none;border-radius:20px;color:white;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
+.bib-muscle-label{position:absolute;top:10px;left:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;background:rgba(0,0,0,0.35);color:white;padding:4px 10px;border-radius:20px;pointer-events:none;}
 .bib-empty{text-align:center;padding:48px 20px;color:var(--muted);}
 .bib-empty-icon{font-size:36px;margin-bottom:10px;}
 .bib-empty-txt{font-size:14px;font-weight:600;}
@@ -1418,8 +1415,6 @@ const ejerciciosBD=[
 // Colores por músculo (usados en toda la app)
 const muscleColors={'Pecho':'#3B82F6','Hombro':'#00BEB8','Tríceps':'#F97316','Trapecio':'#F97316','Espalda':'#22C55E','Bíceps':'#8B5CF6','Braquial':'#8B5CF6','Romboides':'#22C55E','Cuádriceps':'#F59E0B','Isquios':'#EF4444','Glúteo':'#EC4899','Core':'#00BEB8','Lumbar':'#EF4444','Cardio':'#22C55E'};
 const muscleBg={'Pecho':'rgba(59,130,246,0.12)','Hombro':'rgba(0,190,184,0.12)','Tríceps':'rgba(249,115,22,0.12)','Trapecio':'rgba(249,115,22,0.12)','Espalda':'rgba(34,197,94,0.12)','Bíceps':'rgba(139,92,246,0.12)','Braquial':'rgba(139,92,246,0.12)','Romboides':'rgba(34,197,94,0.12)','Cuádriceps':'rgba(245,158,11,0.12)','Isquios':'rgba(239,68,68,0.12)','Glúteo':'rgba(236,72,153,0.12)','Core':'rgba(0,190,184,0.12)','Lumbar':'rgba(239,68,68,0.12)','Cardio':'rgba(34,197,94,0.12)'};
-// wger.de muscle IDs para las imágenes anatómicas
-const muscleWgerId={'Pecho':4,'Hombro':2,'Tríceps':5,'Espalda':13,'Bíceps':1,'Braquial':1,'Cuádriceps':9,'Isquios':10,'Glúteo':12,'Core':6,'Lumbar':10,'Cardio':null};
 // Estado biblioteca
 let bibView='grupos';
 let bibSelectedGroup=null;
@@ -1910,11 +1905,10 @@ function renderBibLista(){
     row.onclick=()=>bibOpenDetalle(ex);
     const bg=muscleBg[ex.musculo]||'var(--bg)';
     const color=muscleColors[ex.musculo]||'var(--teal)';
-    const wid=ex.wger||(muscleWgerId[ex.musculo]||6);
     const difCls=ex.dificultad==='avanzado'?'dif-avanzado':ex.dificultad==='intermedio'?'dif-intermedio':'dif-basico';
     row.innerHTML=`
-      <div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}22;">
-        <img src="https://wger.de/static/images/muscles/main/muscle-${wid}.svg" style="width:38px;height:38px;opacity:0.7;object-fit:contain" onerror="this.outerHTML='<span style=font-size:22px;font-weight:900;color:${color}>${ex.musculo.substring(0,2)}</span>'">
+      <div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;">
+        ${getMuscleThumb(ex.musculo,color)}
       </div>
       <div class="bib-ex-info">
         <div class="bib-ex-name">${ex.name}</div>
@@ -1946,17 +1940,112 @@ function bibGlobalSearch(q){
   matches.forEach(ex=>{
     const color=muscleColors[ex.musculo]||'var(--teal)';
     const bg=muscleBg[ex.musculo]||'var(--teal-dim)';
-    const wid=ex.wger||(muscleWgerId[ex.musculo]||6);
-    const imgSrc=wid?`https://wger.de/static/images/muscles/main/muscle-${wid}.svg`:'';
     const row=document.createElement('div');
     row.className='bib-ex-row';
     row.onclick=()=>{
       bibSelectedGroup=muscleGroups.find(g=>g.musculos.includes(ex.musculo))||muscleGroups[0];
       bibOpenDetalle(ex);
     };
-    row.innerHTML=`<div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;"><div style="font-size:20px;font-weight:900;color:${color};line-height:1">${ex.musculo.substring(0,2)}</div></div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
+    row.innerHTML=`<div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;">${getMuscleThumb(ex.musculo,color)}</div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
     wrap.appendChild(row);
   });
+}
+
+// Icono miniatura para la lista (40x40 viewBox)
+const muscleThumbPath = {
+  'Pecho':      (c)=>`<ellipse cx="14" cy="22" rx="9" ry="11" fill="${c}"/><ellipse cx="26" cy="22" rx="9" ry="11" fill="${c}"/>`,
+  'Espalda':    (c)=>`<path d="M20 10 L7 26 L20 22 L33 26 Z" fill="${c}"/><rect x="17" y="24" width="6" height="10" rx="3" fill="${c}" opacity="0.6"/>`,
+  'Hombro':     (c)=>`<ellipse cx="10" cy="20" rx="8" ry="9" fill="${c}"/><ellipse cx="30" cy="20" rx="8" ry="9" fill="${c}"/>`,
+  'Bíceps':     (c)=>`<path d="M13 32 Q8 20 13 12 Q17 6 20 12 Q23 6 27 12 Q32 20 27 32 Z" fill="${c}" opacity="0.85"/>`,
+  'Tríceps':    (c)=>`<path d="M13 8 Q7 20 13 32 L27 32 Q33 20 27 8 Q22 13 20 16 Q18 13 13 8 Z" fill="${c}" opacity="0.85"/>`,
+  'Core':       (c)=>`<rect x="14" y="8" width="12" height="7" rx="3" fill="${c}"/><rect x="14" y="17" width="12" height="7" rx="3" fill="${c}"/><rect x="14" y="26" width="12" height="7" rx="3" fill="${c}"/>`,
+  'Cuádriceps': (c)=>`<path d="M14 6 L12 34 Q12 38 20 38 Q28 38 28 34 L26 6 Q22 9 20 13 Q18 9 14 6 Z" fill="${c}" opacity="0.85"/>`,
+  'Isquios':    (c)=>`<path d="M13 6 Q10 20 13 34 L27 34 Q30 20 27 6 Q22 10 20 15 Q18 10 13 6 Z" fill="${c}" opacity="0.85"/>`,
+  'Glúteo':     (c)=>`<ellipse cx="14" cy="23" rx="10" ry="12" fill="${c}" opacity="0.9"/><ellipse cx="26" cy="23" rx="10" ry="12" fill="${c}" opacity="0.9"/>`,
+  'Cardio':     (c)=>`<path d="M20 32 L7 20 Q5 12 13 10 Q17 8 20 15 Q23 8 27 10 Q35 12 33 20 Z" fill="${c}" opacity="0.85"/>`,
+};
+function getMuscleThumb(musculo, color) {
+  const pathFn = muscleThumbPath[musculo] || ((c)=>`<text x="20" y="26" text-anchor="middle" font-size="14" font-weight="900" fill="${c}">${musculo.substring(0,2)}</text>`);
+  return `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">${pathFn(color)}</svg>`;
+}
+
+// Diagrama SVG cuerpo humano con músculo resaltado
+function buildMuscleDiagram(primary, secondaries, color) {
+  const muscleEls = {
+    'Pecho':      ['chest'],
+    'Hombro':     ['sh-l','sh-r'],
+    'Bíceps':     ['bi-l','bi-r'],
+    'Braquial':   ['bi-l','bi-r'],
+    'Braquiorradial':['bi-l','bi-r'],
+    'Tríceps':    ['tri-l','tri-r'],
+    'Espalda':    ['lat-l','lat-r'],
+    'Romboides':  ['lat-l','lat-r'],
+    'Trapecio':   ['trap'],
+    'Core':       ['abs'],
+    'Lumbar':     ['lbk'],
+    'Oblicuos':   ['abs'],
+    'Cuádriceps': ['q-l','q-r'],
+    'Isquios':    ['ham-l','ham-r'],
+    'Glúteo':     ['gl-l','gl-r'],
+    'Cardio':     ['chest','abs','q-l','q-r'],
+    'Flexores de cadera':['q-l','q-r'],
+    'Pantorrillas':['cal-l','cal-r'],
+  };
+  const elColors = {};
+  (muscleEls[primary]||[]).forEach(id=>elColors[id]=color);
+  (secondaries||[]).forEach(m=>(muscleEls[m]||[]).forEach(id=>{if(!elColors[id])elColors[id]=color+'66';}));
+  function gc(id){return elColors[id]||'#DDE3EA';}
+
+  const isDark = document.body.classList.contains('dark');
+  const bf = isDark ? 'rgba(255,255,255,0.1)' : '#E0E6ED';
+  const sc = isDark ? 'rgba(255,255,255,0.18)' : '#C2CBD4';
+  const backPrimaries = ['Espalda','Tríceps','Isquios','Glúteo','Lumbar','Romboides','Trapecio'];
+  const isBack = backPrimaries.includes(primary);
+
+  if(isBack){
+    return `<svg viewBox="0 0 120 222" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:198px;width:auto">
+      <circle cx="60" cy="16" r="13" fill="${bf}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="55" y="28" width="10" height="9" rx="3" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <path d="M36 36 C29 37 22 44 20 57 L20 108 C20 112 23 114 27 114 L93 114 C97 114 100 112 100 108 L100 57 C98 44 91 37 84 36 Z" fill="${bf}" stroke="${sc}" stroke-width="1.5"/>
+      <path d="M60 29 L38 36 L36 44 L60 48 L84 44 L82 36 Z" fill="${gc('trap')}" stroke="${sc}" stroke-width="0.8"/>
+      <path d="M22 63 L22 102 C22 105 26 106 32 105 L56 99 L56 61 C42 59 26 60 22 63 Z" fill="${gc('lat-l')}" opacity="0.95"/>
+      <path d="M98 63 L98 102 C98 105 94 106 88 105 L64 99 L64 61 C78 59 94 60 98 63 Z" fill="${gc('lat-r')}" opacity="0.95"/>
+      <rect x="44" y="88" width="32" height="22" rx="6" fill="${gc('lbk')}" opacity="0.9"/>
+      <ellipse cx="25" cy="51" rx="13" ry="11" fill="${gc('sh-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <ellipse cx="95" cy="51" rx="13" ry="11" fill="${gc('sh-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="7" y="48" width="15" height="42" rx="7" fill="${gc('tri-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="98" y="48" width="15" height="42" rx="7" fill="${gc('tri-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="5" y="92" width="13" height="30" rx="6" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <rect x="102" y="92" width="13" height="30" rx="6" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <rect x="33" y="112" width="54" height="14" rx="6" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <ellipse cx="46" cy="124" rx="14" ry="13" fill="${gc('gl-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <ellipse cx="74" cy="124" rx="14" ry="13" fill="${gc('gl-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="33" y="135" width="25" height="52" rx="10" fill="${gc('ham-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="62" y="135" width="25" height="52" rx="10" fill="${gc('ham-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="35" y="189" width="20" height="33" rx="8" fill="${gc('cal-l')}" stroke="${sc}" stroke-width="1"/>
+      <rect x="65" y="189" width="20" height="33" rx="8" fill="${gc('cal-r')}" stroke="${sc}" stroke-width="1"/>
+    </svg>`;
+  } else {
+    return `<svg viewBox="0 0 120 222" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:198px;width:auto">
+      <circle cx="60" cy="16" r="13" fill="${bf}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="55" y="28" width="10" height="9" rx="3" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <path d="M36 36 C29 37 22 44 20 57 L20 108 C20 112 23 114 27 114 L93 114 C97 114 100 112 100 108 L100 57 C98 44 91 37 84 36 Z" fill="${bf}" stroke="${sc}" stroke-width="1.5"/>
+      <ellipse cx="47" cy="62" rx="13" ry="15" fill="${gc('chest')}" opacity="0.95"/>
+      <ellipse cx="73" cy="62" rx="13" ry="15" fill="${gc('chest')}" opacity="0.95"/>
+      <rect x="44" y="79" width="32" height="31" rx="6" fill="${gc('abs')}" opacity="0.9"/>
+      <ellipse cx="25" cy="51" rx="13" ry="11" fill="${gc('sh-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <ellipse cx="95" cy="51" rx="13" ry="11" fill="${gc('sh-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="7" y="48" width="15" height="42" rx="7" fill="${gc('bi-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="98" y="48" width="15" height="42" rx="7" fill="${gc('bi-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="5" y="92" width="13" height="30" rx="6" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <rect x="102" y="92" width="13" height="30" rx="6" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <rect x="33" y="112" width="54" height="16" rx="7" fill="${bf}" stroke="${sc}" stroke-width="1"/>
+      <rect x="33" y="126" width="25" height="55" rx="10" fill="${gc('q-l')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="62" y="126" width="25" height="55" rx="10" fill="${gc('q-r')}" stroke="${sc}" stroke-width="1.5"/>
+      <rect x="35" y="183" width="20" height="38" rx="8" fill="${gc('cal-l')}" stroke="${sc}" stroke-width="1"/>
+      <rect x="65" y="183" width="20" height="38" rx="8" fill="${gc('cal-r')}" stroke="${sc}" stroke-width="1"/>
+    </svg>`;
+  }
 }
 
 function bibOpenDetalle(ex){
@@ -1973,8 +2062,6 @@ function renderBibDetalle(){
   const ex=bibSelectedEx;
   const color=muscleColors[ex.musculo]||'var(--teal)';
   const bg=muscleBg[ex.musculo]||'var(--teal-dim)';
-  const wid=ex.wger||(muscleWgerId[ex.musculo]||6);
-  const anatomySrc=wid?`https://wger.de/static/images/muscles/main/muscle-${wid}.svg`:'';
   const difCls=ex.dificultad==='avanzado'?'dif-avanzado':ex.dificultad==='intermedio'?'dif-intermedio':'dif-basico';
 
   let tabContent='';
@@ -2043,9 +2130,12 @@ function renderBibDetalle(){
       :`<div class="bib-empty"><div class="bib-empty-icon">📊</div><div class="bib-empty-txt">Sin historial todavía</div><div style="font-size:12px;color:var(--muted);margin-top:4px">Completa este ejercicio para ver tu progreso</div></div>`;
   }
 
+  const isDark=document.body.classList.contains('dark');
+  const wrapBg=isDark?`linear-gradient(150deg,${color}35 0%,#1B2638 100%)`:`linear-gradient(150deg,${color}22 0%,#F2F5F8 100%)`;
   el.innerHTML=`
-    <div class="bib-det-img-wrap">
-      ${anatomySrc?`<img class="bib-det-img-anatomy" id="bib-det-main-img" src="${anatomySrc}" alt="${ex.name}">`:''}
+    <div class="bib-det-img-wrap" style="background:${wrapBg}">
+      ${buildMuscleDiagram(ex.musculo,ex.secundarios,color)}
+      <div class="bib-muscle-label">${ex.musculo}</div>
       <button class="bib-det-yt-overlay" onclick="bibOpenYT('${ex.name.replace(/'/g,"\\'")}')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.4 4 12 4 12 4s-4.4 0-6.8.3c-.4.1-1.3.1-2 .9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.9C6.6 18 12 18 12 18s4.4 0 6.8-.3c.4-.1 1.3-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C21.8 8.6 21.6 7.2 21.6 7.2zM10 14.5v-5.5l5.5 2.8L10 14.5z"/></svg>
         Ver demo
