@@ -1608,7 +1608,7 @@ function renderNextTraining(){
       const btn=document.createElement('div');
       btn.style.cssText='background:var(--teal);color:white;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;';
       btn.textContent='Iniciar';
-      btn.onclick=(e)=>{e.stopPropagation();switchTab('semana',document.querySelectorAll('.top-tab')[1]);selectDay('semana',date,dow);};
+      btn.onclick=(e)=>{e.stopPropagation();window.location.href='workout.html';};
       div.appendChild(btn);
     }
     div.onclick=()=>{switchTab('semana',document.querySelectorAll('.top-tab')[1]);selectDay('semana',date,dow);};
@@ -2536,6 +2536,10 @@ function closeSettings(){
 }
 
 function goToTodayWorkout(){
+  const plan=weekPlan[now.getDay()];
+  const override=DB.get('plan_override_'+TODAY);
+  const planName=override||plan.name;
+  if(planName!=='Descanso'){window.location.href='workout.html';return;}
   const navEl=document.getElementById('nav-home');
   gotoPage('home',navEl,'Entrenos',true);
   navEl.classList.add('active');
