@@ -279,6 +279,16 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .bib-det-img-wrap{border-radius:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;height:220px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
 .bib-det-yt-overlay{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:none;border-radius:20px;color:white;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
 .bib-muscle-label{position:absolute;top:10px;left:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;background:rgba(0,0,0,0.35);color:white;padding:4px 10px;border-radius:20px;pointer-events:none;}
+.bib-yt-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px;opacity:0;transition:opacity 0.4s;}
+.bib-yt-thumb.loaded{opacity:1;}
+.bib-yt-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,0.25);}
+.bib-yt-play.visible{display:flex;}
+.bib-video-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;}
+.bib-video-modal.hidden{display:none;}
+.bib-video-close{position:absolute;top:calc(env(safe-area-inset-top,44px)+8px);right:16px;background:none;border:none;color:rgba(255,255,255,0.7);font-size:32px;cursor:pointer;line-height:1;padding:4px;}
+.bib-video-wrap{width:100%;max-width:520px;padding:0 14px;}
+.bib-video-ratio{position:relative;width:100%;padding-top:56.25%;background:#000;border-radius:14px;overflow:hidden;}
+.bib-video-ratio iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
 .bib-empty{text-align:center;padding:48px 20px;color:var(--muted);}
 .bib-empty-icon{font-size:36px;margin-bottom:10px;}
 .bib-empty-txt{font-size:14px;font-weight:600;}
@@ -1413,6 +1423,74 @@ const ejerciciosBD=[
 ];
 
 // Colores por músculo (usados en toda la app)
+// Nombres en inglés para buscar vídeos en wger.de
+const exEnNames={
+  'pb_barra':'Bench press','pb_manc':'Dumbbell bench press','pb_inc_barra':'Incline bench press',
+  'pb_inc':'Incline dumbbell bench press','apertura':'Cable fly','apertura_manc':'Dumbbell fly',
+  'fondos_pecho':'Dips','jalon':'Lat pulldown','jalon_neutro':'Lat pulldown',
+  'remo_polea':'Seated cable row','remo_barra':'Barbell row','remo_manc':'Single arm dumbbell row',
+  'dominadas':'Pull-up','peso_muerto':'Deadlift','face_pull':'Face pull',
+  'pm_manc':'Dumbbell shoulder press','pm_barra':'Military press','arnold':'Arnold press',
+  'elev_lat':'Lateral raise','elev_front':'Front raise','curl_barra':'Barbell curl',
+  'curl_manc':'Alternating dumbbell curl','curl_pred':'Preacher curl','curl_martillo':'Hammer curl',
+  'tri_polea':'Triceps pushdown','press_frances':'Skull crusher','fondos_triceps':'Dips',
+  'ext_cabeza':'Overhead triceps extension','sentadilla':'Squat','prensa':'Leg press',
+  'zancadas':'Dumbbell lunge','ext_cuad':'Leg extension','bulgaras':'Bulgarian split squat',
+  'pmd_rumano':'Romanian deadlift','curl_tumbado':'Leg curl','curl_sentado':'Seated leg curl',
+  'hip_thrust':'Hip thrust','abduccion':'Hip abduction','kickback':'Cable kickback',
+  'ab_wheel':'Ab wheel roller','plancha':'Plank','elev_piernas':'Hanging leg raise',
+  'crunch_cable':'Cable crunch','russian_twist':'Russian twist',
+};
+
+let currentBibVideoId=null;
+
+async function loadYouTubeForEx(ex){
+  const cacheKey='ytid_'+ex.id;
+  let ytId=localStorage.getItem(cacheKey);
+  if(ytId==='null')return; // ya buscamos, no hay vídeo
+  if(!ytId){
+    const enName=exEnNames[ex.id];
+    if(!enName)return;
+    try{
+      const r1=await fetch(`https://wger.de/api/v2/exercise/?format=json&language=2&name=${encodeURIComponent(enName)}&status=2&limit=5`);
+      const d1=await r1.json();
+      if(!d1.results?.length){localStorage.setItem(cacheKey,'null');return;}
+      const wgerId=d1.results[0].id;
+      const r2=await fetch(`https://wger.de/api/v2/exerciseinfo/${wgerId}/?format=json`);
+      const info=await r2.json();
+      const vid=info.videos?.[0];
+      if(!vid?.youtube_ss){localStorage.setItem(cacheKey,'null');return;}
+      const m=vid.youtube_ss.match(/\/vi\/([a-zA-Z0-9_-]+)\//);
+      if(!m){localStorage.setItem(cacheKey,'null');return;}
+      ytId=m[1];
+      localStorage.setItem(cacheKey,ytId);
+    }catch(e){return;}
+  }
+  // Solo actualizar si el usuario sigue en este ejercicio
+  if(bibSelectedEx?.id!==ex.id)return;
+  const thumb=document.getElementById('bib-det-yt-thumb');
+  const play=document.getElementById('bib-det-yt-play');
+  if(!thumb||!play)return;
+  currentBibVideoId=ytId;
+  thumb.src=`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+  thumb.onload=()=>{thumb.classList.add('loaded');play.classList.add('visible');};
+  thumb.onerror=()=>{};
+  // Actualizar botón "Ver demo" para abrir el vídeo
+  const demoBtn=document.getElementById('bib-det-demo-btn');
+  if(demoBtn)demoBtn.onclick=()=>openBibVideoModal(ytId);
+}
+
+function openBibVideoModal(ytId){
+  document.getElementById('bib-video-modal').classList.remove('hidden');
+  document.getElementById('bib-video-container').innerHTML=
+    `<iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&playsinline=1" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+}
+
+function closeBibVideoModal(){
+  document.getElementById('bib-video-modal').classList.add('hidden');
+  document.getElementById('bib-video-container').innerHTML='';
+}
+
 const muscleColors={'Pecho':'#3B82F6','Hombro':'#00BEB8','Tríceps':'#F97316','Trapecio':'#F97316','Espalda':'#22C55E','Bíceps':'#8B5CF6','Braquial':'#8B5CF6','Romboides':'#22C55E','Cuádriceps':'#F59E0B','Isquios':'#EF4444','Glúteo':'#EC4899','Core':'#00BEB8','Lumbar':'#EF4444','Cardio':'#22C55E'};
 const muscleBg={'Pecho':'rgba(59,130,246,0.12)','Hombro':'rgba(0,190,184,0.12)','Tríceps':'rgba(249,115,22,0.12)','Trapecio':'rgba(249,115,22,0.12)','Espalda':'rgba(34,197,94,0.12)','Bíceps':'rgba(139,92,246,0.12)','Braquial':'rgba(139,92,246,0.12)','Romboides':'rgba(34,197,94,0.12)','Cuádriceps':'rgba(245,158,11,0.12)','Isquios':'rgba(239,68,68,0.12)','Glúteo':'rgba(236,72,153,0.12)','Core':'rgba(0,190,184,0.12)','Lumbar':'rgba(239,68,68,0.12)','Cardio':'rgba(34,197,94,0.12)'};
 // Estado biblioteca
@@ -2132,11 +2210,16 @@ function renderBibDetalle(){
 
   const isDark=document.body.classList.contains('dark');
   const wrapBg=isDark?`linear-gradient(150deg,${color}35 0%,#1B2638 100%)`:`linear-gradient(150deg,${color}22 0%,#F2F5F8 100%)`;
+  currentBibVideoId=null;
   el.innerHTML=`
     <div class="bib-det-img-wrap" style="background:${wrapBg}">
       ${buildMuscleDiagram(ex.musculo,ex.secundarios,color)}
+      <img id="bib-det-yt-thumb" class="bib-yt-thumb" alt="${ex.name}">
+      <div id="bib-det-yt-play" class="bib-yt-play" onclick="openBibVideoModal(currentBibVideoId)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+      </div>
       <div class="bib-muscle-label">${ex.musculo}</div>
-      <button class="bib-det-yt-overlay" onclick="bibOpenYT('${ex.name.replace(/'/g,"\\'")}')">
+      <button class="bib-det-yt-overlay" id="bib-det-demo-btn" onclick="bibOpenYT('${ex.name.replace(/'/g,"\\'")}')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.4 4 12 4 12 4s-4.4 0-6.8.3c-.4.1-1.3.1-2 .9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.9C6.6 18 12 18 12 18s4.4 0 6.8-.3c.4-.1 1.3-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C21.8 8.6 21.6 7.2 21.6 7.2zM10 14.5v-5.5l5.5 2.8L10 14.5z"/></svg>
         Ver demo
       </button>
@@ -2156,6 +2239,8 @@ function renderBibDetalle(){
       </div>
       ${tabContent}
     </div>`;
+  // Cargar vídeo de YouTube en segundo plano
+  loadYouTubeForEx(ex);
 }
 
 function setBibTab(t){bibDetallTab=t;renderBibDetalle();}
@@ -3154,6 +3239,13 @@ _sc.addEventListener('touchend',e=>{
   <div class="rest-actions">
     <button class="rest-pause-btn" id="rest-pause-btn" onclick="togglePauseTimer()">⏸ Pausa</button>
     <button class="rest-skip-btn" onclick="skipRestTimer()">Saltar →</button>
+  </div>
+</div>
+<!-- MODAL VÍDEO EJERCICIO -->
+<div class="bib-video-modal hidden" id="bib-video-modal" onclick="closeBibVideoModal()">
+  <button class="bib-video-close" onclick="closeBibVideoModal()">✕</button>
+  <div class="bib-video-wrap" onclick="event.stopPropagation()">
+    <div class="bib-video-ratio" id="bib-video-container"></div>
   </div>
 </div>
 </body>
