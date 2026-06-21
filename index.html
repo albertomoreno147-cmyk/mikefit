@@ -3182,6 +3182,15 @@ _sc.addEventListener('touchend',e=>{
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js');
 }
+
+// Refresca el dashboard al volver desde bfcache (back gesture en iOS/Android)
+window.addEventListener('pageshow', e => {
+  if(e.persisted){ updateHero(); renderNextTraining(); }
+});
+// Refresca cuando la PWA vuelve a primer plano
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden){ updateHero(); renderNextTraining(); }
+});
 </script>
 <!-- PROGRESS PHOTO VIEWER -->
 <div id="photo-viewer" class="photo-viewer">
