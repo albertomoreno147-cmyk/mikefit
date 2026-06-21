@@ -312,6 +312,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 
 /* PROGRESO */
 .stat-row{display:flex;gap:10px;margin-bottom:10px;}
+.musc-tab{padding:5px 11px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.musc-tab.active{background:var(--teal);border-color:var(--teal);color:white;}
+.musc-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.musc-bar-bg{flex:1;height:7px;background:rgba(0,0,0,0.07);border-radius:4px;overflow:hidden;}
+.musc-bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
 .stat-box{flex:1;background:var(--surface);border-radius:18px;padding:16px 12px;box-shadow:var(--shadow);}
 .stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;}
 .stat-val{font-size:22px;font-weight:700;letter-spacing:-0.5px;}
@@ -716,6 +721,17 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
           <div class="peso-input-row"><input type="number" step="0.1" placeholder="77.5" id="peso-input"><button class="save-btn-sm" onclick="savePeso()">OK</button></div>
         </div>
         <div id="peso-log" style="margin-top:4px"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="card-title" style="margin:0">Carga por músculo</div>
+          <div style="display:flex;gap:4px">
+            <button class="musc-tab" id="mt-7" onclick="setMuscleAnDays(7)">7d</button>
+            <button class="musc-tab active" id="mt-30" onclick="setMuscleAnDays(30)">30d</button>
+            <button class="musc-tab" id="mt-0" onclick="setMuscleAnDays(0)">Todo</button>
+          </div>
+        </div>
+        <div id="muscle-chart"></div>
       </div>
       <div class="card">
         <div class="card-title">PR por ejercicio</div>
@@ -3155,6 +3171,108 @@ function renderCargasSemana(){
   }).join('');
 }
 
+let muscleAnDays=30;
+
+const nameToMuscle={
+  'Press banca barra':'Pecho','Press inclinado mancuernas':'Pecho','Press inclinado barra':'Pecho',
+  'Press banca mancuernas':'Pecho','Aperturas polea cruzada':'Pecho','Aperturas mancuernas':'Pecho',
+  'Fondos en paralelas (pecho)':'Pecho','Press en máquina':'Pecho',
+  'Press militar mancuernas':'Hombro','Press militar barra':'Hombro','Press Arnold':'Hombro',
+  'Elevaciones laterales':'Hombro','Elevaciones frontales':'Hombro','Face pull polea':'Hombro',
+  'Extensión tríceps polea':'Tríceps','Press francés (barra EZ)':'Tríceps',
+  'Fondos en paralelas (tríceps)':'Tríceps','Extensión tríceps sobre cabeza':'Tríceps',
+  'Jalón al pecho':'Espalda','Jalón agarre neutro':'Espalda','Remo polea sentado':'Espalda',
+  'Remo barra':'Espalda','Remo mancuerna un brazo':'Espalda','Dominadas':'Espalda',
+  'Peso muerto convencional':'Espalda','Face pull':'Espalda',
+  'Curl bíceps barra':'Bíceps','Curl mancuernas alternado':'Bíceps',
+  'Curl predicador':'Bíceps','Curl martillo polea':'Bíceps','Curl martillo mancuernas':'Bíceps',
+  'Prensa de pierna':'Cuádriceps','Sentadilla barra':'Cuádriceps','Zancadas mancuernas':'Cuádriceps',
+  'Extensión cuádriceps máquina':'Cuádriceps','Sentadilla búlgara':'Cuádriceps',
+  'Peso muerto rumano':'Isquios','Curl femoral':'Isquios','Curl femoral tumbado':'Isquios',
+  'Curl femoral sentado':'Isquios','Good mornings':'Isquios',
+  'Hip thrust barra':'Glúteo','Puente glúteo suelo':'Glúteo','Abducción cadera':'Glúteo',
+  'Cable kickback':'Glúteo','Hip thrust máquina':'Glúteo',
+  'Ab wheel':'Core','Plancha':'Core','Elevación piernas':'Core',
+  'Crunch en polea':'Core','Russian twist':'Core','Dead bug':'Core',
+  'Bici estática zona 2':'Cardio','Movilidad / estiramientos':'Cardio','Elevación gemelos':'Cardio',
+};
+
+const muscleChartColors={
+  'Pecho':'#3B82F6','Hombro':'#00BEB8','Tríceps':'#F97316','Espalda':'#22C55E',
+  'Bíceps':'#8B5CF6','Cuádriceps':'#F59E0B','Isquios':'#EF4444','Glúteo':'#EC4899',
+  'Core':'#64748B','Cardio':'#10B981','Otros':'#94A3B8',
+};
+
+function setMuscleAnDays(d){
+  muscleAnDays=d;
+  ['7','30','0'].forEach(v=>{
+    const el=document.getElementById('mt-'+v);
+    if(el)el.classList.toggle('active',v===String(d));
+  });
+  renderMuscleAnalytics();
+}
+
+function renderMuscleAnalytics(){
+  const el=document.getElementById('muscle-chart');
+  if(!el)return;
+  const cutoff=muscleAnDays>0
+    ?new Date(now.getTime()-muscleAnDays*86400000).toISOString().split('T')[0]
+    :'2000-01-01';
+  const volumen={};
+  Object.keys(localStorage).filter(k=>k.startsWith('ex_')).forEach(k=>{
+    const dateStr=k.slice(3);
+    if(dateStr<cutoff)return;
+    const dow=new Date(dateStr+'T12:00:00').getDay();
+    const plan=getPlanForDate(dateStr,dow);
+    const exList=allExercises[plan.name]||[];
+    const data=DB.get(k)||[];
+    data.forEach((ex,i)=>{
+      if(!ex||!ex.series)return;
+      const name=ex.customName||(i<exList.length?exList[i].name:null);
+      if(!name)return;
+      const musculo=nameToMuscle[name]||'Otros';
+      const vol=ex.series.filter(s=>s&&s.done&&s.kg>0)
+        .reduce((a,s)=>a+(parseFloat(s.kg)||0)*(parseInt(s.reps)||0),0);
+      if(vol>0)volumen[musculo]=(volumen[musculo]||0)+vol;
+    });
+  });
+  if(!Object.keys(volumen).length){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Sin datos en este periodo.<br><span style="font-size:11px">Completa entrenos para ver la distribución</span></div>';
+    return;
+  }
+  const sorted=Object.entries(volumen).sort((a,b)=>b[1]-a[1]);
+  const total=sorted.reduce((a,[,v])=>a+v,0);
+  const maxVol=sorted[0][1];
+  // Donut SVG
+  const R=70,cx=100,cy=100,sw=20,circ=2*Math.PI*R;
+  let off=circ/4;
+  const arcs=sorted.map(([m,v])=>{
+    const dash=(v/total)*circ;
+    const seg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${muscleChartColors[m]||'#888'}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(2)} ${(circ-dash).toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}" stroke-linecap="butt"/>`;
+    off-=dash;return seg;
+  }).join('');
+  const totalLbl=total>=1000?(total/1000).toFixed(1)+'t':Math.round(total)+'kg';
+  const donut=`<svg viewBox="0 0 200 200" style="width:150px;height:150px;display:block;margin:0 auto 18px">
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="${sw}"/>
+    ${arcs}
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="19" font-weight="700" fill="var(--text)" font-family="Inter,sans-serif">${totalLbl}</text>
+    <text x="${cx}" y="${cy+15}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">volumen total</text>
+  </svg>`;
+  const bars=sorted.map(([m,v])=>{
+    const pct=Math.round(v/total*100);
+    const w=Math.round(v/maxVol*100);
+    const lbl=v>=1000?(v/1000).toFixed(1)+'t':Math.round(v)+'kg';
+    const col=muscleChartColors[m]||'#888';
+    return `<div class="musc-bar-row">
+      <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--text);width:82px;flex-shrink:0">${m}</div>
+      <div class="musc-bar-bg"><div class="musc-bar-fill" style="width:${w}%;background:${col}"></div></div>
+      <div style="font-size:11px;color:var(--muted);width:38px;text-align:right;flex-shrink:0">${pct}%</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=donut+bars;
+}
+
 function renderProgreso(){
   // Stats dinámicos
   const log=DB.get('peso_log')||[];
@@ -3186,6 +3304,7 @@ function renderProgreso(){
   if(diasEl)diasEl.textContent=diasGym;
   renderPesoChart();
   renderPesoLog();
+  renderMuscleAnalytics();
   renderPRChips();
   renderPhotoGrid();
   renderMedidas();
