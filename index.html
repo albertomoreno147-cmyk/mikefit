@@ -1444,28 +1444,93 @@ const exEnNames={
 
 let currentBibVideoId=null;
 
+// Tutoriales curados en español — prioridad sobre wger.de
+const exYtIds={
+  // PECHO
+  'pb_barra':      '7aQY3u0Dk-Q', // Tutorial completo press banca
+  'pb_manc':       'uii5wbbN99w', // Press banca mancuernas técnica correcta
+  'pb_inc_barra':  'bUwTJh4PIMk', // Claves press inclinado — PowerExplosive
+  'pb_inc':        'bUwTJh4PIMk', // Press inclinado (también aplica mancuernas)
+  'apertura':      'R93yKsk1ypo', // Aperturas con cable y mancuernas
+  'apertura_manc': 'kgt1Ik1yXpk', // Aperturas pecho con mancuernas técnica
+  'fondos_pecho':  'CjGPpeM_Kog', // Fondos en paralelas — pecho y tríceps
+  // ESPALDA
+  'jalon':         'bPAqG0B8_HQ', // Técnica jalón al pecho
+  'jalon_neutro':  'iubzG1s36-4', // Jalón agarre neutro / polea al pecho
+  'remo_polea':    'JtTusrYzAos', // Remo sentado en polea — técnica correcta
+  'remo_barra':    'NHnfoqSNG1A', // Remo barra-T — ejercicio de espalda
+  'remo_manc':     '1AAilO1XhKM', // Remo a un brazo en polea
+  'dominadas':     'K-g9y7lyQ-o', // Guía COMPLETA dominadas — secretos y errores
+  'peso_muerto':   'pP5tvVqShrY', // Peso muerto con barra — PowerExplosive
+  'face_pull':     'h2I7pHAKLoE', // Cómo hacer face pull — GFit Coach
+  // HOMBROS
+  'pm_manc':       'o5M9RZ-vWrc', // Press militar mancuernas — mejora tu técnica
+  'pm_barra':      'xM2FGQuhZAY', // Press militar barra de pie — PowerExplosive
+  'arnold':        'l5tNUbpusCA', // Press Arnold — biomecánica técnica y errores
+  'elev_lat':      'b6KtNTSHA54', // Elevaciones laterales — tutorial paso a paso
+  // BÍCEPS
+  'curl_barra':    'Ydg0qHw1LwI', // Curl bíceps: creencias falsas — PowerExplosive
+  'curl_manc':     'ajJWRrU5Fxo', // Curl bíceps mancuernas supino
+  'curl_pred':     'lXbs6as_TvA', // Curl predicador — cómo hacerlo correctamente
+  'curl_martillo': 'RHdacbwKbTo', // Curl martillo mancuerna — tutorial paso a paso
+  // TRÍCEPS
+  'tri_polea':     'fx4X-IBYxVI', // Guía completa tríceps con polea
+  'press_frances': 'PTO862T8U7Y', // Press francés técnica correcta
+  'fondos_triceps':'DcS44T6Y5GQ', // Fondos en paralelas — atento a la técnica
+  'ext_cabeza':    'f0hP1PKNjKo', // Extensión tríceps cable overhead
+  // CUÁDRICEPS
+  'sentadilla':    '9D7zI27gFHM', // Sentadilla con barra — guía completa
+  'prensa':        'R1XW1r7pSYc', // Prensa de pierna para glúteos
+  'bulgaras':      'lhKJPxIaPgQ', // Sentadilla búlgara — tutorial técnica completo
+  // ISQUIOS
+  'pmd_rumano':    'BJgFG614Ljs', // Peso muerto rumano con barra
+  'curl_tumbado':  'EAq2oJn9URk', // Curl de piernas en máquina
+  'curl_sentado':  'btw83p9ffTU', // Femoral sentado — tutorial paso a paso
+  // GLÚTEOS
+  'hip_thrust':    '07k__DvYwXQ', // Hip thrust — guía definitiva
+  'abduccion':     'UlBwFUhiIqA', // Abducción cadera en máquina para glúteos
+  'kickback':      '1mL-NCet4dY', // Patada glúteo / extensión cadera en polea
+  // CORE
+  'ab_wheel':      'zaCpg4aJY9U', // Rueda abdominal — técnica perfecta
+  'plancha':       'nmX0DysvqcQ', // Plancha abdominal correctamente
+  'elev_piernas':  'mXJ5bEoh-vk', // Elevación de piernas colgado
+  'russian_twist': 'wuc66c3DOQo', // Giros rusos con peso — tutorial paso a paso
+};
+
 async function loadYouTubeForEx(ex){
   const cacheKey='ytid_'+ex.id;
-  let ytId=localStorage.getItem(cacheKey);
-  if(ytId==='null')return; // ya buscamos, no hay vídeo
-  if(!ytId){
-    const enName=exEnNames[ex.id];
-    if(!enName)return;
-    try{
-      const r1=await fetch(`https://wger.de/api/v2/exercise/?format=json&language=2&name=${encodeURIComponent(enName)}&status=2&limit=5`);
-      const d1=await r1.json();
-      if(!d1.results?.length){localStorage.setItem(cacheKey,'null');return;}
-      const wgerId=d1.results[0].id;
-      const r2=await fetch(`https://wger.de/api/v2/exerciseinfo/${wgerId}/?format=json`);
-      const info=await r2.json();
-      const vid=info.videos?.[0];
-      if(!vid?.youtube_ss){localStorage.setItem(cacheKey,'null');return;}
-      const m=vid.youtube_ss.match(/\/vi\/([a-zA-Z0-9_-]+)\//);
-      if(!m){localStorage.setItem(cacheKey,'null');return;}
-      ytId=m[1];
-      localStorage.setItem(cacheKey,ytId);
-    }catch(e){return;}
+  let ytId=null;
+
+  // IDs curados tienen prioridad (sobrescriben incluso un 'null' previo de wger)
+  if(exYtIds[ex.id]){
+    ytId=exYtIds[ex.id];
+    localStorage.setItem(cacheKey,ytId);
+  }else{
+    const cached=localStorage.getItem(cacheKey);
+    if(cached==='null')return; // ya buscamos en wger, no hay vídeo
+    if(cached){
+      ytId=cached;
+    }else{
+      // Fallback: buscar en wger.de
+      const enName=exEnNames[ex.id];
+      if(!enName)return;
+      try{
+        const r1=await fetch(`https://wger.de/api/v2/exercise/?format=json&language=2&name=${encodeURIComponent(enName)}&status=2&limit=5`);
+        const d1=await r1.json();
+        if(!d1.results?.length){localStorage.setItem(cacheKey,'null');return;}
+        const wgerId=d1.results[0].id;
+        const r2=await fetch(`https://wger.de/api/v2/exerciseinfo/${wgerId}/?format=json`);
+        const info=await r2.json();
+        const vid=info.videos?.[0];
+        if(!vid?.youtube_ss){localStorage.setItem(cacheKey,'null');return;}
+        const m=vid.youtube_ss.match(/\/vi\/([a-zA-Z0-9_-]+)\//);
+        if(!m){localStorage.setItem(cacheKey,'null');return;}
+        ytId=m[1];
+        localStorage.setItem(cacheKey,ytId);
+      }catch(e){return;}
+    }
   }
+
   // Solo actualizar si el usuario sigue en este ejercicio
   if(bibSelectedEx?.id!==ex.id)return;
   const thumb=document.getElementById('bib-det-yt-thumb');
@@ -1475,7 +1540,6 @@ async function loadYouTubeForEx(ex){
   thumb.src=`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
   thumb.onload=()=>{thumb.classList.add('loaded');play.classList.add('visible');};
   thumb.onerror=()=>{};
-  // Actualizar botón "Ver demo" para abrir el vídeo
   const demoBtn=document.getElementById('bib-det-demo-btn');
   if(demoBtn)demoBtn.onclick=()=>openBibVideoModal(ytId);
 }
