@@ -323,7 +323,8 @@ svg.ring{position:absolute;top:-2px;left:-2px;width:74px;height:74px;}
     <div class="history-title" style="margin-bottom:10px">Ejercicios completados</div>
     <div id="sum-ex-list"></div>
   </div>
-  <button class="sum-share-btn" onclick="shareSummary()">📋 Copiar resumen para el coach</button>
+  <button class="sum-share-btn" onclick="shareImage()">📸 Compartir como imagen</button>
+  <button class="sum-share-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-top:8px" onclick="shareSummary()">📋 Copiar texto para el coach</button>
   <button class="sum-back-btn" onclick="closeSummary()">← Volver al inicio</button>
 </div>
 
@@ -903,6 +904,9 @@ function saveToday(){
   DB.set('ex_'+TODAY,exState);
 }
 
+// Datos del resumen (accesibles desde shareImage)
+let sumData={donePct:0,totalSets:0,totalReps:0,totalKg:0,duration:'0:00',dateStr:''};
+
 // ── FINISH ────────────────────────────────────────────────────────────────────
 function finishWorkout(){
   clearInterval(workoutTimer);
@@ -946,8 +950,152 @@ function finishWorkout(){
       </div>
     </div>`;
   }).join('');
+  sumData={donePct,totalSets,totalReps,totalKg:Math.round(totalKg),
+    duration:m+':'+(s<10?'0':'')+s,
+    dateStr:now2.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})};
   document.getElementById('summary-screen').classList.remove('hidden');
   saveToday();
+}
+
+function rrect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+async function shareImage(){
+  const btn=document.querySelector('[onclick="shareImage()"]');
+  if(btn){btn.textContent='⏳ Generando...';btn.disabled=true;}
+  await document.fonts.ready;
+
+  const W=1080,H=1350;
+  const canvas=document.createElement('canvas');
+  canvas.width=W;canvas.height=H;
+  const c=canvas.getContext('2d');
+  const col=plan.color||'#C8F135';
+
+  // Fondo
+  const bg=c.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#0D1520');bg.addColorStop(1,'#0A0A0F');
+  c.fillStyle=bg;c.fillRect(0,0,W,H);
+
+  // Acento de color arriba
+  const topG=c.createRadialGradient(0,0,0,0,0,600);
+  topG.addColorStop(0,col+'33');topG.addColorStop(1,'transparent');
+  c.fillStyle=topG;c.fillRect(0,0,W,H);
+
+  // Logo MikeFit
+  c.fillStyle='#C8F135';
+  c.font='700 68px Inter,-apple-system,sans-serif';
+  c.fillText('MikeFit',80,110);
+
+  // Fecha
+  c.fillStyle='rgba(255,255,255,0.35)';
+  c.font='36px Inter,-apple-system,sans-serif';
+  c.textAlign='right';
+  c.fillText(sumData.dateStr,W-80,110);
+  c.textAlign='left';
+
+  // Línea decorativa
+  c.strokeStyle=col+'55';c.lineWidth=2;
+  c.beginPath();c.moveTo(80,145);c.lineTo(W-80,145);c.stroke();
+
+  // Tipo de entreno
+  c.fillStyle='#ffffff';
+  c.font='700 108px Inter,-apple-system,sans-serif';
+  c.fillText(plan.name,80,275);
+
+  // Subtítulo
+  c.fillStyle='rgba(255,255,255,0.4)';
+  c.font='38px Inter,-apple-system,sans-serif';
+  c.fillText(planExList.length+' ejercicios',80,330);
+
+  // Círculo de progreso
+  const cx=W/2,cy=540,r=175;
+  c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);
+  c.strokeStyle='rgba(255,255,255,0.07)';c.lineWidth=18;c.stroke();
+  const endAngle=-Math.PI/2+(sumData.donePct/100)*Math.PI*2;
+  c.beginPath();c.arc(cx,cy,r,-Math.PI/2,endAngle);
+  c.strokeStyle=col;c.lineWidth=18;c.lineCap='round';c.stroke();
+
+  // % dentro del círculo
+  c.fillStyle='#ffffff';
+  c.font='700 130px Inter,-apple-system,sans-serif';
+  c.textAlign='center';
+  c.fillText(sumData.donePct+'%',cx,cy+46);
+  c.fillStyle='rgba(255,255,255,0.35)';
+  c.font='38px Inter,-apple-system,sans-serif';
+  c.fillText('completado',cx,cy+98);
+  c.textAlign='left';
+
+  // Cards de stats
+  const stats=[
+    {v:sumData.duration,l:'Duración'},
+    {v:sumData.totalSets,l:'Series'},
+    {v:sumData.totalReps,l:'Reps'},
+    {v:sumData.totalKg+'kg',l:'Volumen'},
+  ];
+  const cw=(W-160-24)/4;
+  stats.forEach((s,i)=>{
+    const sx=80+i*(cw+8),sy=762;
+    rrect(c,sx,sy,cw,130,18);
+    c.fillStyle='rgba(255,255,255,0.06)';c.fill();
+    c.fillStyle='#ffffff';
+    c.font='700 52px Inter,-apple-system,sans-serif';
+    c.textAlign='center';
+    c.fillText(s.v,sx+cw/2,sy+72);
+    c.fillStyle='rgba(255,255,255,0.35)';
+    c.font='30px Inter,-apple-system,sans-serif';
+    c.fillText(s.l,sx+cw/2,sy+112);
+  });
+  c.textAlign='left';
+
+  // Separador
+  c.strokeStyle='rgba(255,255,255,0.08)';c.lineWidth=1;
+  c.beginPath();c.moveTo(80,940);c.lineTo(W-80,940);c.stroke();
+
+  // Lista de ejercicios
+  let ey=1010;
+  exState.forEach((ex,i)=>{
+    if(ey>1280)return;
+    const done=ex.series.filter(s=>s.done&&s.kg>0);
+    if(!done.length)return;
+    const name=ex.customName||(i<planExList.length?planExList[i].name:'');
+    if(!name)return;
+    const meta=exMeta[name]||{};
+    const dotCol=muscleColors[meta.musculo]||col;
+    const avgKg=Math.round(done.reduce((a,s)=>a+parseFloat(s.kg||0),0)/done.length*10)/10;
+    const totalR=done.reduce((a,s)=>a+(parseInt(s.reps)||0),0);
+    c.beginPath();c.arc(92,ey-10,9,0,Math.PI*2);
+    c.fillStyle=dotCol;c.fill();
+    c.fillStyle='#ffffff';
+    c.font='600 36px Inter,-apple-system,sans-serif';
+    c.fillText(name,118,ey);
+    c.fillStyle='rgba(255,255,255,0.35)';
+    c.font='30px Inter,-apple-system,sans-serif';
+    c.fillText(done.length+'×'+avgKg+'kg · '+totalR+' reps',118,ey+42);
+    ey+=100;
+  });
+
+  // Footer
+  c.fillStyle='rgba(255,255,255,0.18)';
+  c.font='30px Inter,-apple-system,sans-serif';
+  c.textAlign='center';
+  c.fillText('Entrenado con MikeFit · mikefit.app',W/2,H-55);
+
+  canvas.toBlob(async blob=>{
+    if(btn){btn.textContent='📸 Compartir como imagen';btn.disabled=false;}
+    const file=new File([blob],'mikefit-entreno.png',{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:'MikeFit · '+plan.name}).catch(()=>{});
+    }else{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='mikefit-entreno.png';a.click();
+    }
+  },'image/png');
 }
 
 function shareSummary(){
