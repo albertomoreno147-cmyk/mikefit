@@ -568,6 +568,9 @@ function loadExState(){
 }
 
 function showRestDay(){
+  document.getElementById('ex-counter').textContent='';
+  document.querySelector('.ex-progress').style.display='none';
+  document.getElementById('workout-timer').textContent='';
   document.querySelector('.scroll').innerHTML=`
     <div class="rest-day-view">
       <div class="rest-day-icon">😴</div>
