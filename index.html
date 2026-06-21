@@ -700,12 +700,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
     <!-- PROGRESO -->
     <div class="page" id="page-progreso">
       <div class="stat-row">
-        <div class="stat-box"><div class="stat-label">Peso actual</div><div class="stat-val" id="peso-actual">77.5<span style="font-size:15px">kg</span></div><div class="stat-sub">Objetivo: 73 kg</div></div>
-        <div class="stat-box"><div class="stat-label">Grasa</div><div class="stat-val" style="color:var(--blue)">18.2<span style="font-size:15px">%</span></div><div class="stat-sub">Objetivo: 13-14%</div></div>
+        <div class="stat-box"><div class="stat-label">Peso actual</div><div class="stat-val" id="prog-peso-actual">—<span style="font-size:15px">kg</span></div><div class="stat-sub" id="prog-peso-obj">Objetivo: 73 kg</div></div>
+        <div class="stat-box"><div class="stat-label">Grasa</div><div class="stat-val" id="prog-grasa" style="color:var(--blue)">—<span style="font-size:15px">%</span></div><div class="stat-sub">Objetivo: 13-14%</div></div>
       </div>
       <div class="stat-row">
-        <div class="stat-box"><div class="stat-label">Perdido</div><div class="stat-val" style="color:var(--green)">−2.6<span style="font-size:15px">kg</span></div><div class="stat-sub">Desde abril 2026</div></div>
-        <div class="stat-box"><div class="stat-label">Días gym</div><div class="stat-val" style="color:var(--teal)">5</div><div class="stat-sub">Esta semana</div></div>
+        <div class="stat-box"><div class="stat-label">Perdido</div><div class="stat-val" id="prog-perdido" style="color:var(--green)">—<span style="font-size:15px">kg</span></div><div class="stat-sub" id="prog-perdido-sub">desde el inicio</div></div>
+        <div class="stat-box"><div class="stat-label">Días gym</div><div class="stat-val" id="prog-dias-gym" style="color:var(--teal)">—</div><div class="stat-sub">Esta semana</div></div>
       </div>
       <div class="card">
         <div class="card-title">Evolución del peso</div>
@@ -2877,7 +2877,7 @@ function renderPesoChart(){
   if(!el)return;
   const log=DB.get('peso_log')||[];
   if(log.length<2){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Registra al menos 2 pesadas para ver la curva</div>';return;}
-  const pts=log.slice(-15).map(p=>({label:p.date,val:p.val}));
+  const pts=log.slice(-15).map(p=>({label:p.date,val:parseFloat(p.val??p.kg)})).filter(p=>!isNaN(p.val)&&p.val>0);
   el.innerHTML=buildSVGChart(pts,'#00BEB8','kg');
 }
 
@@ -3136,6 +3136,34 @@ function renderCargasSemana(){
 }
 
 function renderProgreso(){
+  // Stats dinámicos
+  const log=DB.get('peso_log')||[];
+  const pActual=parseFloat(log[log.length-1]?.val??log[log.length-1]?.kg)||null;
+  const pInicial=parseFloat(log[0]?.val??log[0]?.kg)||null;
+  const pesoActualEl=document.getElementById('prog-peso-actual');
+  if(pesoActualEl)pesoActualEl.innerHTML=(pActual?pActual:'—')+'<span style="font-size:15px">kg</span>';
+  const perdidoEl=document.getElementById('prog-perdido');
+  if(perdidoEl&&pActual&&pInicial){
+    const diff=Math.round((pInicial-pActual)*10)/10;
+    perdidoEl.innerHTML=(diff>0?'−':diff<0?'+':'')+Math.abs(diff)+'<span style="font-size:15px">kg</span>';
+    perdidoEl.style.color=diff>0?'var(--green)':diff<0?'var(--red)':'var(--muted)';
+    const sub=document.getElementById('prog-perdido-sub');
+    if(sub&&log[0]?.date)sub.textContent='desde '+log[0].date;
+  }
+  // Grasa desde perfil
+  const prof=DB.get('mikefit_profile')||{};
+  const grasaEl=document.getElementById('prog-grasa');
+  if(grasaEl)grasaEl.innerHTML=(prof.bodyfat||'—')+'<span style="font-size:15px">%</span>';
+  // Días gym esta semana
+  let diasGym=0;
+  for(let i=0;i<7;i++){const d=new Date(now);d.setDate(d.getDate()-d.getDay()+(i===0?0:i)+1-(d.getDay()===0?7:0));
+    const dow=d.getDay();const date=d.toISOString().split('T')[0];
+    if(weekPlan[dow]?.name==='Descanso')continue;
+    const exS=DB.get('ex_'+date);
+    if(exS&&exS.length>0&&exS.some(e=>e.series?.some(s=>s?.done)))diasGym++;
+  }
+  const diasEl=document.getElementById('prog-dias-gym');
+  if(diasEl)diasEl.textContent=diasGym;
   renderPesoChart();
   renderPesoLog();
   renderPRChips();
