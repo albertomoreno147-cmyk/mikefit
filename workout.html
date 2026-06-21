@@ -976,6 +976,10 @@ function closeModal(id){document.getElementById(id).classList.add('hidden');}
 function goBack(){if(confirm('¿Salir del entreno? Se guarda lo que llevas.'))window.location.href='index.html';}
 
 init();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
 </body>
 </html>

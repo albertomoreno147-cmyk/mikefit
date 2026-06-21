@@ -3178,6 +3178,10 @@ _sc.addEventListener('touchend',e=>{
   if(dx<0&&currentTab==='dashboard')switchTab('semana',tabs[1]);
   else if(dx>0&&currentTab==='semana')switchTab('dashboard',tabs[0]);
 },{passive:true});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
 <!-- PROGRESS PHOTO VIEWER -->
 <div id="photo-viewer" class="photo-viewer">
