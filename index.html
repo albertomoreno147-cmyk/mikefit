@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="MikeFit">
 <meta name="theme-color" content="#FFFFFF">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>MikeFit</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -3357,5 +3358,58 @@ document.addEventListener('visibilitychange', () => {
     <div class="bib-video-ratio" id="bib-video-container"></div>
   </div>
 </div>
+
+<!-- BANNER INSTALAR PWA -->
+<div id="install-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#1C1C26;border-top:1px solid rgba(255,255,255,0.1);padding:14px 16px 28px;box-shadow:0 -4px 24px rgba(0,0,0,0.4)">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+    <img src="icon-192.png" style="width:44px;height:44px;border-radius:10px;flex-shrink:0">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#F0EFE8">Instala MikeFit</div>
+      <div style="font-size:12px;color:#556;margin-top:1px">Acceso rápido desde tu pantalla de inicio</div>
+    </div>
+    <div onclick="document.getElementById('install-banner').style.display='none'" style="margin-left:auto;color:#556;font-size:20px;cursor:pointer;padding:4px">✕</div>
+  </div>
+  <div id="install-ios" style="display:none;font-size:13px;color:#aab;line-height:1.7">
+    En Safari: toca el botón <strong style="color:#F0EFE8">⬜↑</strong> en la barra de abajo → desplaza hacia abajo → <strong style="color:#C8F135">Añadir a pantalla de inicio</strong>
+  </div>
+  <div id="install-android" style="display:none;font-size:13px;color:#aab;line-height:1.7">
+    En Chrome: toca <strong style="color:#F0EFE8">⋮</strong> arriba a la derecha → <strong style="color:#C8F135">Añadir a pantalla de inicio</strong>
+  </div>
+  <div id="install-btn-wrap" style="display:none;margin-top:2px">
+    <button id="install-btn" style="width:100%;padding:13px;background:#C8F135;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#0A0A0F;cursor:pointer;font-family:inherit">Instalar app</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // No mostrar si ya está instalada como PWA
+  const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+  if(isStandalone)return;
+  const dismissed=localStorage.getItem('install_banner_dismissed');
+  if(dismissed)return;
+  const banner=document.getElementById('install-banner');
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid=/android/i.test(navigator.userAgent);
+  if(isIOS){
+    document.getElementById('install-ios').style.display='block';
+    setTimeout(()=>banner.style.display='block',2000);
+  }else if(isAndroid){
+    document.getElementById('install-android').style.display='block';
+    setTimeout(()=>banner.style.display='block',2000);
+  }
+  // Android Chrome: botón nativo si disponible
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();
+    document.getElementById('install-android').style.display='none';
+    document.getElementById('install-btn-wrap').style.display='block';
+    document.getElementById('install-btn').onclick=()=>{e.prompt();banner.style.display='none';};
+    banner.style.display='block';
+  });
+  // Ocultar al instalar
+  window.addEventListener('appinstalled',()=>banner.style.display='none');
+  // Guardar dismiss
+  banner.querySelector('[onclick*=display]').addEventListener('click',()=>localStorage.setItem('install_banner_dismissed','1'));
+})();
+</script>
 </body>
 </html>
