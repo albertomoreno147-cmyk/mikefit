@@ -862,6 +862,10 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
             <div class="prof-data-item"><div class="prof-data-val">25</div><div class="prof-data-lbl">Edad</div></div>
             <div class="prof-data-item"><div class="prof-data-val">18.2%</div><div class="prof-data-lbl">% Grasa</div></div>
           </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <button id="gender-male" onclick="setGender('male')" style="flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">🏋️‍♂️ Hombre</button>
+            <button id="gender-female" onclick="setGender('female')" style="flex:1;padding:9px;border-radius:10px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">🏋️‍♀️ Mujer</button>
+          </div>
           <div class="prof-goal-row">
             <div class="prof-goal-lbl">Objetivo: 73 kg</div>
             <div class="prof-goal-bar"><div class="prof-goal-fill" id="prof-goal-fill" style="width:35%"></div></div>
@@ -2444,6 +2448,8 @@ let calYear=now.getFullYear();
 function renderMonthCalendar(){
   const el=document.getElementById('month-calendar');
   if(!el)return;
+  const gender=(DB.get('mikefit_profile')||{}).gender||'male';
+  const personEmoji=gender==='female'?'🏋️‍♀️':'🏋️‍♂️';
   const monthName=months[calMonth].charAt(0).toUpperCase()+months[calMonth].slice(1);
   const firstDay=new Date(calYear,calMonth,1);
   const lastDay=new Date(calYear,calMonth+1,0);
@@ -2484,16 +2490,12 @@ function renderMonthCalendar(){
     let inner='';
     if(isToday){
       inner=`<div class="cal-today-wrap"><span class="cal-day-num">${d}</span></div>`;
-      if(isDone) inner+=`<span class="cal-done-badge">100%</span>`;
-      else if(isTraining) inner+=`<span class="cal-gym-icon">🏋️</span>`;
+      if(isDone) inner+=`<span class="cal-gym-icon">${personEmoji}</span>`;
     } else if(isDone){
-      inner=`<span class="cal-day-num">${d}</span><span class="cal-done-badge">100%</span>`;
-    } else if(isTraining&&!isPast){
-      inner=`<span class="cal-day-num">${d}</span><span class="cal-gym-icon">🏋️</span>`;
-    } else if(isTraining&&isPast){
-      inner=`<span class="cal-day-num" style="color:var(--muted)">${d}</span><span class="cal-gym-icon" style="opacity:0.35">🏋️</span>`;
+      inner=`<span class="cal-day-num">${d}</span><span class="cal-gym-icon">${personEmoji}</span>`;
     } else {
-      inner=`<span class="cal-day-num ${isTraining?'':'rest-day'}" style="${!isTraining?'color:var(--muted)':''}">${d}</span>`;
+      const col=(!isTraining||isPast)&&!isTraining?'color:var(--muted)':isTraining&&isPast?'color:var(--muted)':'';
+      inner=`<span class="cal-day-num" style="${col}">${d}</span>`;
     }
 
     html+=`<div class="cal-day" onclick="calDayTap('${dateStr}',${dow})">${inner}</div>`;
@@ -2629,6 +2631,21 @@ function updateAvatarDisplay(src){
   }
 }
 
+function setGender(g){
+  const prof=DB.get('mikefit_profile')||{};
+  prof.gender=g;
+  DB.set('mikefit_profile',prof);
+  updateGenderButtons(g);
+  renderMonthCalendar();
+}
+function updateGenderButtons(g){
+  const teal='2px solid var(--teal)';const def='2px solid var(--border)';
+  const m=document.getElementById('gender-male');
+  const f=document.getElementById('gender-female');
+  if(m)m.style.border=g==='male'?teal:def;
+  if(f)f.style.border=g==='female'?teal:def;
+}
+
 function renderProfile(){
   // Nombre editable
   const nameEl=document.getElementById('prof-name');
@@ -2670,6 +2687,8 @@ function renderProfile(){
   if(fillEl)fillEl.style.width=pct+'%';
   const pctEl=document.getElementById('prof-goal-pct');
   if(pctEl)pctEl.textContent=pct+'%';
+  const gender=(DB.get('mikefit_profile')||{}).gender||'male';
+  updateGenderButtons(gender);
   applyTheme();
   renderSupps();
   renderTransformacion();
