@@ -1876,6 +1876,7 @@ function toggleExDay(date,i,which){
   s[i].done=!s[i].done;
   DB.set('ex_'+date,s);
   buildWeekStrip(which);
+  renderDayDetail(which);
   if(which==='dash')renderNextTraining();
 }
 
