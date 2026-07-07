@@ -771,7 +771,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
       <div class="card">
         <div class="card-title">Medidas corporales</div>
         <div class="medidas-grid" id="medidas-grid"></div>
-        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
+        <div id="medidas-chart-section"></div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px">
           <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em">Registrar medidas</div>
           <div class="medidas-inputs">
             <div class="medida-input-wrap"><label>Pecho (cm)</label><input type="number" step="0.5" id="m-pecho" placeholder="96"></div>
@@ -2672,6 +2673,8 @@ function generateSummary(){
   meals.forEach((m,i)=>{txt+=`${ms[i]?'✅':'⬜'} ${m.name}\n`;if(ms[i]){tp+=m.p;tc+=m.c;tf+=m.f;tk+=m.k;}});
   txt+=`\nMACROS: ${tk}kcal | ${tp}g P | ${tc}g C | ${tf}g F\n`;
   if(pesoLog.length>0){const l=pesoLog[pesoLog.length-1];txt+=`\n⚖️ PESO: ${l.val}kg${l.diff!==null?` (${l.diff>0?'+':''}${l.diff.toFixed(1)}kg)`:''}\n`;}
+  const mLog=DB.get('medidas_log')||[];
+  if(mLog.length>0){const lm=mLog[mLog.length-1];const parts=MEDIDA_FIELDS.filter(f=>lm[f.key]).map(f=>`${f.lbl}: ${lm[f.key]}cm`);if(parts.length)txt+=`📏 MEDIDAS (${lm.label}): ${parts.join(' · ')}\n`;}
   const dowIdx=[1,2,3,4,5,6,0].indexOf(now.getDay());
   txt+=`\n💊 SUPLEMENTOS:\n`;
   supps.forEach((s,i)=>txt+=`${suppState[i][dowIdx]?'✅':'⬜'} ${s.name}\n`);
@@ -3286,44 +3289,83 @@ function calcDiscos(){
   res.style.display='';
 }
 
+const MEDIDA_FIELDS=[
+  {key:'pecho',  lbl:'Pecho',   color:'#00BEB8', good:1},
+  {key:'cintura',lbl:'Cintura', color:'#EF4444', good:-1},
+  {key:'brazos', lbl:'Brazos',  color:'#C8F135', good:1},
+  {key:'muslos', lbl:'Muslos',  color:'#F97316', good:1},
+];
+let selectedMedidaKey='cintura';
+
 function renderMedidas(){
   const log=DB.get('medidas_log')||[];
   const grid=document.getElementById('medidas-grid');
   const logEl=document.getElementById('medidas-log');
+  const chartSection=document.getElementById('medidas-chart-section');
   if(!grid)return;
   const last=log[log.length-1]||null;
   const prev=log[log.length-2]||null;
-  const fields=[
-    {key:'pecho',lbl:'Pecho',good:1},
-    {key:'cintura',lbl:'Cintura',good:-1},
-    {key:'brazos',lbl:'Brazos',good:1},
-    {key:'muslos',lbl:'Muslos',good:1}
-  ];
+
+  // Grid de valores actuales
   if(!last){
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:12px;color:var(--muted);font-size:13px">Registra tus primeras medidas para ver el progreso</div>';
   } else {
-    grid.innerHTML=fields.map(f=>{
-      const val=last[f.key];
-      if(!val)return '';
+    grid.innerHTML=MEDIDA_FIELDS.map(f=>{
+      const val=last[f.key];if(!val)return '';
       let diffHtml='';
       if(prev&&prev[f.key]){
         const d=Math.round((val-prev[f.key])*10)/10;
-        if(d!==0){
-          const good=(d>0&&f.good>0)||(d<0&&f.good<0);
-          const col=good?'var(--green)':'var(--red)';
-          diffHtml=`<div class="medida-diff" style="color:${col}">${d>0?'+':''}${d} cm</div>`;
-        }else{diffHtml=`<div class="medida-diff" style="color:var(--muted)">sin cambios</div>`;}
+        if(d!==0){const good=(d>0&&f.good>0)||(d<0&&f.good<0);diffHtml=`<div class="medida-diff" style="color:${good?'var(--green)':'var(--red)'}">${d>0?'+':''}${d} cm</div>`;}
+        else diffHtml=`<div class="medida-diff" style="color:var(--muted)">sin cambios</div>`;
       }
       return `<div class="medida-box"><div class="medida-lbl">${f.lbl}</div><div class="medida-val">${val}<span> cm</span></div>${diffHtml}</div>`;
     }).join('');
   }
+
+  // Sección de gráfica
+  if(chartSection){
+    const available=MEDIDA_FIELDS.filter(f=>log.filter(e=>e[f.key]).length>=2);
+    if(available.length){
+      if(!available.find(f=>f.key===selectedMedidaKey))selectedMedidaKey=available[0].key;
+      const chips=available.map(f=>`<div class="pr-chip${f.key===selectedMedidaKey?' active':''}" onclick="selectMedida('${f.key}')">${f.lbl}</div>`).join('');
+      chartSection.innerHTML=`<div style="border-top:1px solid var(--border);padding-top:12px;margin-top:10px"><div class="pr-chips-wrap" style="margin-bottom:10px">${chips}</div><div id="medidas-chart"></div></div>`;
+      renderMedidasChart(selectedMedidaKey);
+    } else {
+      chartSection.innerHTML='';
+    }
+  }
+
+  // Historial
   if(!logEl)return;
   if(!log.length){logEl.innerHTML='';return;}
-  logEl.innerHTML=`<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Historial</div>`+
-    log.slice().reverse().slice(0,5).map(e=>{
-      const chips=fields.filter(f=>e[f.key]).map(f=>`<div class="medida-chip">${f.lbl.slice(0,1)}: ${e[f.key]}cm</div>`).join('');
+  logEl.innerHTML=`<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;margin-top:12px">Historial</div>`+
+    log.slice().reverse().slice(0,6).map(e=>{
+      const chips=MEDIDA_FIELDS.filter(f=>e[f.key]).map(f=>`<div class="medida-chip">${f.lbl[0]}: ${e[f.key]}cm</div>`).join('');
       return `<div class="medidas-log-item"><span style="font-size:12px;color:var(--muted);flex-shrink:0">${e.label}</span><div class="medidas-chips">${chips}</div></div>`;
     }).join('');
+}
+
+function selectMedida(key){
+  selectedMedidaKey=key;
+  document.querySelectorAll('#medidas-chart-section .pr-chip').forEach(c=>c.classList.toggle('active',c.textContent===MEDIDA_FIELDS.find(f=>f.key===key)?.lbl));
+  renderMedidasChart(key);
+}
+
+function renderMedidasChart(key){
+  const el=document.getElementById('medidas-chart');if(!el)return;
+  const log=DB.get('medidas_log')||[];
+  const f=MEDIDA_FIELDS.find(x=>x.key===key);
+  const data=log.filter(e=>e[key]).map(e=>({date:e.date,label:(e.label||e.date).slice(0,6),val:e[key]}));
+  if(data.length<2){el.innerHTML='';return;}
+  const current=data[data.length-1].val;
+  const initial=data[0].val;
+  const change=Math.round((current-initial)*10)/10;
+  const isGood=(change>0&&f.good>0)||(change<0&&f.good<0);
+  const changeColor=change===0?'var(--muted)':isGood?'var(--green)':'var(--red)';
+  el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px">
+    <span style="font-size:12px;color:var(--muted)">Actual: <strong style="color:${f.color}">${current} cm</strong></span>
+    <span style="font-size:12px;font-weight:700;color:${changeColor}">${change>0?'+':''}${change} cm desde inicio</span>
+  </div>`+buildSVGChart(data,f.color,'cm');
 }
 
 function saveMedidas(){
