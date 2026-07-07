@@ -2521,8 +2521,10 @@ function renderBibDetalle(){
   } else {
     const allDates=[];
     for(let i=0;i<30;i++){const d=new Date(now);d.setDate(d.getDate()-i);const date=d.toISOString().split('T')[0];const exS=DB.get('ex_'+date);if(exS){const found=exS.find(e=>e.id===ex.id);if(found&&found.done)allDates.push({date,sets:found.sets});}}
+    const rm1=getBestEstimated1RM(ex.name);
+    const rm1Html=rm1>0?`<div style="display:flex;justify-content:space-between;align-items:center;background:var(--teal-dim);border-radius:10px;padding:10px 14px;margin-bottom:12px"><span style="font-size:12px;color:var(--muted);font-weight:600">1RM ESTIMADO</span><span style="font-size:18px;font-weight:700;color:var(--teal)">~${rm1} kg</span></div>`:'';
     tabContent=allDates.length
-      ?`<div class="bib-det-section"><div class="bib-det-label">Últimas ${allDates.length} sesiones</div>${allDates.map(d=>`<div class="bib-hist-row"><span class="bib-hist-date">${d.date}</span><span class="bib-hist-val">${d.sets?d.sets.length+' series':'✓ completado'}</span></div>`).join('')}</div>`
+      ?`<div class="bib-det-section">${rm1Html}<div class="bib-det-label">Últimas ${allDates.length} sesiones</div>${allDates.map(d=>`<div class="bib-hist-row"><span class="bib-hist-date">${d.date}</span><span class="bib-hist-val">${d.sets?d.sets.length+' series':'✓ completado'}</span></div>`).join('')}</div>`
       :`<div class="bib-empty"><div class="bib-empty-icon">📊</div><div class="bib-empty-txt">Sin historial todavía</div><div style="font-size:12px;color:var(--muted);margin-top:4px">Completa este ejercicio para ver tu progreso</div></div>`;
   }
 
@@ -3149,6 +3151,28 @@ function renderPesoChart(){
   el.innerHTML=buildSVGChart(pts,'#00BEB8','kg');
 }
 
+function getBestEstimated1RM(exName){
+  let best=0;
+  Object.keys(localStorage).filter(k=>k.startsWith('ex_')).forEach(k=>{
+    const dateStr=k.slice(3);
+    const data=DB.get(k);if(!data)return;
+    const dow=new Date(dateStr+'T12:00:00').getDay();
+    const plan=getPlanForDate(dateStr,dow);
+    const exList=allExercises[plan.name]||[];
+    data.forEach((s,i)=>{
+      const name=s.customName||(i<exList.length?exList[i].name:null);
+      if(name!==exName)return;
+      (s.series||[]).forEach(sr=>{
+        if(sr&&sr.done&&sr.kg>0&&parseInt(sr.reps)>0){
+          const rm=Math.round(sr.kg*(1+parseInt(sr.reps)/30));
+          if(rm>best)best=rm;
+        }
+      });
+    });
+  });
+  return best;
+}
+
 function getPRHistory(exName){
   const results=[];
   Object.keys(localStorage).forEach(k=>{
@@ -3197,7 +3221,9 @@ function renderPRChart(name){
     return;
   }
   const best=Math.max(...data.map(d=>d.val));
-  el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">Mejor marca: <strong style="color:var(--blue)">${best}kg</strong></span><span style="font-size:12px;color:var(--muted)">${data.length} sesión${data.length>1?'es':''}</span></div>`+buildSVGChart(data,'#3B82F6','kg');
+  const rm1=getBestEstimated1RM(name);
+  const rm1Txt=rm1>0?`· 1RM ~<strong style="color:var(--teal)">${rm1}kg</strong>`:'';
+  el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--muted)">Mejor: <strong style="color:var(--blue)">${best}kg</strong> ${rm1Txt}</span><span style="font-size:12px;color:var(--muted)">${data.length} sesión${data.length>1?'es':''}</span></div>`+buildSVGChart(data,'#3B82F6','kg');
 }
 
 // ---- CALCULADORAS ----

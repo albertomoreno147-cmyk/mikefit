@@ -94,6 +94,12 @@ svg.ring{position:absolute;top:-2px;left:-2px;width:74px;height:74px;}
 /* HISTORY */
 .history-section{padding:0 16px 14px;}
 .history-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;}
+.suggestion-bar{background:rgba(0,190,184,0.08);border:1.5px solid rgba(0,190,184,0.22);border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.sugg-lbl{font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:2px;}
+.sugg-val{font-size:15px;font-weight:700;}
+.rm1-row{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.rm1-lbl{font-size:11px;color:var(--muted);}
+.rm1-val{font-size:13px;font-weight:700;color:var(--accent);}
 .history-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
 .history-row:last-child{border-bottom:none;}
 .history-date{font-size:11px;color:var(--muted);}
@@ -237,6 +243,7 @@ svg.ring{position:absolute;top:-2px;left:-2px;width:74px;height:74px;}
           <div class="wt-btn" id="wt-total" onclick="setWeightMode('total')">Total</div>
         </div>
       </div>
+      <div id="suggestion-bar" class="suggestion-bar" style="display:none"></div>
       <div id="sets-list"></div>
       <div class="add-set-btn" onclick="addSet()">+ Serie extra</div>
     </div>
@@ -244,6 +251,10 @@ svg.ring{position:absolute;top:-2px;left:-2px;width:74px;height:74px;}
     <div class="history-section">
       <div class="history-title">Semana anterior</div>
       <div id="history-list"></div>
+      <div id="rm1-row" class="rm1-row" style="display:none">
+        <span class="rm1-lbl">1RM estimado</span>
+        <span class="rm1-val" id="rm1-val"></span>
+      </div>
     </div>
 
     <div style="height:16px"></div>
@@ -619,14 +630,23 @@ function renderEx(){
   document.getElementById('ex-name').textContent=name;
   document.getElementById('ex-sets-info').textContent=planEx.sets;
 
-  // Last week kg
+  // Last week kg + progression suggestion
   const prevDate=new Date(now.getTime()-7*86400000).toISOString().split('T')[0];
   const prevState=DB.get('ex_'+prevDate);
   let lastKgTxt='—';
+  const suggBar=document.getElementById('suggestion-bar');
   if(prevState&&prevState[currentEx]){
-    const kgs=prevState[currentEx].series.filter(s=>s&&s.kg>0).map(s=>s.kg+'kg');
-    if(kgs.length)lastKgTxt=kgs.join(' · ');
-  }
+    const prevSeries=prevState[currentEx].series.filter(s=>s&&s.kg>0);
+    if(prevSeries.length){
+      lastKgTxt=prevSeries.map(s=>s.kg+'kg').join(' · ');
+      const maxPrevKg=Math.max(...prevSeries.map(s=>s.kg));
+      const targetKg=Math.round((maxPrevKg+2.5)*2)/2;
+      if(plan.name!=='Zona 2'){
+        suggBar.style.display='';
+        suggBar.innerHTML=`<div><div class="sugg-lbl">Semana pasada</div><div class="sugg-val" style="color:rgba(255,255,255,0.5)">${maxPrevKg} kg</div></div><div style="text-align:right"><div class="sugg-lbl">Objetivo hoy</div><div class="sugg-val" style="color:#00BEB8">≥ ${targetKg} kg 🎯</div></div>`;
+      } else { suggBar.style.display='none'; }
+    } else { suggBar.style.display='none'; }
+  } else { suggBar.style.display='none'; }
   document.getElementById('ex-last-kg').textContent=lastKgTxt;
 
   // Reps circle (from sets string e.g. "4×6-10·RIR2" → "6-10")
@@ -897,6 +917,41 @@ function renderHistory(){
       <div class="history-date">S${i+1} · ${new Date(prevDate+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</div>
       <div class="history-val">${s.kg}kg${weightMode==='side'?' ×2':''} · ${s.reps}r</div>
     </div>`).join('');
+  // 1RM estimado
+  const rm1El=document.getElementById('rm1-row');
+  const rm1Val=document.getElementById('rm1-val');
+  if(plan.name!=='Zona 2'){
+    const best1RM=getBest1RM();
+    if(best1RM>0){rm1El.style.display='';rm1Val.textContent='~'+best1RM+' kg';}
+    else rm1El.style.display='none';
+  } else rm1El.style.display='none';
+}
+
+// ── 1RM & PROGRESIÓN ──────────────────────────────────────────────────────────
+function calc1RM(kg,reps){
+  if(!kg||!reps||reps<=0)return 0;
+  return Math.round(kg*(1+reps/30));
+}
+
+function getBest1RM(){
+  const exName=exState[currentEx].customName||planExList[currentEx].name;
+  let best=0;
+  Object.keys(localStorage).filter(k=>k.startsWith('ex_')).forEach(k=>{
+    const dow=new Date(k.slice(3)+'T12:00:00').getDay();
+    if(weekPlan[dow].name!==plan.name)return;
+    const data=DB.get(k)||[];
+    if(currentEx>=data.length)return;
+    const ex=data[currentEx];
+    const name=ex.customName||planExList[currentEx]?.name;
+    if(name!==exName)return;
+    (ex.series||[]).forEach(s=>{
+      if(s&&s.done&&s.kg>0&&parseInt(s.reps)>0){
+        const rm=calc1RM(s.kg,parseInt(s.reps));
+        if(rm>best)best=rm;
+      }
+    });
+  });
+  return best;
 }
 
 // ── SAVE ──────────────────────────────────────────────────────────────────────
