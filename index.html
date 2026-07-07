@@ -1857,6 +1857,8 @@ function renderDayDetail(which){
       </div>`;
     });
     html+=`<div onclick="addExtraEx('${selDate}','${which}')" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:1.5px dashed var(--border);border-radius:12px;cursor:pointer;color:var(--muted);font-size:13px;margin-top:8px">+ Añadir ejercicio</div>`;
+    const sessionDone=exState.filter(e=>!e.isExtra).every(e=>e.done);
+    html+=`<button onclick="closeSession('${selDate}','${which}')" style="margin-top:10px;background:${sessionDone?'var(--teal-dim)':'var(--teal)'};color:${sessionDone?'var(--teal)':'white'};border:none;border-radius:14px;padding:13px;width:100%;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">${sessionDone?'✓ Sesión completada':'Cerrar sesión ✓'}</button>`;
     html+=`</div>`;
   }
   html+=`<div class="day-section"><div class="day-section-title">Nota del día</div>
@@ -1865,6 +1867,18 @@ function renderDayDetail(which){
   </div>`;
   html+=`</div>`;
   el.innerHTML=html;
+}
+
+function closeSession(date,which){
+  const dow=new Date(date+'T12:00:00').getDay();
+  const plan=getPlanForDate(date,dow);
+  const exList=allExercises[plan.name]||[];
+  let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
+  s.forEach(ex=>{ex.done=true;ex.series=ex.series.map(sr=>({...sr,done:true}));});
+  DB.set('ex_'+date,s);
+  buildWeekStrip(which);
+  renderDayDetail(which);
+  if(which==='dash')renderNextTraining();
 }
 
 function toggleExDay(date,i,which){
@@ -3324,7 +3338,9 @@ function checkSerie(date,i,j,which){
   if(!s[i]||!s[i].series[j])return;
   const wasDone=s[i].series[j].done;
   s[i].series[j].done=!wasDone;
+  s[i].done=s[i].series.filter(sr=>sr).every(sr=>sr.done);
   DB.set('ex_'+date,s);
+  buildWeekStrip(which);
   renderDayDetail(which);
   if(!wasDone){
     const ex=i<exList.length?exList[i]:null;
