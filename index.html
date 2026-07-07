@@ -173,6 +173,32 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .serie-box-input.sdone{background:var(--teal-dim);border-color:var(--teal-border);}
 .s-check{color:var(--muted);font-size:13px;font-weight:700;}
 .s-check.sdone{background:var(--teal);border-color:var(--teal);color:#fff;}
+/* GAMIFICACIÓN */
+.xp-bar-wrap{margin-top:14px;padding:0 2px;}
+.xp-bar-meta{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:5px;font-weight:600;}
+.xp-bar-track{height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),#C8F135);border-radius:3px;transition:width 0.5s ease;}
+.logro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.logro-card{background:var(--bg);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;border:1.5px solid var(--border);}
+.logro-card.unlocked{background:var(--teal-dim);border-color:var(--teal-border);}
+.logro-icon{font-size:24px;filter:grayscale(1);opacity:0.3;}
+.logro-card.unlocked .logro-icon{filter:none;opacity:1;}
+.logro-name{font-size:10px;font-weight:600;color:var(--muted);line-height:1.2;}
+.logro-card.unlocked .logro-name{color:var(--text);}
+.reto-card{background:linear-gradient(135deg,rgba(0,190,184,0.07),rgba(200,241,53,0.04));border:1.5px solid var(--teal-border);border-radius:16px;padding:16px;}
+.reto-card-title{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
+.reto-card-name{font-size:16px;font-weight:700;margin-bottom:3px;}
+.reto-card-desc{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.4;}
+.reto-claim-btn{background:var(--teal);color:white;border:none;border-radius:11px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;}
+.reto-claim-btn:disabled{background:var(--teal-dim);color:var(--teal);cursor:default;}
+.achieve-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:900;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.25s;pointer-events:none;backdrop-filter:blur(4px);}
+.achieve-overlay.show{opacity:1;pointer-events:auto;}
+.achieve-modal{background:var(--surface);border-radius:24px;padding:32px 24px;text-align:center;max-width:290px;width:88%;transform:scale(0.82);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.achieve-overlay.show .achieve-modal{transform:scale(1);}
+.achieve-modal-icon{font-size:54px;margin-bottom:10px;}
+.achieve-modal-tag{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.achieve-modal-name{font-size:21px;font-weight:700;margin-bottom:6px;}
+.achieve-modal-desc{font-size:13px;color:var(--muted);}
 /* REST TIMER PANEL */
 .rest-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:24px 24px 0 0;padding:0 20px calc(var(--safe-bottom) + 76px);z-index:200;box-shadow:0 -6px 40px rgba(0,0,0,0.18);transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.34,1.2,0.64,1);}
 .rest-panel.open{transform:translateY(0);}
@@ -867,6 +893,10 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
             <div class="prof-stat"><div class="prof-stat-val" id="prof-sesiones">—</div><div class="prof-stat-lbl">Sesiones</div></div>
             <div class="prof-stat"><div class="prof-stat-val" id="prof-perdido">—</div><div class="prof-stat-lbl">Perdido</div></div>
           </div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-meta"><span id="xp-level-lbl">Nivel 1</span><span id="xp-progress-lbl">0 / 200 XP</span></div>
+            <div class="xp-bar-track"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+          </div>
         </div>
 
         <!-- DATOS CORPORALES -->
@@ -888,6 +918,14 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
             <div class="prof-goal-pct" id="prof-goal-pct">35%</div>
           </div>
         </div>
+
+        <!-- RETO SEMANAL -->
+        <div class="settings-section-lbl">Reto semanal</div>
+        <div class="reto-card" id="reto-semanal-card" style="margin-bottom:12px"></div>
+
+        <!-- LOGROS -->
+        <div class="settings-section-lbl">Logros</div>
+        <div class="card" style="margin-bottom:12px"><div class="logro-grid" id="logros-grid"></div></div>
 
         <!-- TRANSFORMACIÓN -->
         <div class="settings-section-lbl">Transformación</div>
@@ -1050,6 +1088,181 @@ const START=new Date('2026-05-18');
 const diffDays=Math.floor((now-START)/86400000);
 const streak=Math.max(1,diffDays+1);
 
+// ── GAMIFICACIÓN ──────────────────────────────────────────────────────────────
+function getStreak(){
+  let s=0;
+  for(let offset=0;offset<365;offset++){
+    const check=new Date(now);check.setDate(check.getDate()-offset);
+    const dow=check.getDay();
+    if(weekPlan[dow].name==='Descanso')continue;
+    const date=check.toISOString().split('T')[0];
+    const exS=DB.get('ex_'+date);
+    const isDone=exS&&exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done);
+    if(isDone){s++;}else if(date===TODAY){continue;}else{break;}
+  }
+  return s;
+}
+
+function getStats(){
+  let entrenosCompletados=0,seriesCompletadas=0;
+  Object.keys(localStorage).filter(k=>k.startsWith('ex_')).forEach(k=>{
+    const exS=DB.get(k)||[];
+    if(exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done))entrenosCompletados++;
+    exS.forEach(ex=>{(ex.series||[]).forEach(s=>{if(s&&s.done)seriesCompletadas++;});});
+  });
+  return {entrenosCompletados,seriesCompletadas};
+}
+
+function getXP(){
+  const {entrenosCompletados,seriesCompletadas}=getStats();
+  const logros=(DB.get('mikefit_achievements')||[]).length;
+  const weeklyXP=DB.get('mikefit_weekly_xp')||0;
+  return entrenosCompletados*20+seriesCompletadas*2+logros*100+weeklyXP;
+}
+
+function getLevel(xp){
+  let lvl=1,need=200;
+  while(xp>=need){xp-=need;lvl++;need=200+(lvl-1)*50;}
+  return {lvl,current:xp,needed:need};
+}
+
+const ACHIEVEMENTS=[
+  {id:'racha_3',icon:'🔥',name:'En racha',desc:'3 días seguidos de entreno'},
+  {id:'racha_7',icon:'⚡',name:'Semana de fuego',desc:'7 días seguidos de entreno'},
+  {id:'racha_14',icon:'💪',name:'Máquina',desc:'14 días seguidos de entreno'},
+  {id:'racha_30',icon:'🏆',name:'Leyenda',desc:'30 días seguidos de entreno'},
+  {id:'entrenos_1',icon:'🎯',name:'Primer paso',desc:'Tu primer entreno completado'},
+  {id:'entrenos_10',icon:'🌟',name:'10 sesiones',desc:'10 entrenos completados'},
+  {id:'entrenos_25',icon:'💎',name:'25 sesiones',desc:'25 entrenos completados'},
+  {id:'entrenos_50',icon:'👑',name:'50 sesiones',desc:'50 entrenos completados'},
+  {id:'semana_perfecta',icon:'🎖️',name:'Semana perfecta',desc:'5 entrenos en una misma semana'},
+  {id:'primer_peso',icon:'⚖️',name:'En control',desc:'Primer registro de peso'},
+  {id:'menos_2kg',icon:'📉',name:'−2 kg',desc:'Perdiste 2 kg desde el inicio'},
+  {id:'primera_foto',icon:'📸',name:'Transformación',desc:'Primera foto de progreso'},
+  {id:'primer_pr',icon:'🚀',name:'Nuevo récord',desc:'Primer ejercicio con carga registrada'},
+];
+
+function _hasSemanasPerfectas(){
+  const wkMap={};
+  Object.keys(localStorage).filter(k=>k.startsWith('ex_')).forEach(k=>{
+    const d=new Date(k.replace('ex_','')+'T12:00:00');
+    if(weekPlan[d.getDay()].name==='Descanso')return;
+    const exS=DB.get(k)||[];
+    if(!(exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done)))return;
+    const dow=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(dow===0?6:dow-1));
+    const wk=mon.toISOString().split('T')[0];
+    wkMap[wk]=(wkMap[wk]||0)+1;
+  });
+  return Object.values(wkMap).some(c=>c>=5);
+}
+
+let _achieveQueue=[],_achieveShowing=false,_achieveTimer=null;
+function checkAchievements(){
+  const unlocked=new Set(DB.get('mikefit_achievements')||[]);
+  const newOnes=[];
+  const s=getStreak();const {entrenosCompletados}=getStats();
+  [[3,'racha_3'],[7,'racha_7'],[14,'racha_14'],[30,'racha_30']].forEach(([n,id])=>{if(s>=n&&!unlocked.has(id)){unlocked.add(id);newOnes.push(id);}});
+  [[1,'entrenos_1'],[10,'entrenos_10'],[25,'entrenos_25'],[50,'entrenos_50']].forEach(([n,id])=>{if(entrenosCompletados>=n&&!unlocked.has(id)){unlocked.add(id);newOnes.push(id);}});
+  if(!unlocked.has('semana_perfecta')&&_hasSemanasPerfectas()){unlocked.add('semana_perfecta');newOnes.push('semana_perfecta');}
+  const pesoL=DB.get('peso_log')||[];
+  if(pesoL.length>=1&&!unlocked.has('primer_peso')){unlocked.add('primer_peso');newOnes.push('primer_peso');}
+  if(pesoL.length>=2&&(pesoL[0].val-pesoL[pesoL.length-1].val)>=2&&!unlocked.has('menos_2kg')){unlocked.add('menos_2kg');newOnes.push('menos_2kg');}
+  if((DB.get('progress_photos')||[]).length>=1&&!unlocked.has('primera_foto')){unlocked.add('primera_foto');newOnes.push('primera_foto');}
+  const hasPR=Object.keys(localStorage).filter(k=>k.startsWith('ex_')).some(k=>(DB.get(k)||[]).some(ex=>(ex.series||[]).some(s=>s&&s.done&&s.kg>0)));
+  if(hasPR&&!unlocked.has('primer_pr')){unlocked.add('primer_pr');newOnes.push('primer_pr');}
+  if(newOnes.length){
+    DB.set('mikefit_achievements',[...unlocked]);
+    newOnes.forEach(id=>_achieveQueue.push(ACHIEVEMENTS.find(a=>a.id===id)));
+    if(!_achieveShowing)_processAchieveQueue();
+  }
+}
+function _processAchieveQueue(){
+  if(!_achieveQueue.length){_achieveShowing=false;return;}
+  _achieveShowing=true;
+  const a=_achieveQueue.shift();
+  const el=document.getElementById('achieve-overlay');if(!el)return;
+  document.getElementById('achieve-icon').textContent=a.icon;
+  document.getElementById('achieve-name').textContent=a.name;
+  document.getElementById('achieve-desc').textContent=a.desc;
+  el.classList.add('show');el.onclick=_closeAchieveModal;
+  _achieveTimer=setTimeout(_closeAchieveModal,3200);
+}
+function _closeAchieveModal(){
+  clearTimeout(_achieveTimer);
+  const el=document.getElementById('achieve-overlay');
+  if(el){el.classList.remove('show');el.onclick=null;}
+  setTimeout(_processAchieveQueue,350);
+}
+function showAchievementModal(a){_achieveQueue.push(a);if(!_achieveShowing)_processAchieveQueue();}
+
+function updateXPBar(){
+  const xp=getXP();const {lvl,current,needed}=getLevel(xp);
+  const fill=document.getElementById('xp-bar-fill');
+  const lvlEl=document.getElementById('xp-level-lbl');
+  const xpEl=document.getElementById('xp-progress-lbl');
+  if(fill)fill.style.width=(current/needed*100)+'%';
+  if(lvlEl)lvlEl.textContent='Nivel '+lvl;
+  if(xpEl)xpEl.textContent=current+' / '+needed+' XP';
+}
+
+function renderLogros(){
+  const el=document.getElementById('logros-grid');if(!el)return;
+  const unlocked=new Set(DB.get('mikefit_achievements')||[]);
+  el.innerHTML=ACHIEVEMENTS.map(a=>`<div class="logro-card${unlocked.has(a.id)?' unlocked':''}">
+    <div class="logro-icon">${a.icon}</div><div class="logro-name">${a.name}</div></div>`).join('');
+}
+
+function _getWeekDates(){
+  const mon=new Date(now);const dow=mon.getDay();mon.setDate(mon.getDate()-(dow===0?6:dow-1));
+  const dates=[];
+  for(let d=0;d<7;d++){const day=new Date(mon);day.setDate(mon.getDate()+d);if(day>now)break;dates.push({dateStr:day.toISOString().split('T')[0],dow:day.getDay()});}
+  return dates;
+}
+
+const WEEKLY_CHALLENGES=[
+  {id:'perfecta',name:'Semana perfecta',desc:'Completa todos los días de entreno de esta semana',xp:150,
+   check(){const ds=_getWeekDates().filter(d=>weekPlan[d.dow].name!=='Descanso');const done=ds.filter(d=>{const e=DB.get('ex_'+d.dateStr)||[];return e.length>0&&e.filter(x=>!x.isExtra).every(x=>x.done);}).length;return {done,total:ds.length};}},
+  {id:'3dias',name:'3 días seguidos',desc:'Entrena 3 días consecutivos esta semana',xp:100,
+   check(){let s=0,max=0;_getWeekDates().forEach(d=>{if(weekPlan[d.dow].name==='Descanso')return;const e=DB.get('ex_'+d.dateStr)||[];const ok=e.length>0&&e.filter(x=>!x.isExtra).every(x=>x.done);ok?(s++,max=Math.max(max,s)):s=0;});return {done:Math.min(max,3),total:3};}},
+  {id:'nota',name:'Anota tu sesión',desc:'Escribe una nota en cualquier día de esta semana',xp:50,
+   check(){const done=_getWeekDates().some(d=>DB.get('note_'+d.dateStr))?1:0;return {done,total:1};}},
+  {id:'extra',name:'Ejercicio extra',desc:'Añade un ejercicio extra en cualquier sesión esta semana',xp:75,
+   check(){const done=_getWeekDates().some(d=>(DB.get('ex_'+d.dateStr)||[]).some(e=>e.isExtra))?1:0;return {done,total:1};}},
+];
+
+function renderRetoSemanal(){
+  const el=document.getElementById('reto-semanal-card');if(!el)return;
+  const weekNum=Math.floor(diffDays/7);
+  const ch=WEEKLY_CHALLENGES[weekNum%WEEKLY_CHALLENGES.length];
+  const {done,total}=ch.check();
+  const weekKey='wk_'+weekNum+'_'+ch.id;
+  const claimed=(DB.get('mikefit_weekly_claimed')||[]).includes(weekKey);
+  const isDone=done>=total;
+  const pct=total>0?Math.min(100,Math.round(done/total*100)):0;
+  el.innerHTML=`<div class="reto-card-title">⚔️ Reto semanal · +${ch.xp} XP</div>
+    <div class="reto-card-name">${ch.name}</div>
+    <div class="reto-card-desc">${ch.desc}</div>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px"><span>Progreso</span><span>${done}/${total}</span></div>
+      <div class="prof-goal-bar"><div class="prof-goal-fill" style="width:${pct}%"></div></div>
+    </div>
+    <button class="reto-claim-btn" onclick="claimWeeklyChallenge()" ${!isDone||claimed?'disabled':''}>
+      ${claimed?'✓ Reclamado':isDone?'¡Reclamar +'+ch.xp+' XP!':'En progreso…'}
+    </button>`;
+}
+
+function claimWeeklyChallenge(){
+  const weekNum=Math.floor(diffDays/7);
+  const ch=WEEKLY_CHALLENGES[weekNum%WEEKLY_CHALLENGES.length];
+  const weekKey='wk_'+weekNum+'_'+ch.id;
+  const claimed=DB.get('mikefit_weekly_claimed')||[];
+  if(claimed.includes(weekKey))return;
+  claimed.push(weekKey);DB.set('mikefit_weekly_claimed',claimed);
+  DB.set('mikefit_weekly_xp',(DB.get('mikefit_weekly_xp')||0)+ch.xp);
+  renderRetoSemanal();updateXPBar();
+  showAchievementModal({icon:'⚔️',name:'¡Reto completado!',desc:ch.name+' · +'+ch.xp+' XP'});
+}
+
 const motivations=[
   'Cada rep te acerca más a tu objetivo 💪',
   'Sin excusas. Solo resultados.',
@@ -1120,7 +1333,7 @@ function updateHero(){
   const hw=document.getElementById('hero-week');
   if(hw) hw.textContent=Math.max(1,Math.ceil(streak/7));
   const hs=document.getElementById('hero-streak-val');
-  if(hs) hs.textContent=Math.max(1,diffDays+1);
+  if(hs) hs.textContent=getStreak();
   // Gradiente dinámico según tipo de entreno (colores sólidos oscuros)
   const hero=document.querySelector('.hero-card');
   if(hero&&plan.color){
@@ -1879,6 +2092,7 @@ function closeSession(date,which){
   buildWeekStrip(which);
   renderDayDetail(which);
   if(which==='dash')renderNextTraining();
+  checkAchievements();
 }
 
 function toggleExDay(date,i,which){
@@ -2685,7 +2899,7 @@ function renderProfile(){
   updateAvatarDisplay(DB.get('profile_photo')||null);
   // Racha
   const rachaEl=document.getElementById('prof-racha');
-  if(rachaEl)rachaEl.textContent=Math.max(1,diffDays+1)+'d';
+  if(rachaEl)rachaEl.textContent=getStreak()+'d';
   // Sesiones completadas desde el inicio
   let sesiones=0;
   for(let i=0;i<=diffDays;i++){
@@ -2723,6 +2937,9 @@ function renderProfile(){
   applyTheme();
   renderSupps();
   renderTransformacion();
+  renderLogros();
+  renderRetoSemanal();
+  updateXPBar();
 }
 
 function openSettings(){
@@ -3412,6 +3629,7 @@ function changeRestPreset(secs){
 
 // ---- INIT ----
 applyTheme();
+checkAchievements();
 updateHero();
 renderNextTraining();
 renderMonthCalendar();
@@ -3566,5 +3784,16 @@ document.addEventListener('visibilitychange', () => {
   banner.querySelector('[onclick*=display]').addEventListener('click',()=>localStorage.setItem('install_banner_dismissed','1'));
 })();
 </script>
+
+<!-- MODAL LOGRO DESBLOQUEADO -->
+<div class="achieve-overlay" id="achieve-overlay">
+  <div class="achieve-modal">
+    <div class="achieve-modal-icon" id="achieve-icon">🏆</div>
+    <div class="achieve-modal-tag">¡Logro desbloqueado!</div>
+    <div class="achieve-modal-name" id="achieve-name"></div>
+    <div class="achieve-modal-desc" id="achieve-desc"></div>
+  </div>
+</div>
+
 </body>
 </html>
