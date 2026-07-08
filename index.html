@@ -1323,7 +1323,7 @@ function buildWeekRing(){
 
 function updateHero(){
   const dow=now.getDay();
-  const plan=weekPlan[dow];
+  const plan=getPlanForDate(TODAY,dow);
   const g=document.getElementById('hero-greeting');
   if(g) g.textContent=getGreeting();
   const ht=document.getElementById('hero-day-type');
@@ -1917,8 +1917,8 @@ function buildWeekStrip(which){
   if(!strip)return;
   strip.innerHTML='';
   [1,2,3,4,5,6,0].forEach((dow,i)=>{
-    const p=weekPlan[dow];
     const date=getDateForDow(dow,which==='semana'?weekOffsetSemana:0);
+    const p=getPlanForDate(date,dow);
     const isToday=date===TODAY;
     const isSel=date===selDate;
     const exS=DB.get('ex_'+date);
@@ -1947,9 +1947,9 @@ function renderNextTraining(){
   // Contar completados esta semana
   let completed=0;
   [1,2,3,4,5,6,0].forEach(dow=>{
-    const p=weekPlan[dow];
-    if(p.name==='Descanso')return;
     const date=getDateForDow(dow);
+    const p=getPlanForDate(date,dow);
+    if(p.name==='Descanso')return;
     const exS=DB.get('ex_'+date);
     if(exS&&exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done))completed++;
   });
@@ -1962,9 +1962,9 @@ function renderNextTraining(){
     const d=new Date(now);
     d.setDate(d.getDate()+offset);
     const dow=d.getDay();
-    const p=weekPlan[dow];
-    if(p.name==='Descanso')continue;
     const date=d.toISOString().split('T')[0];
+    const p=getPlanForDate(date,dow);
+    if(p.name==='Descanso')continue;
     const exS=DB.get('ex_'+date);
     const isDone=exS&&exS.length>0&&exS.filter(e=>!e.isExtra).every(e=>e.done);
     upcoming.push({dow,date,plan:p,isDone,isToday:date===TODAY});
@@ -2121,7 +2121,7 @@ function chgKg(date,i,j,d,which){
 }
 
 function setKg(date,i,j,v){
-  const plan=weekPlan[new Date(date+'T12:00:00').getDay()];
+  const plan=getPlanForDate(date,new Date(date+'T12:00:00').getDay());
   const exList=allExercises[plan.name]||[];
   let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
   if(!s[i]||!s[i].series[j])return;
@@ -2130,7 +2130,7 @@ function setKg(date,i,j,v){
 }
 
 function setReps(date,i,j,v){
-  const plan=weekPlan[new Date(date+'T12:00:00').getDay()];
+  const plan=getPlanForDate(date,new Date(date+'T12:00:00').getDay());
   const exList=allExercises[plan.name]||[];
   let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
   if(!s[i]||!s[i].series[j])return;
@@ -2139,7 +2139,7 @@ function setReps(date,i,j,v){
 }
 
 function swapEx(date,i,name,which){
-  const plan=weekPlan[new Date(date+'T12:00:00').getDay()];
+  const plan=getPlanForDate(date,new Date(date+'T12:00:00').getDay());
   const exList=allExercises[plan.name]||[];
   let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
   if(!s[i])return;
@@ -2154,7 +2154,7 @@ function addExtraEx(date,which){
   if(!name)return;
   const setsStr=prompt('Series × reps (ej: 3×12):','3×12');
   const numSets=parseInt((setsStr||'3×12').split('×')[0])||3;
-  const plan=weekPlan[new Date(date+'T12:00:00').getDay()];
+  const plan=getPlanForDate(date,new Date(date+'T12:00:00').getDay());
   const exList=allExercises[plan.name]||[];
   let s=DB.get('ex_'+date)||exList.map(e=>({done:false,series:Array(e.numSets).fill(null).map(()=>({kg:0,reps:''})),alts:e.alts}));
   s.push({done:false,customName:name,sets:setsStr||'3×12',numSets,series:Array(numSets).fill(null).map(()=>({kg:0,reps:''})),alts:[],isExtra:true});
@@ -2654,7 +2654,7 @@ function saveNoteHome(which){
 
 // ---- SUMMARY ----
 function generateSummary(){
-  const plan=weekPlan[now.getDay()];
+  const plan=getPlanForDate(TODAY,now.getDay());
   const exList=allExercises[plan.name]||[];
   const exState=DB.get('ex_'+TODAY)||[];
   const ms=DB.get('meals_'+TODAY)||Array(meals.length).fill(false);
