@@ -468,14 +468,17 @@ const muscleColors={
   'Core':'#00BEB8','Lumbar':'#EF4444','Cardio':'#22C55E',
 };
 
-function getPlanToday(){
-  const dow=now.getDay();
-  const override=DB.get('plan_override_'+TODAY);
+function getPlanForDateWO(dateStr,dow){
+  const override=DB.get('plan_override_'+dateStr);
   if(override){
     const found=[{name:'PUSH'},{name:'PULL'},{name:'Zona 2'},{name:'LEGS'},{name:'Full+Core'},{name:'Descanso'}].find(o=>o.name===override);
     if(found){const wp=Object.values(weekPlan).find(p=>p.name===found.name);return wp||weekPlan[dow];}
   }
   return weekPlan[dow];
+}
+
+function getPlanToday(){
+  return getPlanForDateWO(TODAY,now.getDay());
 }
 
 // ── SVG MUSCLE DIAGRAM ───────────────────────────────────────────────────────
@@ -937,8 +940,9 @@ function getBest1RM(){
   const exName=exState[currentEx].customName||planExList[currentEx].name;
   let best=0;
   Object.keys(localStorage).filter(k=>k.startsWith('ex_')).forEach(k=>{
-    const dow=new Date(k.slice(3)+'T12:00:00').getDay();
-    if(weekPlan[dow].name!==plan.name)return;
+    const dateStr=k.slice(3);
+    const dow=new Date(dateStr+'T12:00:00').getDay();
+    if(getPlanForDateWO(dateStr,dow).name!==plan.name)return;
     const data=DB.get(k)||[];
     if(currentEx>=data.length)return;
     const ex=data[currentEx];
