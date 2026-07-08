@@ -1,4 +1,4 @@
-const CACHE = 'mikefit-v1';
+const CACHE = 'mikefit-v2';
 const APP_SHELL = [
   './index.html',
   './workout.html',
