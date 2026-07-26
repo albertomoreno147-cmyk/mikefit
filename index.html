@@ -3730,8 +3730,10 @@ _sc.addEventListener('touchend',e=>{
   else if(dx>0&&currentTab==='semana')switchTab('dashboard',tabs[0]);
 },{passive:true});
 
+let swReg=null;
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js').then(reg=>{
+    swReg=reg;
     reg.addEventListener('updatefound',()=>{
       const nw=reg.installing;
       if(!nw)return;
@@ -3749,9 +3751,15 @@ if('serviceWorker' in navigator){
 window.addEventListener('pageshow', e => {
   if(e.persisted){ updateHero(); renderNextTraining(); }
 });
-// Refresca cuando la PWA vuelve a primer plano
+// Refresca cuando la PWA vuelve a primer plano. iOS a veces no comprueba
+// actualizaciones del service worker al solo traer la app a primer plano
+// (sin cierre completo), así que forzamos la comprobación aquí también.
 document.addEventListener('visibilitychange', () => {
-  if(!document.hidden){ updateHero(); renderNextTraining(); }
+  if(!document.hidden){
+    updateHero();
+    renderNextTraining();
+    if(swReg)swReg.update().catch(()=>{});
+  }
 });
 </script>
 <!-- PROGRESS PHOTO VIEWER -->
