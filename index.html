@@ -298,18 +298,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .bib-ex-row:active{opacity:0.6;}
 .bib-ex-thumb{width:54px;height:54px;border-radius:13px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);}
 .bib-ex-thumb svg{width:38px;height:38px;}
+.bib-ex-thumb img{width:100%;height:100%;object-fit:cover;}
+.bib-ex-thumb.photo{border:1.5px solid var(--teal-border)!important;background:var(--bg);}
 .bib-ex-info{flex:1;min-width:0;}
 .bib-ex-name{font-size:15px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:3px;}
 .bib-ex-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;}
 .bib-ex-chev{font-size:20px;line-height:1;flex-shrink:0;}
 /* Detalle imagen */
 .bib-det-img-wrap{border-radius:18px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;height:220px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
-.bib-det-yt-overlay{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:none;border-radius:20px;color:white;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
-.bib-muscle-label{position:absolute;top:10px;left:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;background:rgba(0,0,0,0.35);color:white;padding:4px 10px;border-radius:20px;pointer-events:none;}
-.bib-yt-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px;opacity:0;transition:opacity 0.4s;}
-.bib-yt-thumb.loaded{opacity:1;}
-.bib-yt-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,0.25);}
-.bib-yt-play.visible{display:flex;}
+.bib-muscle-label{position:absolute;top:10px;left:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;background:rgba(0,0,0,0.4);color:white;padding:5px 12px;border-radius:20px;pointer-events:none;z-index:2;}
+.bib-hero-photo{width:100%;height:100%;object-fit:cover;border:1.5px solid var(--teal-border);box-sizing:border-box;}
+.bib-hero-gif{position:relative;width:100%;height:100%;border:1.5px solid var(--teal-border);box-sizing:border-box;border-radius:18px;overflow:hidden;}
+.bib-hero-gif img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.bib-hero-gif img.f0{animation:bibHeroFlip 1.4s steps(1) infinite;}
+.bib-hero-gif img.f1{animation:bibHeroFlip 1.4s steps(1) infinite;animation-delay:0.7s;}
+@keyframes bibHeroFlip{0%,49.9%{opacity:1;}50%,100%{opacity:0;}}
 .bib-video-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;}
 .bib-video-modal.hidden{display:none;}
 .bib-video-close{position:absolute;top:calc(env(safe-area-inset-top,44px)+8px);right:16px;background:none;border:none;color:rgba(255,255,255,0.7);font-size:32px;cursor:pointer;line-height:1;padding:4px;}
@@ -1402,255 +1405,255 @@ const meals=[
 
 const ejerciciosBD=[
   // ── PECHO ──
-  {id:'pb_barra',name:'Press banca barra',musculo:'Pecho',wger:4,dificultad:'intermedio',secundarios:['Tríceps','Hombro'],
+  {id:'pb_barra',name:'Press banca barra',musculo:'Pecho',wger:4,dbId:'Barbell_Bench_Press_-_Medium_Grip',gifUrl:null,dificultad:'intermedio',secundarios:['Tríceps','Hombro'],
    desc:'El rey del entrenamiento de pecho. Trabaja el pectoral mayor en toda su extensión con fuerte participación del deltoides anterior y el tríceps. El ejercicio más efectivo para ganar masa y fuerza en el tren superior.',
    como:'Tumbado en banco plano, barra a altura de ojos. Agarre ligeramente más ancho que los hombros. Baja controlando 2-3s hasta rozar el pecho (línea del pezón). Codos a 45-60°. Sube explosivo.',
    numSets:4,sets:'4×6-10 · RIR 2',alts:['Press banca mancuernas','Press en máquina'],
    errores:['Rebotar la barra en el pecho — pierde tensión y es peligroso','Codos a 90° (perpendiculares): deben ir a 45-75° del torso','Levantar las caderas del banco al empujar','Agarre demasiado ancho: aumenta el riesgo en el hombro']},
-  {id:'pb_manc',name:'Press banca mancuernas',musculo:'Pecho',wger:4,dificultad:'básico',secundarios:['Tríceps','Hombro'],
+  {id:'pb_manc',name:'Press banca mancuernas',musculo:'Pecho',wger:4,dbId:'Dumbbell_Bench_Press',gifUrl:null,dificultad:'básico',secundarios:['Tríceps','Hombro'],
    desc:'Mayor rango de movimiento que la barra y trabaja los estabilizadores. Ideal para corregir desequilibrios entre los dos lados del pecho.',
    como:'Mancuernas a la altura del pecho, palmas al frente. Baja hasta que los codos queden ligeramente por debajo del banco. Sube sin chocar las mancuernas arriba.',
    numSets:3,sets:'3×10-12 · RIR 2',alts:['Press banca barra','Press en máquina'],
    errores:['Subir las mancuernas en arco demasiado cerrado — pierde tensión en el pecho','No llegar al rango completo de movimiento','Soltar las mancuernas bruscamente en la bajada','Muñecas torcidas — mantenerlas neutras y firmes']},
-  {id:'pb_inc_barra',name:'Press inclinado barra',musculo:'Pecho',wger:4,dificultad:'intermedio',secundarios:['Tríceps','Hombro'],
+  {id:'pb_inc_barra',name:'Press inclinado barra',musculo:'Pecho',wger:4,dbId:'Barbell_Incline_Bench_Press_-_Medium_Grip',gifUrl:null,dificultad:'intermedio',secundarios:['Tríceps','Hombro'],
    desc:'Activa principalmente el pectoral clavicular (porción superior). El ángulo inclinado desplaza el énfasis hacia la parte alta del pecho, que suele ser la más difícil de desarrollar.',
    como:'Banco a 30-45°. No más inclinación o se convierte en ejercicio de hombros. Baja controlado al pecho superior. Sube explosivo con codos a 45-60°.',
    numSets:4,sets:'4×8-10 · RIR 2',alts:['Press inclinado mancuernas'],
    errores:['Banco más de 45° — trabaja más el hombro que el pecho','Codos flareados a 90° — aumenta el riesgo en el hombro','No retractar las escápulas al inicio','Descender sin control']},
-  {id:'pb_inc',name:'Press inclinado mancuernas',musculo:'Pecho',wger:4,dificultad:'básico',secundarios:['Tríceps'],
+  {id:'pb_inc',name:'Press inclinado mancuernas',musculo:'Pecho',wger:4,dbId:'Incline_Dumbbell_Press',gifUrl:null,dificultad:'básico',secundarios:['Tríceps'],
    desc:'Combina el ángulo inclinado con el mayor rango de movimiento de las mancuernas. Excelente para dar fullness a la parte superior del pectoral.',
    como:'Banco a 30-45°. Baja las mancuernas con codos a 45-60°. Rango completo: ligeramente por debajo del pecho. Sube sin bloquear codos.',
    numSets:3,sets:'3×10-12 · RIR 2',alts:['Press inclinado barra'],
    errores:['Inclinar el banco más de 45°','Usar demasiado peso y perder la técnica','No controlar la bajada (mínimo 2 segundos)','Juntar las mancuernas arriba — pierde tensión']},
-  {id:'apertura',name:'Aperturas polea cruzada',musculo:'Pecho',wger:4,dificultad:'básico',secundarios:['Hombro'],
+  {id:'apertura',name:'Aperturas polea cruzada',musculo:'Pecho',wger:4,dbId:'Cable_Crossover',gifUrl:null,dificultad:'básico',secundarios:['Hombro'],
    desc:'Tensión constante en el pectoral durante todo el recorrido. A diferencia de las mancuernas, la tensión no desaparece en la cima. Perfecto para el aislamiento y la contracción máxima.',
    como:'Poleas a la altura del pecho. Codos ligeramente doblados, sin cambiar el ángulo. Junta las manos en el centro apretando el pecho. Retrocede controlado.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Aperturas mancuernas','Pec-Deck'],
    errores:['Doblar los codos como si fuera un press','Dejar que los codos vayan detrás de los hombros — riesgo de lesión','No contraer el pecho al juntar las manos','Usar demasiado peso y perder la trayectoria']},
-  {id:'apertura_manc',name:'Aperturas mancuernas',musculo:'Pecho',wger:4,dificultad:'básico',secundarios:['Hombro'],
+  {id:'apertura_manc',name:'Aperturas mancuernas',musculo:'Pecho',wger:4,dbId:'Dumbbell_Flyes',gifUrl:null,dificultad:'básico',secundarios:['Hombro'],
    desc:'Clásico ejercicio de aislamiento de pecho. La tensión se pierde en la cima a diferencia de la polea. Ideal como finisher después de press compuestos.',
    como:'Banco plano, mancuernas arriba con palmas enfrentadas. Baja en arco amplio manteniendo el ángulo del codo. Para cuando el pecho note el estiramiento. Sube apretando.',
    numSets:3,sets:'3×12-15 · RIR 3',alts:['Aperturas en polea cruzada'],
    errores:['Bajar demasiado — riesgo en el hombro y el bíceps','Doblar los codos durante el movimiento','Usar tanto peso que se convierte en un press','No sentir el estiramiento en la bajada']},
-  {id:'fondos_pecho',name:'Fondos en paralelas (pecho)',musculo:'Pecho',wger:4,dificultad:'intermedio',secundarios:['Tríceps','Hombro'],
+  {id:'fondos_pecho',name:'Fondos en paralelas (pecho)',musculo:'Pecho',wger:4,dbId:'Dips_-_Chest_Version',gifUrl:null,dificultad:'intermedio',secundarios:['Tríceps','Hombro'],
    desc:'Ejercicio compuesto muy eficiente para pecho y tríceps. Inclinar el tronco hacia adelante maximiza la activación del pectoral. Permite añadir peso con cinturón para progresar.',
    como:'Inclina el torso 20-30° hacia adelante. Baja hasta sentir estiramiento en el pecho. Codos ligeramente abiertos. Sube sin bloquear codos arriba.',
    numSets:3,sets:'3×10-15 · RIR 2',alts:['Press banca barra'],
    errores:['Torso vertical — trabaja más el tríceps que el pecho','No bajar suficiente — rango parcial','Dejar que los hombros suban hacia las orejas','Oscilación del cuerpo para generar impulso']},
 
   // ── ESPALDA ──
-  {id:'jalon',name:'Jalón al pecho',musculo:'Espalda',wger:13,dificultad:'básico',secundarios:['Bíceps','Romboides'],
+  {id:'jalon',name:'Jalón al pecho',musculo:'Espalda',wger:13,dbId:'Wide-Grip_Lat_Pulldown',gifUrl:null,dificultad:'básico',secundarios:['Bíceps','Romboides'],
    desc:'El ejercicio principal para desarrollar la amplitud del dorsal ancho. Ideal si todavía no puedes hacer dominadas. Trabaja el dorsal ancho que da forma de V a la espalda.',
    como:'Agarre prono ligeramente más ancho que los hombros. Pecho arriba y escápulas bajas. Tira hacia la clavícula. Controla la subida 2-3 segundos.',
    numSets:4,sets:'4×8-10 · RIR 2',alts:['Dominadas','Jalón agarre neutro'],
    errores:['Inclinar demasiado el torso atrás — se convierte en remo','Dejar que los hombros suban al inicio','Tirar hasta el cuello o al pecho bajo','Soltar el peso sin control en la excéntrica']},
-  {id:'jalon_neutro',name:'Jalón agarre neutro',musculo:'Espalda',wger:13,dificultad:'básico',secundarios:['Bíceps'],
+  {id:'jalon_neutro',name:'Jalón agarre neutro',musculo:'Espalda',wger:13,dbId:'V-Bar_Pulldown',gifUrl:null,dificultad:'básico',secundarios:['Bíceps'],
    desc:'El agarre neutro pone el bíceps en una posición más fuerte, permitiendo usar más peso. Activa más el dorsal inferior y es más amigable para los hombros.',
    como:'Barra de agarre neutro o cuerda. Tira hacia el esternón. Pecho arriba durante todo el movimiento. Control total en la subida.',
    numSets:3,sets:'3×10-12 · RIR 2',alts:['Jalón al pecho','Dominadas agarre neutro'],
    errores:['No retraer las escápulas al inicio','Usar impulso del torso para bajar la barra','Soltar la tensión en la fase de extensión','Codos demasiado separados del cuerpo']},
-  {id:'remo_polea',name:'Remo polea sentado',musculo:'Espalda',wger:13,dificultad:'básico',secundarios:['Bíceps','Romboides'],
+  {id:'remo_polea',name:'Remo polea sentado',musculo:'Espalda',wger:13,dbId:'Seated_Cable_Rows',gifUrl:null,dificultad:'básico',secundarios:['Bíceps','Romboides'],
    desc:'Fundamental para el espesor de la espalda. Trabaja trapecio inferior, romboides y dorsal en profundidad. Imprescindible para una espalda gruesa y equilibrada.',
    como:'Espalda recta sin curvar. Tira hacia el ombligo apretando el codo hacia el cuerpo. Escápulas juntas al final. Extiende con control.',
    numSets:4,sets:'4×10-12 · RIR 2',alts:['Remo barra','Remo mancuerna'],
    errores:['Redondear la espalda baja al tirar','Usar el impulso del torso (balanceo)','Tirar con los brazos en lugar de liderar con los codos','No llegar a la extensión completa de los brazos']},
-  {id:'remo_barra',name:'Remo barra',musculo:'Espalda',wger:13,dificultad:'intermedio',secundarios:['Bíceps','Core','Trapecio'],
+  {id:'remo_barra',name:'Remo barra',musculo:'Espalda',wger:13,dbId:'Bent_Over_Barbell_Row',gifUrl:null,dificultad:'intermedio',secundarios:['Bíceps','Core','Trapecio'],
    desc:'El ejercicio compuesto más completo para la espalda. Trabaja toda la musculatura posterior con gran sobrecarga. Clave para ganar masa total de espalda.',
    como:'Espalda a 15-30° del suelo. Tira hacia la zona baja del abdomen. Codos pegados al cuerpo. Control total en la vuelta.',
    numSets:4,sets:'4×6-8 · RIR 2',alts:['Remo polea sentado','Remo mancuerna'],
    errores:['Redondear la columna lumbar — muy peligroso con peso','Usar impulso de piernas','Tirar demasiado arriba — zona del pecho en vez del abdomen','No mantener el core activado']},
-  {id:'remo_manc',name:'Remo mancuerna un brazo',musculo:'Espalda',wger:13,dificultad:'básico',secundarios:['Bíceps','Core'],
+  {id:'remo_manc',name:'Remo mancuerna un brazo',musculo:'Espalda',wger:13,dbId:'One-Arm_Dumbbell_Row',gifUrl:null,dificultad:'básico',secundarios:['Bíceps','Core'],
    desc:'Permite un rango de movimiento excepcional y aislar cada lado independientemente. Ideal para corregir asimetrías. Uno de los ejercicios de espalda más eficientes.',
    como:'Rodilla y mano apoyadas en el banco. Espalda paralela al suelo. Tira la mancuerna hacia la cadera. Lleva el codo hacia el techo. Control total.',
    numSets:4,sets:'4×10-12 · RIR 2',alts:['Remo polea sentado','Remo barra'],
    errores:['Rotar el torso para coger más peso — compensación','No llegar al rango completo ni arriba ni abajo','Tirar con el bíceps en lugar de con la espalda','No apoyar bien la rodilla — inestabilidad']},
-  {id:'dominadas',name:'Dominadas',musculo:'Espalda',wger:13,dificultad:'avanzado',secundarios:['Bíceps','Core'],
+  {id:'dominadas',name:'Dominadas',musculo:'Espalda',wger:13,dbId:'Pullups',gifUrl:null,dificultad:'avanzado',secundarios:['Bíceps','Core'],
    desc:'El ejercicio de espalda más completo y funcional. El peso corporal es la resistencia. Estándar de fuerza de tracción del tren superior.',
    como:'Agarre prono más ancho que los hombros. Parte de extensión completa. Sube hasta que la barbilla pase la barra. Baja controlado sin soltarte.',
    numSets:4,sets:'4×5-8 · RIR 1',alts:['Jalón al pecho','Asistidas con goma'],
    errores:['Kipping — usar el balanceo del cuerpo para subir','No llegar a la extensión completa abajo','Encorvar la espalda lumbar','Subir con el cuello en lugar de con la espalda']},
-  {id:'peso_muerto',name:'Peso muerto convencional',musculo:'Espalda',wger:13,dificultad:'avanzado',secundarios:['Glúteo','Isquios','Core'],
+  {id:'peso_muerto',name:'Peso muerto convencional',musculo:'Espalda',wger:13,dbId:'Barbell_Deadlift',gifUrl:null,dificultad:'avanzado',secundarios:['Glúteo','Isquios','Core'],
    desc:'El ejercicio más completo del gimnasio. Trabaja más de 12 grupos musculares. Sobrecarga máxima para ganancia de masa y fuerza total.',
    como:'Pies a anchura de cadera, barra sobre el metatarso. Caderas abajo, pecho arriba, espalda neutral. Empuja el suelo alejándote. Bloquea arriba apretando el glúteo.',
    numSets:4,sets:'4×4-6 · RIR 2',alts:['Peso muerto rumano','Peso muerto sumo'],
    errores:['Redondear la espalda lumbar — el error más peligroso','Dejar que la barra se separe del cuerpo','Caderas demasiado altas al inicio — se convierte en buenos días','No activar el core y los lats antes de tirar']},
-  {id:'face_pull',name:'Face pull polea',musculo:'Espalda',wger:13,dificultad:'básico',secundarios:['Hombro'],
+  {id:'face_pull',name:'Face pull polea',musculo:'Espalda',wger:13,dbId:'Face_Pull',gifUrl:null,dificultad:'básico',secundarios:['Hombro'],
    desc:'Imprescindible para la salud del hombro y la postura. Trabaja el deltoides posterior y los rotadores externos, cruciales para equilibrar el entrenamiento de pecho.',
    como:'Polea alta con cuerda. Tira hacia la cara separando las manos. Codos al nivel de los hombros o más arriba. Aprieta los romboides al final.',
    numSets:3,sets:'3×15-20 · RIR 3',alts:['Elevaciones posteriores mancuernas'],
    errores:['Tirar demasiado peso y perder la técnica','Codos por debajo de los hombros — pierde eficacia','No separar las manos al final del movimiento','Inclinar el torso atrás para ayudarse']},
 
   // ── HOMBROS ──
-  {id:'pm_manc',name:'Press militar mancuernas',musculo:'Hombro',wger:2,dificultad:'básico',secundarios:['Tríceps','Trapecio'],
+  {id:'pm_manc',name:'Press militar mancuernas',musculo:'Hombro',wger:2,dbId:'Dumbbell_Shoulder_Press',gifUrl:null,dificultad:'básico',secundarios:['Tríceps','Trapecio'],
    desc:'El ejercicio compuesto principal para los hombros. Las mancuernas permiten un rango de movimiento más natural y trabajan cada brazo independientemente, corrigiendo asimetrías.',
    como:'Sentado o de pie, mancuernas a la altura de los hombros, palmas al frente. Sube hasta casi juntar arriba. Baja controlado sin descansar en la posición baja.',
    numSets:4,sets:'4×8-12 · RIR 2',alts:['Press militar barra','Press Arnold'],
    errores:['Arquear excesivamente la espalda lumbar','Bajar las mancuernas por debajo de los hombros','Usar impulso de piernas para subir el peso','Bloquear los codos completamente arriba']},
-  {id:'pm_barra',name:'Press militar barra',musculo:'Hombro',wger:2,dificultad:'intermedio',secundarios:['Tríceps','Core'],
+  {id:'pm_barra',name:'Press militar barra',musculo:'Hombro',wger:2,dbId:'Barbell_Shoulder_Press',gifUrl:null,dificultad:'intermedio',secundarios:['Tríceps','Core'],
    desc:'Permite mayor sobrecarga que las mancuernas. El movimiento de press vertical más cargado y uno de los más completos para fuerza de hombros.',
    como:'Barra a la altura de la clavícula. Agarre ligeramente más ancho que los hombros. Sube en línea recta. Core activado durante todo el movimiento.',
    numSets:4,sets:'4×6-8 · RIR 2',alts:['Press militar mancuernas'],
    errores:['Inclinar el torso atrás — se convierte en press inclinado','Llevar la barra hacia adelante en lugar de en línea recta','No activar el core — riesgo lumbar','Codos demasiado adelantados al inicio']},
-  {id:'arnold',name:'Press Arnold',musculo:'Hombro',wger:2,dificultad:'intermedio',secundarios:['Tríceps'],
+  {id:'arnold',name:'Press Arnold',musculo:'Hombro',wger:2,dbId:'Arnold_Dumbbell_Press',gifUrl:null,dificultad:'intermedio',secundarios:['Tríceps'],
    desc:'Diseñado por Arnold Schwarzenegger. La rotación de las palmas trabaja los tres haces del deltoides en un solo ejercicio. Excelente variante para añadir variedad al entrenamiento de hombros.',
    como:'Comienza con palmas mirando hacia ti, mancuernas al pecho. Sube rotando hasta que las palmas miren al frente. Invierte la rotación en la bajada.',
    numSets:3,sets:'3×10-12 · RIR 2',alts:['Press militar mancuernas'],
    errores:['Hacer la rotación de forma brusca sin control','Usar demasiado peso y perder el rango de rotación','Dejar que los codos vayan muy atrás','No mantener el core activado']},
-  {id:'elev_lat',name:'Elevaciones laterales',musculo:'Hombro',wger:2,dificultad:'básico',secundarios:['Trapecio'],
+  {id:'elev_lat',name:'Elevaciones laterales',musculo:'Hombro',wger:2,dbId:'Side_Lateral_Raise',gifUrl:null,dificultad:'básico',secundarios:['Trapecio'],
    desc:'El ejercicio de aislamiento indispensable para el haz medio del deltoides, responsable de la anchura visible del hombro. Requiere peso moderado y control total de la excéntrica.',
    como:'De pie o sentado. Codos ligeramente doblados, sin cambiar el ángulo. Sube hasta la altura del hombro. Baja controlado 2-3 segundos.',
    numSets:4,sets:'4×15-20 · RIR 3',alts:['Elevaciones laterales cable','Elevaciones en máquina'],
    errores:['Usar demasiado peso e impulsarse con el cuerpo','Levantar los brazos por encima de los hombros — el trapecio se lleva el trabajo','Doblar excesivamente los codos — reduce el momento de fuerza','No controlar la bajada — la excéntrica es la mitad del trabajo']},
-  {id:'elev_front',name:'Elevaciones frontales',musculo:'Hombro',wger:2,dificultad:'básico',secundarios:['Pecho'],
+  {id:'elev_front',name:'Elevaciones frontales',musculo:'Hombro',wger:2,dbId:'Front_Dumbbell_Raise',gifUrl:null,dificultad:'básico',secundarios:['Pecho'],
    desc:'Aísla el deltoides anterior (parte frontal). Útil si tienes el deltoides frontal débil, aunque el press de pecho ya lo trabaja bastante.',
    como:'Mancuernas con agarre neutro o pronado. Sube hasta la horizontal con codos ligeramente doblados. Baja controlado.',
    numSets:3,sets:'3×12-15 · RIR 3',alts:['Elevaciones laterales'],
    errores:['Subir por encima de la cabeza — innecesario y lesivo','Usar impulso del torso o de las piernas','Rotar incorrectamente la muñeca','Hacer el movimiento demasiado rápido']},
 
   // ── BÍCEPS ──
-  {id:'curl_barra',name:'Curl bíceps barra',musculo:'Bíceps',wger:1,dificultad:'básico',secundarios:['Braquial'],
+  {id:'curl_barra',name:'Curl bíceps barra',musculo:'Bíceps',wger:1,dbId:'Barbell_Curl',gifUrl:null,dificultad:'básico',secundarios:['Braquial'],
    desc:'El ejercicio más clásico para los bíceps. La barra permite mayor carga que las mancuernas y trabaja ambos bíceps simultáneamente. Fundamental para ganar volumen en el brazo.',
    como:'Codos pegados al cuerpo y fijos. Agarre supino (palmas arriba). Sube hasta la contracción máxima. Baja hasta casi extender sin bloquear el codo.',
    numSets:3,sets:'3×10-12 · RIR 2',alts:['Curl mancuernas','Curl EZ barra'],
    errores:['Separar los codos del cuerpo — el hombro ayuda','Usar el balanceo del torso para subir','No completar el rango de movimiento arriba ni abajo','Bloquear los codos al bajar — pérdida de tensión']},
-  {id:'curl_manc',name:'Curl mancuernas alternado',musculo:'Bíceps',wger:1,dificultad:'básico',secundarios:['Braquial'],
+  {id:'curl_manc',name:'Curl mancuernas alternado',musculo:'Bíceps',wger:1,dbId:'Dumbbell_Alternate_Bicep_Curl',gifUrl:null,dificultad:'básico',secundarios:['Braquial'],
    desc:'Permite trabajar cada brazo independientemente y supinar la muñeca durante el movimiento, lo que aumenta la activación del bíceps braquial.',
    como:'Alterna los brazos. Supina la muñeca al subir (gira la palma hacia arriba). Contracción máxima arriba. Control total en la bajada.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Curl bíceps barra','Curl polea baja'],
    errores:['No supinar la muñeca — pierde activación del bíceps','Balanceo del cuerpo para impulsar el peso','Hacer los dos brazos a la vez sin controlar','No controlar la fase excéntrica']},
-  {id:'curl_pred',name:'Curl predicador',musculo:'Bíceps',wger:1,dificultad:'intermedio',secundarios:[],
+  {id:'curl_pred',name:'Curl predicador',musculo:'Bíceps',wger:1,dbId:'Preacher_Curl',gifUrl:null,dificultad:'intermedio',secundarios:[],
    desc:'El banco predicador elimina la posibilidad de usar el cuerpo para hacer trampa. Aísla el bíceps de forma muy efectiva, especialmente en la contracción máxima.',
    como:'Codo apoyado en la almohadilla. Baja hasta casi extender (sin bloquear). Sube controlado. No hay trampas posibles en esta posición.',
    numSets:3,sets:'3×10-12 · RIR 2',alts:['Curl concentrado','Curl polea baja'],
    errores:['Bajar hasta bloquear el codo — riesgo de rotura bicipital','Levantar el hombro del banco para ayudarse','Usar demasiado peso y perder el rango','Subir demasiado rápido sin sentir el músculo']},
-  {id:'curl_martillo',name:'Curl martillo',musculo:'Bíceps',wger:1,dificultad:'básico',secundarios:['Braquial','Braquiorradial'],
+  {id:'curl_martillo',name:'Curl martillo',musculo:'Bíceps',wger:1,dbId:'Hammer_Curls',gifUrl:null,dificultad:'básico',secundarios:['Braquial','Braquiorradial'],
    desc:'El agarre neutro activa más el braquial y braquiorradial. Clave para un brazo grueso en todas sus partes, no solo en la cresta del bíceps.',
    como:'Agarre neutro (pulgares arriba). Codos fijos. Sube sin rotar la muñeca. La mancuerna sube vertical. Baja controlado.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Curl bíceps barra'],
    errores:['Rotar la muñeca — se convierte en curl supino','Separar los codos del cuerpo','Impulso del torso para subir','Rango incompleto de movimiento']},
 
   // ── TRÍCEPS ──
-  {id:'tri_polea',name:'Extensión tríceps polea',musculo:'Tríceps',wger:5,dificultad:'básico',secundarios:[],
+  {id:'tri_polea',name:'Extensión tríceps polea',musculo:'Tríceps',wger:5,dbId:'Triceps_Pushdown',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'El ejercicio de aislamiento más popular para tríceps. La polea mantiene tensión constante durante todo el movimiento. Trabaja las tres cabezas del tríceps.',
    como:'Polea alta con barra recta o cuerda. Codos pegados al cuerpo y fijos. Extiende completamente. Vuelve controlado sin superar los 90°.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Press francés','Dips tríceps'],
    errores:['Separar los codos del cuerpo — el hombro ayuda','No extender completamente — pierdes la contracción máxima','Inclinar el torso para usar más peso','Volver más de 90° — los dorsales empiezan a trabajar']},
-  {id:'press_frances',name:'Press francés (barra EZ)',musculo:'Tríceps',wger:5,dificultad:'intermedio',secundarios:[],
+  {id:'press_frances',name:'Press francés (barra EZ)',musculo:'Tríceps',wger:5,dbId:'EZ-Bar_Skullcrusher',gifUrl:null,dificultad:'intermedio',secundarios:[],
    desc:'El mejor ejercicio para la cabeza larga del tríceps. Con el codo elevado, la cabeza larga trabaja en estiramiento, generando mayor hipertrofia.',
    como:'Barra EZ sobre la frente. Codos apuntando al techo, fijos. Baja hacia la frente o detrás de la cabeza. Extiende sin bloquear.',
    numSets:4,sets:'4×10-12 · RIR 2',alts:['Extensión tríceps sobre cabeza'],
    errores:['Mover los codos durante el ejercicio','Bajar demasiado rápido — riesgo en el codo','Usar mucho peso y perder el rango de movimiento','Bloquear los codos en la extensión total']},
-  {id:'fondos_triceps',name:'Fondos en paralelas (tríceps)',musculo:'Tríceps',wger:5,dificultad:'intermedio',secundarios:['Pecho','Hombro'],
+  {id:'fondos_triceps',name:'Fondos en paralelas (tríceps)',musculo:'Tríceps',wger:5,dbId:'Dips_-_Triceps_Version',gifUrl:null,dificultad:'intermedio',secundarios:['Pecho','Hombro'],
    desc:'Ejercicio compuesto de tríceps. Con el torso vertical se maximiza la activación del tríceps. Se puede añadir peso con cinturón para una progresión excelente.',
    como:'Torso lo más vertical posible. Codos pegados al cuerpo. Baja hasta que los codos estén a 90°. Sube sin bloquear arriba.',
    numSets:3,sets:'3×10-15 · RIR 2',alts:['Extensión tríceps polea'],
    errores:['Inclinar el torso adelante — activa el pecho','Descender más de 90° en el codo — riesgo articular','Separar los codos hacia afuera','Balanceo del cuerpo para subir']},
-  {id:'ext_cabeza',name:'Extensión tríceps sobre cabeza',musculo:'Tríceps',wger:5,dificultad:'básico',secundarios:[],
+  {id:'ext_cabeza',name:'Extensión tríceps sobre cabeza',musculo:'Tríceps',wger:5,dbId:'Triceps_Overhead_Extension_with_Rope',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'Con el brazo elevado, la cabeza larga trabaja en su máximo estiramiento. Ideal para ganar volumen en la parte interna del brazo.',
    como:'Mancuerna o cuerda de polea baja detrás de la cabeza. Codos apuntando arriba. Extiende los codos sin moverlos. Baja controlado.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Press francés'],
    errores:['Mover los codos durante el movimiento','No llegar al rango completo tanto abajo como arriba','Usar el impulso de la espalda','Agarrar la mancuerna de forma incorrecta']},
 
   // ── CUÁDRICEPS ──
-  {id:'sentadilla',name:'Sentadilla barra',musculo:'Cuádriceps',wger:9,dificultad:'avanzado',secundarios:['Glúteo','Isquios','Core'],
+  {id:'sentadilla',name:'Sentadilla barra',musculo:'Cuádriceps',wger:9,dbId:'Barbell_Squat',gifUrl:null,dificultad:'avanzado',secundarios:['Glúteo','Isquios','Core'],
    desc:'La reina de todos los ejercicios. Trabaja cuádriceps, glúteo, isquiotibiales y core en cada repetición. Activa más masa muscular que cualquier otro ejercicio del gym.',
    como:'Barra en trapecios. Pies a anchura de hombros. Rodillas en dirección de los pies. Baja hasta que los muslos estén paralelos al suelo. Sube explosivo.',
    numSets:4,sets:'4×6-10 · RIR 2',alts:['Sentadilla goblet','Prensa de pierna'],
    errores:['Rodillas que colapsan hacia dentro — valgus','Talones que se levantan — trabaja la movilidad del tobillo','Redondear la espalda baja — riesgo lumbar','Subir el culo primero antes que el pecho — buenos días involuntario']},
-  {id:'prensa',name:'Prensa de pierna',musculo:'Cuádriceps',wger:9,dificultad:'básico',secundarios:['Glúteo'],
+  {id:'prensa',name:'Prensa de pierna',musculo:'Cuádriceps',wger:9,dbId:'Leg_Press',gifUrl:null,dificultad:'básico',secundarios:['Glúteo'],
    desc:'Permite trabajar con más volumen los cuádriceps con menor carga en la columna. La posición de los pies varía la activación: pies altos = más glúteo, pies bajos = más cuádriceps.',
    como:'Pies a anchura de caderas. No bloquees las rodillas arriba. Baja hasta 90° o un poco más. Espalda siempre pegada al respaldo.',
    numSets:4,sets:'4×10-12 · RIR 2',alts:['Sentadilla barra','Hack squat'],
    errores:['Bloquear las rodillas en la extensión total','Despegar la espalda baja del respaldo al bajar','Pies demasiado juntos o separados para tu anatomía','Bajar demasiado y perder la posición lumbar']},
-  {id:'zancadas',name:'Zancadas mancuernas',musculo:'Cuádriceps',wger:9,dificultad:'básico',secundarios:['Glúteo','Isquios','Core'],
+  {id:'zancadas',name:'Zancadas mancuernas',musculo:'Cuádriceps',wger:9,dbId:'Dumbbell_Lunges',gifUrl:null,heroPos:'center 25%',dificultad:'básico',secundarios:['Glúteo','Isquios','Core'],
    desc:'Trabajan cuádriceps y glúteo unilateralmente. Mejoran el equilibrio y corrigen desequilibrios entre piernas. Excelente para añadir volumen sin cargar tanto la columna.',
    como:'Paso largo. Baja la rodilla trasera casi al suelo. Rodilla delantera no pasa el pie. Sube empujando desde el talón. Torso recto.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Sentadilla búlgara'],
    errores:['Rodilla delantera que colapsa hacia dentro','Inclinar el torso excesivamente hacia adelante','Paso demasiado corto — más cuádriceps, menos glúteo','Perder el equilibrio por usar demasiado peso']},
-  {id:'ext_cuad',name:'Extensión cuádriceps máquina',musculo:'Cuádriceps',wger:9,dificultad:'básico',secundarios:[],
+  {id:'ext_cuad',name:'Extensión cuádriceps máquina',musculo:'Cuádriceps',wger:9,dbId:'Leg_Extensions',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'El único ejercicio que aísla completamente el cuádriceps. Especialmente útil para trabajar la inserción inferior cerca de la rodilla. Complementa los ejercicios compuestos.',
    como:'Espalda pegada al respaldo. Extiende completamente. Aprieta el cuádriceps arriba 1 segundo. Baja controlado hasta 90°.',
    numSets:3,sets:'3×15-20 · RIR 3',alts:['Prensa de pierna'],
    errores:['No completar la extensión final — la más importante','Bajar con un golpe brusco','Levantar las caderas del asiento para ayudarse','Demasiado peso y técnica deteriorada']},
-  {id:'bulgaras',name:'Sentadilla búlgara',musculo:'Cuádriceps',wger:9,dificultad:'avanzado',secundarios:['Glúteo','Isquios'],
+  {id:'bulgaras',name:'Sentadilla búlgara',musculo:'Cuádriceps',wger:9,dbId:'Split_Squat_with_Dumbbells',gifUrl:null,heroFit:'contain',dificultad:'avanzado',secundarios:['Glúteo','Isquios'],
    desc:'Una de las variantes más efectivas y completas de piernas. Trabaja cuádriceps y glúteo unilateralmente con un rango de movimiento muy amplio. Brutal para hipertrofia.',
    como:'Pie trasero apoyado en banco a altura de rodilla. Baja controlado. Rodilla delantera alineada con el pie. Empuja desde el talón para subir.',
    numSets:4,sets:'4×8-10 · RIR 2',alts:['Zancadas mancuernas'],
    errores:['Pie trasero demasiado alto — inestabilidad y riesgo en la rodilla','Rodilla delantera que colapsa hacia dentro','Inclinar el torso demasiado hacia adelante','Empujar desde los dedos del pie en lugar del talón']},
 
   // ── ISQUIOTIBIALES ──
-  {id:'pmd_rumano',name:'Peso muerto rumano',musculo:'Isquios',wger:10,dificultad:'intermedio',secundarios:['Glúteo','Lumbar'],
+  {id:'pmd_rumano',name:'Peso muerto rumano',musculo:'Isquios',wger:10,dbId:'Romanian_Deadlift',gifUrl:null,dificultad:'intermedio',secundarios:['Glúteo','Lumbar'],
    desc:'El ejercicio estrella para los isquiotibiales. La carga excéntrica con piernas semi-extendidas estira los isquios al máximo, generando un estímulo de hipertrofia muy potente.',
    como:'Piernas casi rectas (rodilla ligeramente doblada). Barra o mancuernas rozando las piernas. Espalda SIEMPRE recta. Baja hasta sentir el estiramiento. Empuja las caderas hacia adelante para subir.',
    numSets:4,sets:'4×8-10 · RIR 2',alts:['Curl isquios máquina'],
    errores:['Redondear la espalda lumbar — el error más frecuente y peligroso','Bajar la barra separándola de las piernas','Doblar las rodillas demasiado — se convierte en sentadilla','No sentir el estiramiento de los isquios al bajar']},
-  {id:'curl_tumbado',name:'Curl isquios máquina tumbado',musculo:'Isquios',wger:10,dificultad:'básico',secundarios:[],
+  {id:'curl_tumbado',name:'Curl isquios máquina tumbado',musculo:'Isquios',wger:10,dbId:'Lying_Leg_Curls',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'El único ejercicio que aísla completamente los isquiotibiales en la flexión de rodilla. Trabaja ambas cabezas. Indispensable para equilibrar el desarrollo de piernas.',
    como:'Tumbado boca abajo. Almohadilla justo sobre el talón. Dobla las rodillas hasta 90° o más. Aprieta al final. Baja muy controlado.',
    numSets:4,sets:'4×10-12 · RIR 2',alts:['Curl isquios sentado','Peso muerto rumano'],
    errores:['Levantar las caderas del banco al subir','Usar impulso para subir en lugar de la fuerza muscular','Bajar demasiado rápido — la excéntrica es clave','No llegar al rango completo por exceso de peso']},
-  {id:'curl_sentado',name:'Curl isquios máquina sentado',musculo:'Isquios',wger:10,dificultad:'básico',secundarios:[],
+  {id:'curl_sentado',name:'Curl isquios máquina sentado',musculo:'Isquios',wger:10,dbId:'Seated_Leg_Curl',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'La variante sentada mantiene la cadera flexionada, lo que mantiene el isquio en mayor estiramiento. Esto genera mayor tensión y mejor hipertrofia que la versión tumbada.',
    como:'Caderas bien atrás en el asiento. Almohadilla sobre el Aquiles. Baja controlado. Aprieta al llegar al fondo. Vuelve despacio.',
    numSets:3,sets:'3×12-15 · RIR 2',alts:['Curl isquios tumbado'],
    errores:['No ajustar bien el asiento — la cadera debe estar en flexión','Volver con demasiada velocidad','No completar el rango de movimiento','Levantarse del asiento para ayudarse']},
 
   // ── GLÚTEO ──
-  {id:'hip_thrust',name:'Hip thrust barra',musculo:'Glúteo',wger:12,dificultad:'intermedio',secundarios:['Isquios','Core'],
+  {id:'hip_thrust',name:'Hip thrust barra',musculo:'Glúteo',wger:12,dbId:'Barbell_Hip_Thrust',gifUrl:null,dificultad:'intermedio',secundarios:['Isquios','Core'],
    desc:'El mejor ejercicio para activar y desarrollar el glúteo máximo. La posición horizontal de la cadera maximiza la activación del glúteo de una forma imposible en sentadilla.',
    como:'Hombros en banco, barra sobre las caderas con almohadilla. Pies a anchura de cadera. Empuja hasta la paralela. Aprieta el glúteo fuerte 1 segundo arriba.',
    numSets:4,sets:'4×10-15 · RIR 2',alts:['Puente glúteo en suelo','Hip thrust máquina'],
    errores:['No apretar el glúteo en la posición alta','Hiperextender la columna lumbar arriba — arqueado excesivo','Pies demasiado alejados o cerca del cuerpo','Barra sin almohadilla — se desplaza durante el ejercicio']},
-  {id:'abduccion',name:'Abducción cadera máquina',musculo:'Glúteo',wger:12,dificultad:'básico',secundarios:[],
+  {id:'abduccion',name:'Abducción cadera máquina',musculo:'Glúteo',wger:12,dbId:'Thigh_Abductor',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'Trabaja el glúteo medio y el tensor de la fascia lata. Fundamental para la estabilidad de la cadera y la rodilla, y para dar forma a la parte lateral del glúteo.',
    como:'Sentado con la espalda pegada al respaldo. Abre las piernas lentamente. Aprieta al máximo. Cierra controlado sin llegar a la posición inicial.',
    numSets:3,sets:'3×15-20 · RIR 3',alts:['Abducción con banda'],
    errores:['Levantar las caderas del asiento para abrir más','Cerrar las piernas completamente — pierde la tensión','No mantener la espalda pegada al respaldo','Velocidad excesiva en el movimiento']},
-  {id:'kickback',name:'Patada trasera polea',musculo:'Glúteo',wger:12,dificultad:'básico',secundarios:['Isquios'],
+  {id:'kickback',name:'Patada trasera polea',musculo:'Glúteo',wger:12,dbId:'One-Legged_Cable_Kickback',gifUrl:null,dificultad:'básico',secundarios:['Isquios'],
    desc:'La extensión de cadera en polea aísla el glúteo máximo en el rango final del movimiento. Especialmente bueno para trabajar la parte superior del glúteo.',
    como:'Tobillo en la polea baja. Inclínate ligeramente hacia adelante. Extiende la pierna hacia atrás y arriba. Aprieta el glúteo. Baja controlado.',
    numSets:3,sets:'3×15-20 · RIR 3',alts:['Hip thrust'],
    errores:['Rotar la cadera para elevar más la pierna','Usar impulso en lugar de contraer el glúteo','Inclinar demasiado el torso — espalda en riesgo','No completar la extensión de cadera']},
 
   // ── CORE ──
-  {id:'ab_wheel',name:'Ab wheel (rueda abdominal)',musculo:'Core',wger:6,dificultad:'avanzado',secundarios:['Lumbar','Hombro'],
+  {id:'ab_wheel',name:'Ab wheel (rueda abdominal)',musculo:'Core',wger:6,dbId:'Ab_Roller',gifUrl:null,dificultad:'avanzado',secundarios:['Lumbar','Hombro'],
    desc:'Uno de los ejercicios más exigentes para el core completo. El reto es mantener la columna neutral mientras se extiende el cuerpo. Construye una fuerza funcional excepcional.',
    como:'Arrodillado. Rueda hacia adelante manteniendo la lumbar NEUTRAL — no dejes que caiga. Para antes de tocar el suelo si no tienes control. Vuelve apretando el abdomen.',
    numSets:3,sets:'3×8-12 · RIR 2',alts:['Plancha frontal','Crunch en polea'],
    errores:['Dejar caer la lumbar al extenderse — el error más común y lesivo','Extenderse más de lo que el core puede controlar','No volver activamente — dejarse caer','Hacerlo sin haber dominado antes la plancha']},
-  {id:'plancha',name:'Plancha frontal',musculo:'Core',wger:6,dificultad:'básico',secundarios:['Hombro','Glúteo'],
+  {id:'plancha',name:'Plancha frontal',musculo:'Core',wger:6,dbId:'Plank',gifUrl:null,dificultad:'básico',secundarios:['Hombro','Glúteo'],
    desc:'El ejercicio isométrico de core más completo. Trabaja todo el cilindro abdominal de forma funcional. La base para cualquier ejercicio avanzado de core.',
    como:'Codos debajo de los hombros. Cuerpo en línea recta de cabeza a talones. Aprieta abdomen, glúteo y cuádriceps. Respira normalmente.',
    numSets:3,sets:'3×30-60 seg · RIR 2',alts:['Ab wheel','Plancha con brazos extendidos'],
    errores:['Caderas demasiado altas — pirámide','Caderas demasiado bajas — espalda hundida','Aguantar la respiración durante el ejercicio','Dejar que el cuello cuelgue']},
-  {id:'elev_piernas',name:'Elevación de piernas colgado',musculo:'Core',wger:6,dificultad:'avanzado',secundarios:['Flexores de cadera'],
+  {id:'elev_piernas',name:'Elevación de piernas colgado',musculo:'Core',wger:6,dbId:'Hanging_Leg_Raise',gifUrl:null,dificultad:'avanzado',secundarios:['Flexores de cadera'],
    desc:'Trabaja el recto abdominal inferior y los flexores de cadera en un rango de movimiento muy amplio. Requiere una fuerza de agarre y de core muy desarrollada.',
    como:'Colgado de la barra, pies juntos. Eleva las piernas hasta 90° manteniendo el control. Si puedes, lleva las piernas más arriba. Baja MUY lento.',
    numSets:3,sets:'3×10-15 · RIR 2',alts:['Elevación de piernas en banco inclinado'],
    errores:['Usar el balanceo para subir las piernas','Doblar las rodillas para hacer trampa','Bajar las piernas con un golpe','No controlar el movimiento desde el inicio']},
-  {id:'crunch_cable',name:'Crunch en polea',musculo:'Core',wger:6,dificultad:'básico',secundarios:[],
+  {id:'crunch_cable',name:'Crunch en polea',musculo:'Core',wger:6,dbId:'Cable_Crunch',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'Permite cargar el abdomen con resistencia progresiva, algo que ningún crunch en el suelo puede hacer. Ideal para hipertrofiar el recto abdominal.',
    como:'De rodillas frente a la polea alta. Cuerda detrás de la cabeza. Flexiona el tronco llevando los codos hacia las rodillas. Aprieta fuerte. Vuelve controlado.',
    numSets:3,sets:'3×15-20 · RIR 3',alts:['Ab wheel','Crunch en banco declinado'],
    errores:['Tirar con los brazos en lugar de flexionar la columna','No exhalar al contraer','No llegar al rango completo de flexión','Demasiado peso y técnica perdida']},
-  {id:'russian_twist',name:'Russian twist',musculo:'Core',wger:6,dificultad:'básico',secundarios:['Oblicuos'],
+  {id:'russian_twist',name:'Russian twist',musculo:'Core',wger:6,dbId:'Russian_Twist',gifUrl:null,dificultad:'básico',secundarios:['Oblicuos'],
    desc:'Trabaja los oblicuos y el core en rotación. Complemento importante para la estabilidad lateral. Para más dificultad, añade un balón medicinal o disco.',
    como:'Sentado con la espalda a 45°. Pies levantados o apoyados. Gira el torso de lado a lado tocando el suelo. Mantén el abdomen activo.',
    numSets:3,sets:'3×20-30 rep · RIR 2',alts:['Crunch en polea','Plancha lateral'],
    errores:['Rotar solo con los brazos sin mover el torso','Ir demasiado rápido sin control','Redondear la espalda al girar','Aguantar la respiración']},
 
   // ── CARDIO ──
-  {id:'bici',name:'Bici estática zona 2',musculo:'Cardio',wger:null,dificultad:'básico',secundarios:[],
+  {id:'bici',name:'Bici estática zona 2',musculo:'Cardio',wger:null,dbId:'Bicycling_Stationary',gifUrl:null,dificultad:'básico',secundarios:[],
    desc:'El cardio en zona 2 (60-70% FCmax, 130-145 ppm) es el más beneficioso para la salud cardiovascular y la quema de grasa sin catabolizar músculo. Aumenta las mitocondrias y la eficiencia metabólica.',
    como:'Mantén 130-145 ppm. Debes poder hablar con frases cortas pero notar que trabajas. Ritmo constante durante 40-45 minutos mínimo.',
    numSets:1,sets:'40-45 min · 130-145 ppm',alts:['Elíptica','Remo máquina','Caminar inclinado'],
    errores:['Ir demasiado rápido y salir de zona 2','Sesiones muy cortas de menos de 30 min','Usar el móvil constantemente y perder el ritmo','No hidratarse durante la sesión']},
-  {id:'remo_maquina',name:'Remo máquina (ergómetro)',musculo:'Cardio',wger:null,dificultad:'intermedio',secundarios:['Espalda','Piernas'],
+  {id:'remo_maquina',name:'Remo máquina (ergómetro)',musculo:'Cardio',wger:null,dbId:'Rowing_Stationary',gifUrl:null,dificultad:'intermedio',secundarios:['Espalda','Piernas'],
    desc:'El cardio más completo: trabaja el 85% de los músculos del cuerpo en cada pasada. Muy eficiente para zona 2 sin impacto en las articulaciones.',
    como:'60% del trabajo lo hacen las piernas. Empuja con piernas primero, luego inclina el torso, luego tira con los brazos. Invierte el orden al volver.',
    numSets:1,sets:'20-30 min · zona 2',alts:['Bici estática','Elíptica'],
    errores:['Tirar primero con los brazos — el error más frecuente','Redondear la espalda al finalizar el tirón','No extender completamente las piernas al empujar','Agarre demasiado fuerte que fatiga los antebrazos']},
-  {id:'cuerda',name:'Cuerda de saltar',musculo:'Cardio',wger:null,dificultad:'intermedio',secundarios:['Core','Pantorrillas'],
+  {id:'cuerda',name:'Cuerda de saltar',musculo:'Cardio',wger:null,dbId:'Rope_Jumping',gifUrl:null,dificultad:'intermedio',secundarios:['Core','Pantorrillas'],
    desc:'Cardio de alta intensidad muy eficiente para HIIT. En 10 minutos quema calorías equivalentes a 30 minutos de carrera. Mejora la coordinación, el ritmo y la resistencia cardiovascular.',
    como:'Cuerda a la altura de las axilas. Salto pequeño (apenas despegar). Muñecas rotan, no los hombros. Empieza con intervalos: 30s on, 30s off.',
    numSets:1,sets:'Intervalos 30:30 × 10 rondas',alts:['Bici estática','HIIT caminadora'],
@@ -1772,13 +1775,7 @@ async function loadYouTubeForEx(ex){
 
   // Solo actualizar si el usuario sigue en este ejercicio
   if(bibSelectedEx?.id!==ex.id)return;
-  const thumb=document.getElementById('bib-det-yt-thumb');
-  const play=document.getElementById('bib-det-yt-play');
-  if(!thumb||!play)return;
   currentBibVideoId=ytId;
-  thumb.src=`https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-  thumb.onload=()=>{thumb.classList.add('loaded');play.classList.add('visible');};
-  thumb.onerror=()=>{};
   const demoBtn=document.getElementById('bib-det-demo-btn');
   if(demoBtn)demoBtn.onclick=()=>openBibVideoModal(ytId);
 }
@@ -2303,9 +2300,10 @@ function renderBibLista(){
     const bg=muscleBg[ex.musculo]||'var(--bg)';
     const color=muscleColors[ex.musculo]||'var(--teal)';
     const difCls=ex.dificultad==='avanzado'?'dif-avanzado':ex.dificultad==='intermedio'?'dif-intermedio':'dif-basico';
+    const hasPhoto=!!(ex.dbId||ex.gifUrl);
     row.innerHTML=`
-      <div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;">
-        ${getMuscleThumb(ex.musculo,color)}
+      <div class="bib-ex-thumb${hasPhoto?' photo':''}" style="${hasPhoto?'':`background:${bg};border:1.5px solid ${color}33;`}">
+        ${getExThumb(ex,color)}
       </div>
       <div class="bib-ex-info">
         <div class="bib-ex-name">${ex.name}</div>
@@ -2343,7 +2341,8 @@ function bibGlobalSearch(q){
       bibSelectedGroup=muscleGroups.find(g=>g.musculos.includes(ex.musculo))||muscleGroups[0];
       bibOpenDetalle(ex);
     };
-    row.innerHTML=`<div class="bib-ex-thumb" style="background:${bg};border:1.5px solid ${color}33;">${getMuscleThumb(ex.musculo,color)}</div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
+    const hasPhoto=!!(ex.dbId||ex.gifUrl);
+    row.innerHTML=`<div class="bib-ex-thumb${hasPhoto?' photo':''}" style="${hasPhoto?'':`background:${bg};border:1.5px solid ${color}33;`}">${getExThumb(ex,color)}</div><div class="bib-ex-info"><div class="bib-ex-name">${ex.name}</div><div class="bib-ex-sub">${ex.musculo} · ${ex.sets}</div></div><div class="bib-ex-chev" style="color:${color}">›</div>`;
     wrap.appendChild(row);
   });
 }
@@ -2364,6 +2363,13 @@ const muscleThumbPath = {
 function getMuscleThumb(musculo, color) {
   const pathFn = muscleThumbPath[musculo] || ((c)=>`<text x="20" y="26" text-anchor="middle" font-size="14" font-weight="900" fill="${c}">${musculo.substring(0,2)}</text>`);
   return `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">${pathFn(color)}</svg>`;
+}
+// Miniatura de la lista: foto real (dbId/gifUrl) > icono de músculo (fallback)
+function getExThumb(ex, color) {
+  const fitStyle=`object-fit:${ex.heroFit||'cover'};object-position:${ex.heroPos||'center'};`;
+  if(ex.gifUrl) return `<img style="${fitStyle}" src="${ex.gifUrl}" alt="${ex.name}">`;
+  if(ex.dbId) return `<img style="${fitStyle}" src="${FREE_EXERCISE_DB_BASE}/${encodeURIComponent(ex.dbId)}/0.jpg" alt="${ex.name}">`;
+  return getMuscleThumb(ex.musculo, color);
 }
 
 // Diagrama SVG cuerpo humano con músculo resaltado
@@ -2443,6 +2449,24 @@ function buildMuscleDiagram(primary, secondaries, color) {
       <rect x="65" y="183" width="20" height="38" rx="8" fill="${gc('cal-r')}" stroke="${sc}" stroke-width="1"/>
     </svg>`;
   }
+}
+
+// Hero de la pantalla de detalle: gif propio > foto animada (free-exercise-db) > diagrama SVG de músculo
+const FREE_EXERCISE_DB_BASE='https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
+function buildExerciseHero(ex,color){
+  // heroFit/heroPos: overrides puntuales de encuadre para fotos con proporción atípica (ver ejercicios con esos campos)
+  const fitStyle=`object-fit:${ex.heroFit||'cover'};object-position:${ex.heroPos||'center'};`;
+  if(ex.gifUrl){
+    return `<img class="bib-hero-photo" style="${fitStyle}" src="${ex.gifUrl}" alt="${ex.name}">`;
+  }
+  if(ex.dbId){
+    const base=`${FREE_EXERCISE_DB_BASE}/${encodeURIComponent(ex.dbId)}`;
+    return `<div class="bib-hero-gif">
+      <img class="f0" style="${fitStyle}" src="${base}/0.jpg" alt="${ex.name}">
+      <img class="f1" style="${fitStyle}" src="${base}/1.jpg" alt="${ex.name}">
+    </div>`;
+  }
+  return buildMuscleDiagram(ex.musculo,ex.secundarios,color);
 }
 
 function bibOpenDetalle(ex){
@@ -2531,19 +2555,10 @@ function renderBibDetalle(){
 
   const isDark=document.body.classList.contains('dark');
   const wrapBg=isDark?`linear-gradient(150deg,${color}35 0%,#1B2638 100%)`:`linear-gradient(150deg,${color}22 0%,#F2F5F8 100%)`;
-  currentBibVideoId=null;
   el.innerHTML=`
     <div class="bib-det-img-wrap" style="background:${wrapBg}">
-      ${buildMuscleDiagram(ex.musculo,ex.secundarios,color)}
-      <img id="bib-det-yt-thumb" class="bib-yt-thumb" alt="${ex.name}">
-      <div id="bib-det-yt-play" class="bib-yt-play" onclick="openBibVideoModal(currentBibVideoId)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-      </div>
+      ${buildExerciseHero(ex,color)}
       <div class="bib-muscle-label">${ex.musculo}</div>
-      <button class="bib-det-yt-overlay" id="bib-det-demo-btn" onclick="bibOpenYT('${ex.name.replace(/'/g,"\\'")}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.4 4 12 4 12 4s-4.4 0-6.8.3c-.4.1-1.3.1-2 .9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.9C6.6 18 12 18 12 18s4.4 0 6.8-.3c.4-.1 1.3-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C21.8 8.6 21.6 7.2 21.6 7.2zM10 14.5v-5.5l5.5 2.8L10 14.5z"/></svg>
-        Ver demo
-      </button>
     </div>
     <div class="bib-det-body">
       <div class="bib-det-top">
@@ -2560,8 +2575,6 @@ function renderBibDetalle(){
       </div>
       ${tabContent}
     </div>`;
-  // Cargar vídeo de YouTube en segundo plano
-  loadYouTubeForEx(ex);
 }
 
 function setBibTab(t){bibDetallTab=t;renderBibDetalle();}
