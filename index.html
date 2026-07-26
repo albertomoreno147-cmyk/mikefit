@@ -2368,7 +2368,7 @@ function getMuscleThumb(musculo, color) {
 function getExThumb(ex, color) {
   const fitStyle=`object-fit:${ex.heroFit||'cover'};object-position:${ex.heroPos||'center'};`;
   if(ex.gifUrl) return `<img style="${fitStyle}" src="${ex.gifUrl}" alt="${ex.name}">`;
-  if(ex.dbId) return `<img style="${fitStyle}" src="${FREE_EXERCISE_DB_BASE}/${encodeURIComponent(ex.dbId)}/0.jpg" alt="${ex.name}">`;
+  if(ex.dbId) return `<img style="${fitStyle}" src="${EX_PHOTOS_BASE}/${encodeURIComponent(ex.dbId)}/0.jpg" alt="${ex.name}">`;
   return getMuscleThumb(ex.musculo, color);
 }
 
@@ -2451,8 +2451,8 @@ function buildMuscleDiagram(primary, secondaries, color) {
   }
 }
 
-// Hero de la pantalla de detalle: gif propio > foto animada (free-exercise-db) > diagrama SVG de músculo
-const FREE_EXERCISE_DB_BASE='https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
+// Hero de la pantalla de detalle: gif propio > foto animada (fotos locales, offline) > diagrama SVG de músculo
+const EX_PHOTOS_BASE='./ex-photos';
 function buildExerciseHero(ex,color){
   // heroFit/heroPos: overrides puntuales de encuadre para fotos con proporción atípica (ver ejercicios con esos campos)
   const fitStyle=`object-fit:${ex.heroFit||'cover'};object-position:${ex.heroPos||'center'};`;
@@ -2460,7 +2460,7 @@ function buildExerciseHero(ex,color){
     return `<img class="bib-hero-photo" style="${fitStyle}" src="${ex.gifUrl}" alt="${ex.name}">`;
   }
   if(ex.dbId){
-    const base=`${FREE_EXERCISE_DB_BASE}/${encodeURIComponent(ex.dbId)}`;
+    const base=`${EX_PHOTOS_BASE}/${encodeURIComponent(ex.dbId)}`;
     return `<div class="bib-hero-gif">
       <img class="f0" style="${fitStyle}" src="${base}/0.jpg" alt="${ex.name}">
       <img class="f1" style="${fitStyle}" src="${base}/1.jpg" alt="${ex.name}">
