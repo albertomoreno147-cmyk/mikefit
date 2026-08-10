@@ -397,6 +397,25 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
 .rb-ok{background:var(--green-dim);color:var(--green);}
 .rb-warn{background:rgba(245,166,35,0.15);color:#F5A623;}
 .rb-bad{background:var(--red-dim);color:var(--red);}
+/* NUTRICIÓN — AJUSTES DE OBJETIVOS */
+.nutr-goal-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.nutr-goal-lbl{font-size:13px;color:var(--muted);font-weight:600;}
+.nutr-goal-val{font-size:15px;font-weight:700;color:var(--text);}
+.field-nutr{display:block;margin-bottom:14px;}
+.field-nutr-lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px;}
+.field-nutr-lbl span{color:var(--teal);font-weight:700;}
+.field-nutr select{width:100%;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);
+  background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;outline:none;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A9BB0' stroke-width='2.5' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;}
+.field-nutr select:focus{border-color:var(--teal);}
+.field-nutr input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:99px;background:var(--bg);outline:none;}
+.field-nutr input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--surface);border:2.5px solid var(--teal);box-shadow:0 1px 4px rgba(0,0,0,0.15);cursor:pointer;}
+.field-nutr input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--surface);border:2.5px solid var(--teal);cursor:pointer;}
+.nutr-adv-toggle{width:100%;background:none;border:none;padding:4px 0 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-family:inherit;}
+.nutr-maint-note{font-size:12px;color:var(--muted);margin-top:2px;}
+.nutr-maint-note b{color:var(--text);}
 /* CALCULADORAS */
 .calc-tabs{display:flex;background:var(--bg);border-radius:11px;padding:3px;margin-bottom:16px;}
 .calc-tab{flex:1;padding:8px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:all 0.15s;}
@@ -730,6 +749,44 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(-
         </div>
         <button class="nutr-sub-btn" onclick="alert('Habla con tu coach Mike para activar el plan nutricional 💬')">🔒 Solicitar Plan Nutricional</button>
         <div class="nutr-sub-note">Contacta con tu coach para activarlo</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tus objetivos calóricos</div>
+        <div class="nutr-goal-row">
+          <div class="nutr-goal-lbl">Peso usado (desde Progreso)</div>
+          <div class="nutr-goal-val" id="ns-peso">— kg</div>
+        </div>
+        <label class="field-nutr">
+          <div class="field-nutr-lbl">Nivel de actividad</div>
+          <select id="ns-actividad" onchange="saveNutriSettings()">
+            <option value="1.2">Sedentario · poco o nada de ejercicio</option>
+            <option value="1.5">Ligero · ~3 días/semana</option>
+            <option value="1.6">Moderado · 4-5 días/semana</option>
+            <option value="1.75">Alto · 6-7 días/semana</option>
+            <option value="1.9">Muy alto · atleta</option>
+          </select>
+        </label>
+        <div class="calc-tabs" id="ns-objetivo">
+          <div class="calc-tab" data-goal="perder" onclick="setNutriGoal('perder')">Perder</div>
+          <div class="calc-tab" data-goal="mantener" onclick="setNutriGoal('mantener')">Mantener</div>
+          <div class="calc-tab" data-goal="ganar" onclick="setNutriGoal('ganar')">Ganar</div>
+        </div>
+        <label class="field-nutr" id="ns-ajuste-wrap" style="display:none;margin-top:14px">
+          <div class="field-nutr-lbl">Ajuste: <span id="ns-ajuste-val">15%</span></div>
+          <input type="range" id="ns-ajuste" min="10" max="20" step="1" value="15" oninput="saveNutriSettings()">
+        </label>
+        <button class="nutr-adv-toggle" id="ns-adv-toggle" onclick="toggleNutriAdv()">Ajustes avanzados ▾</button>
+        <div id="ns-advanced" style="display:none">
+          <label class="field-nutr">
+            <div class="field-nutr-lbl">Proteína: <span id="ns-prot-val">1.6 g/kg</span></div>
+            <input type="range" id="ns-protkg" min="1.6" max="2.2" step="0.1" value="1.6" oninput="saveNutriSettings()">
+          </label>
+          <label class="field-nutr" style="margin-bottom:0">
+            <div class="field-nutr-lbl">Grasa: <span id="ns-fat-val">0.7 g/kg</span></div>
+            <input type="range" id="ns-fatkg" min="0.5" max="1" step="0.05" value="0.7" oninput="saveNutriSettings()">
+          </label>
+        </div>
+        <div class="nutr-maint-note" id="ns-maint-note"></div>
       </div>
       <div class="nutri-macro-row">
         <div class="nutri-macro-box"><div class="nutri-macro-val" id="h-kcal">0<span> kcal</span></div><div class="nutri-macro-lbl">Energía</div></div>
@@ -2214,19 +2271,86 @@ function toggleMealDay(date,i,which){
 }
 
 // ---- NUTRITION ----
+function getCurrentWeight(){
+  return (pesoLog[pesoLog.length-1]?.val)||(DB.get('mikefit_profile')||{}).weight||78;
+}
+
+function getNutriSettings(){
+  return Object.assign({actividad:'1.6',goal:'perder',ajuste:15,protKg:1.6,fatKg:0.7},DB.get('nutricion_settings')||{});
+}
+
+function computeNutritionTargets(){
+  const s=getNutriSettings();
+  const peso=getCurrentWeight();
+  const maint=peso*22*parseFloat(s.actividad);
+  let kcal=maint;
+  if(s.goal==='perder')kcal=maint*(1-s.ajuste/100);
+  if(s.goal==='ganar')kcal=maint*(1+s.ajuste/100);
+  const prot=peso*s.protKg, protK=prot*4;
+  const fat=peso*s.fatKg, fatK=fat*9;
+  const carb=Math.max(0,kcal-protK-fatK)/4;
+  return {kcal:Math.round(kcal),prot:Math.round(prot),carb:Math.round(carb),fat:Math.round(fat),maint:Math.round(maint)};
+}
+
+function saveNutriSettings(){
+  const s=getNutriSettings();
+  s.actividad=document.getElementById('ns-actividad').value;
+  s.ajuste=parseFloat(document.getElementById('ns-ajuste').value);
+  s.protKg=parseFloat(document.getElementById('ns-protkg').value);
+  s.fatKg=parseFloat(document.getElementById('ns-fatkg').value);
+  DB.set('nutricion_settings',s);
+  updateMacros();
+}
+
+function setNutriGoal(g){
+  const s=getNutriSettings();s.goal=g;DB.set('nutricion_settings',s);
+  updateMacros();
+}
+
+function toggleNutriAdv(){
+  const el=document.getElementById('ns-advanced');
+  const open=el.style.display!=='none';
+  el.style.display=open?'none':'block';
+  const btn=document.getElementById('ns-adv-toggle');
+  if(btn)btn.textContent=open?'Ajustes avanzados ▾':'Ajustes avanzados ▴';
+}
+
+function renderNutriSettings(){
+  const s=getNutriSettings();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('ns-peso',getCurrentWeight()+' kg');
+  const act=document.getElementById('ns-actividad');if(act)act.value=s.actividad;
+  document.querySelectorAll('#ns-objetivo .calc-tab').forEach(b=>b.classList.toggle('active',b.dataset.goal===s.goal));
+  const ajusteWrap=document.getElementById('ns-ajuste-wrap');
+  if(ajusteWrap)ajusteWrap.style.display=s.goal==='mantener'?'none':'block';
+  const ajusteInput=document.getElementById('ns-ajuste');if(ajusteInput)ajusteInput.value=s.ajuste;
+  set('ns-ajuste-val',s.ajuste+'%');
+  const protInput=document.getElementById('ns-protkg');if(protInput)protInput.value=s.protKg;
+  set('ns-prot-val',s.protKg.toFixed(1)+' g/kg');
+  const fatInput=document.getElementById('ns-fatkg');if(fatInput)fatInput.value=s.fatKg;
+  set('ns-fat-val',s.fatKg.toFixed(2)+' g/kg');
+  const t=computeNutritionTargets();
+  const note=document.getElementById('ns-maint-note');
+  if(note)note.innerHTML=s.goal==='mantener'
+    ?'Mantenimiento estimado: <b>'+t.maint+'</b> kcal'
+    :'Mantenimiento: <b>'+t.maint+'</b> kcal · objetivo <b>'+t.kcal+'</b> kcal';
+}
+
 function updateMacros(){
   const ms=DB.get('meals_'+TODAY)||Array(meals.length).fill(false);
   let p=0,c=0,f=0,k=0;
   meals.forEach((m,i)=>{if(ms[i]){p+=m.p;c+=m.c;f+=m.f;k+=m.k;}});
+  const t=computeNutritionTargets();
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   const setstyle=(id,v)=>{const el=document.getElementById(id);if(el)el.style.width=v;};
   set('h-kcal',k);set('h-prot',p+'g');set('h-carb',c+'g');set('h-fat',f+'g');
-  setstyle('bp-prot',Math.min(100,Math.round(p/175*100))+'%');
-  setstyle('bp-carb',Math.min(100,Math.round(c/170*100))+'%');
-  setstyle('bp-fat',Math.min(100,Math.round(f/65*100))+'%');
-  setstyle('bp-kcal',Math.min(100,Math.round(k/1965*100))+'%');
-  set('bn-prot',p+'/175g');set('bn-carb',c+'/170g');set('bn-fat',f+'/65g');set('bn-kcal',k+'/1965');
+  setstyle('bp-prot',Math.min(100,Math.round(p/t.prot*100))+'%');
+  setstyle('bp-carb',Math.min(100,Math.round(c/t.carb*100))+'%');
+  setstyle('bp-fat',Math.min(100,Math.round(f/t.fat*100))+'%');
+  setstyle('bp-kcal',Math.min(100,Math.round(k/t.kcal*100))+'%');
+  set('bn-prot',p+'/'+t.prot+'g');set('bn-carb',c+'/'+t.carb+'g');set('bn-fat',f+'/'+t.fat+'g');set('bn-kcal',k+'/'+t.kcal);
   renderMealList();
+  renderNutriSettings();
 }
 
 function renderMealList(){
