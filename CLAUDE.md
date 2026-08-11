@@ -67,11 +67,12 @@ Bottom Nav (4 tabs)
 - `mikefit_profile` — perfil del usuario (onboarding)
 
 ## Plan de entreno actual
-- **Lunes:** PUSH (pecho, hombro, tríceps)
-- **Martes:** PULL (espalda, bíceps)
-- **Miércoles:** Zona 2 (cardio suave)
-- **Jueves:** LEGS (cuádriceps, isquios, glúteo)
-- **Viernes:** Full+Core
+- **Lunes:** Push (pecho, hombro, tríceps)
+- **Martes:** Pull (espalda, bíceps)
+- **Miércoles:** Piernas (cuádriceps, isquios, glúteo)
+- **Jueves:** Torso (pecho, espalda, hombro, brazos)
+- **Viernes:** Pierna 2 (glúteo, isquios — variación)
+- **Sábado/Domingo:** Descanso
 - **Sábado/Domingo:** Descanso
 
 ## Git

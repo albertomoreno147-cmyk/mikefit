@@ -1390,7 +1390,7 @@ function getGreeting(){
   return `Buenas noches, ${name} 🌙`;
 }
 
-const planEmoji={'Zona 2':'🚴','Descanso':'😴'};
+const planEmoji={'Descanso':'😴'};
 
 function buildWeekRing(){
   const wrap=document.getElementById('hero-ring-wrap');
@@ -1455,45 +1455,58 @@ function updateHero(){
 const weekPlan={
   1:{name:'PUSH',color:'#00BEB8',short:'PUSH'},
   2:{name:'PULL',color:'#3B82F6',short:'PULL'},
-  3:{name:'Zona 2',color:'#22C55E',short:'Z2'},
-  4:{name:'LEGS',color:'#F97316',short:'LEGS'},
-  5:{name:'Full+Core',color:'#EF4444',short:'FULL'},
+  3:{name:'Piernas',color:'#F97316',short:'LEGS'},
+  4:{name:'Torso',color:'#EF4444',short:'TORSO'},
+  5:{name:'Pierna 2',color:'#8B5CF6',short:'LEG2'},
   6:{name:'Descanso',color:'#94A3B8',short:'REST'},
   0:{name:'Descanso',color:'#94A3B8',short:'REST'},
 };
 
 const allExercises={
   PUSH:[
-    {name:'Press banca barra',sets:'4×6-10·RIR2',numSets:4,alts:['Press banca mancuernas','Press máquina','Aperturas cable']},
-    {name:'Press inclinado mancuernas',sets:'3×10-12·RIR2',numSets:3,alts:['Press inclinado barra','Press inclinado máquina']},
-    {name:'Press militar mancuernas',sets:'4×8-12·RIR2',numSets:4,alts:['Press militar barra','Press Arnold']},
-    {name:'Elevaciones laterales',sets:'4×15-20·RIR3',numSets:4,alts:['Elevaciones cable','Face pulls']},
-    {name:'Extensión tríceps polea',sets:'3×12-15·RIR2',numSets:3,alts:['Press francés','Fondos paralelas']},
+    {name:'Press banca barra',sets:'4×6-10·RIR2',numSets:4,alts:['Press banca mancuernas','Press en máquina']},
+    {name:'Press inclinado mancuernas',sets:'3×8-10·RIR2',numSets:3,alts:['Press inclinado barra']},
+    {name:'Press militar mancuernas',sets:'3×8-10·RIR2',numSets:3,alts:['Press militar barra','Press Arnold']},
+    {name:'Elevaciones laterales',sets:'3×12-15·RIR1',numSets:3,alts:['Elevaciones laterales cable','Elevaciones en máquina']},
+    {name:'Extensión tríceps polea',sets:'3×12-15·RIR1',numSets:3,alts:['Press francés','Dips tríceps']},
+    {name:'Aperturas polea cruzada',sets:'3×12-15·RIR1',numSets:3,alts:['Aperturas mancuernas','Pec-Deck']},
+    {name:'Press francés (barra EZ)',sets:'3×12-15·RIR1',numSets:3,alts:['Extensión tríceps sobre cabeza']},
   ],
   PULL:[
     {name:'Jalón al pecho',sets:'4×8-10·RIR2',numSets:4,alts:['Dominadas','Jalón agarre neutro']},
-    {name:'Remo polea sentado',sets:'4×10-12·RIR2',numSets:4,alts:['Remo barra','Remo mancuerna']},
-    {name:'Curl bíceps barra',sets:'3×10-12·RIR2',numSets:3,alts:['Curl mancuernas','Curl polea baja']},
-    {name:'Curl martillo polea',sets:'3×12-15·RIR2',numSets:3,alts:['Curl martillo mancuernas','Curl concentrado']},
+    {name:'Remo barra',sets:'3×8-10·RIR2',numSets:3,alts:['Remo polea sentado','Remo mancuerna un brazo']},
+    {name:'Remo polea sentado',sets:'3×8-10·RIR2',numSets:3,alts:['Remo barra','Remo mancuerna un brazo']},
+    {name:'Face pull polea',sets:'3×12-15·RIR1',numSets:3,alts:['Elevaciones posteriores mancuernas']},
+    {name:'Curl bíceps barra',sets:'3×10-12·RIR1',numSets:3,alts:['Curl mancuernas alternado','Curl EZ barra']},
+    {name:'Curl predicador',sets:'3×10-12·RIR1',numSets:3,alts:['Curl concentrado','Curl polea baja']},
+    {name:'Curl martillo',sets:'3×12-15·RIR1',numSets:3,alts:['Curl bíceps barra']},
   ],
-  'Zona 2':[
-    {name:'Bici estática zona 2',sets:'40-45min · 130-145ppm',numSets:1,alts:['Elíptica','Remo máquina']},
-    {name:'Movilidad / estiramientos',sets:'10-15min',numSets:1,alts:['Foam roller','Yoga']},
+  Piernas:[
+    {name:'Sentadilla barra',sets:'4×6-10·RIR2',numSets:4,alts:['Prensa de pierna','Sentadilla goblet']},
+    {name:'Peso muerto rumano',sets:'3×8-10·RIR2',numSets:3,alts:['Curl isquios máquina tumbado','Good mornings']},
+    {name:'Hip thrust barra',sets:'3×8-10·RIR2',numSets:3,alts:['Puente glúteo en suelo','Hip thrust máquina']},
+    {name:'Extensión cuádriceps máquina',sets:'3×12-15·RIR1',numSets:3,alts:['Prensa de pierna']},
+    {name:'Curl isquios máquina tumbado',sets:'3×12-15·RIR1',numSets:3,alts:['Curl isquios máquina sentado','Peso muerto rumano']},
+    {name:'Abducción cadera máquina',sets:'3×15-20·RIR1',numSets:3,alts:['Abducción con banda']},
+    {name:'Elevación gemelos',sets:'3×12-15·RIR1',numSets:3,alts:['Gemelos máquina']},
   ],
-  LEGS:[
-    {name:'Prensa de pierna',sets:'4×10-12·RIR2',numSets:4,alts:['Sentadilla goblet','Zancadas']},
-    {name:'Curl femoral',sets:'4×10-12·RIR2',numSets:4,alts:['Peso muerto pierna rígida']},
-    {name:'Hip thrust barra',sets:'4×12-15·RIR2',numSets:4,alts:['Puente glúteo suelo','Hip thrust máquina']},
-    {name:'Peso muerto rumano',sets:'3×10-12·RIR2',numSets:3,alts:['Good mornings']},
-    {name:'Elevación gemelos',sets:'4×15-20·RIR3',numSets:4,alts:['Gemelos máquina']},
+  Torso:[
+    {name:'Press banca mancuernas',sets:'4×8-10·RIR2',numSets:4,alts:['Press banca barra','Press en máquina']},
+    {name:'Remo mancuerna un brazo',sets:'3×8-10·RIR2',numSets:3,alts:['Remo polea sentado','Remo barra']},
+    {name:'Press Arnold',sets:'3×8-10·RIR2',numSets:3,alts:['Press militar mancuernas']},
+    {name:'Jalón agarre neutro',sets:'3×10-12·RIR1',numSets:3,alts:['Jalón al pecho','Dominadas agarre neutro']},
+    {name:'Curl mancuernas alternado',sets:'3×10-12·RIR1',numSets:3,alts:['Curl bíceps barra','Curl polea baja']},
+    {name:'Fondos en paralelas (tríceps)',sets:'3×8-12·RIR1',numSets:3,alts:['Extensión tríceps polea']},
+    {name:'Elevaciones frontales',sets:'3×12-15·RIR1',numSets:3,alts:['Elevaciones laterales']},
   ],
-  'Full+Core':[
-    {name:'Peso muerto rumano',sets:'4×8-10·RIR2',numSets:4,alts:['Hip thrust','Good mornings']},
-    {name:'Press inclinado mancuernas',sets:'3×10-12·RIR2',numSets:3,alts:['Aperturas cable','Push ups']},
-    {name:'Jalón agarre neutro',sets:'3×10-12·RIR2',numSets:3,alts:['Remo polea','Pull over']},
-    {name:'Ab wheel',sets:'3×8-12·RIR2',numSets:3,alts:['Plancha','Crunch cable']},
-    {name:'Elevación piernas',sets:'3×12-15',numSets:3,alts:['Crunch bicicleta']},
-    {name:'Plancha',sets:'3×35-45s',numSets:3,alts:['Plancha lateral','Dead bug']},
+  'Pierna 2':[
+    {name:'Sentadilla búlgara',sets:'4×8-10·RIR2',numSets:4,alts:['Zancadas mancuernas','Prensa de pierna']},
+    {name:'Hip thrust barra',sets:'3×8-10·RIR2',numSets:3,alts:['Puente glúteo en suelo','Hip thrust máquina']},
+    {name:'Curl isquios máquina sentado',sets:'3×10-12·RIR2',numSets:3,alts:['Curl isquios máquina tumbado']},
+    {name:'Extensión cuádriceps máquina',sets:'3×12-15·RIR1',numSets:3,alts:['Prensa de pierna']},
+    {name:'Patada trasera polea',sets:'3×12-15·RIR1',numSets:3,alts:['Hip thrust barra']},
+    {name:'Abducción cadera máquina',sets:'3×15-20·RIR1',numSets:3,alts:['Abducción con banda']},
+    {name:'Elevación gemelos sentado',sets:'3×12-15·RIR1',numSets:3,alts:['Elevación gemelos']},
   ],
   Descanso:[],
 };
@@ -1955,9 +1968,9 @@ let weekOffsetSemana=0;
 const workoutOptions=[
   {name:'PUSH',color:'#00BEB8'},
   {name:'PULL',color:'#3B82F6'},
-  {name:'Zona 2',color:'#22C55E'},
-  {name:'LEGS',color:'#F97316'},
-  {name:'Full+Core',color:'#EF4444'},
+  {name:'Piernas',color:'#F97316'},
+  {name:'Torso',color:'#EF4444'},
+  {name:'Pierna 2',color:'#8B5CF6'},
   {name:'Descanso',color:'#94A3B8'},
 ];
 
