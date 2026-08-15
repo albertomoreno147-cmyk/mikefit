@@ -1,4 +1,4 @@
-const CACHE = 'mikefit-v1786780652';
+const CACHE = 'mikefit-v1786780814';
 const APP_SHELL = [
   './index.html',
   './workout.html',

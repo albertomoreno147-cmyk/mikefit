@@ -1507,6 +1507,24 @@ const allExercises={
   Descanso:[],
 };
 
+// Ajusta el texto de series×reps·RIR mostrado según el objetivo/nivel del perfil
+// (onboarding), sin tocar numSets ni el ejercicio en sí — solo el rango sugerido.
+function adjustSetsForGoal(baseSets){
+  const prof=DB.get('mikefit_profile')||{};
+  const m=(baseSets||'').match(/^(\d+)×(\d+)(?:-(\d+))?·RIR(\d+)$/);
+  if(!m)return baseSets;
+  const sets=m[1];
+  let lo=parseInt(m[2]),hi=m[3]?parseInt(m[3]):lo,rir=parseInt(m[4]);
+  if(prof.goal==='strength'){
+    lo=Math.max(3,lo-3);
+    hi=Math.max(lo+1,hi-4);
+    rir=Math.max(0,rir-1);
+  }
+  if(prof.level==='beginner')rir=Math.min(4,rir+1);
+  if(prof.level==='advanced')rir=Math.max(0,rir-1);
+  return hi>lo?`${sets}×${lo}-${hi}·RIR${rir}`:`${sets}×${lo}·RIR${rir}`;
+}
+
 const meals=[
   {icon:'🥚',name:'Desayuno',desc:'Claras + huevo + tostada + café',p:35,c:22,f:14,k:350},
   {icon:'🥗',name:'Comida',desc:'Proteína + verdura + grasa',p:40,c:45,f:15,k:475},
@@ -2280,7 +2298,7 @@ function renderDayDetail(which){
     exState.forEach((s,i)=>{
       const ex=i<exList.length?exList[i]:null;
       const name=s.customName||(ex?ex.name:'Ejercicio extra');
-      const sets=s.sets||(ex?ex.sets:'');
+      const sets=s.sets||(ex?adjustSetsForGoal(ex.sets):'');
       const alts=s.alts||(ex?ex.alts:[]);
       const prevS=prevState&&prevState[i];
       let prevTxt='';

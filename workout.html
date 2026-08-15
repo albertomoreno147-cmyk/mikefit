@@ -407,6 +407,31 @@ const allExercises={
   Descanso:[],
 };
 
+// Ajusta el texto de series×reps·RIR mostrado según el objetivo/nivel del perfil
+// (onboarding), sin tocar numSets ni el ejercicio en sí — solo el rango sugerido.
+function adjustSetsForGoal(baseSets){
+  const prof=DB.get('mikefit_profile')||{};
+  const m=(baseSets||'').match(/^(\d+)×(\d+)(?:-(\d+))?·RIR(\d+)$/);
+  if(!m)return baseSets;
+  const sets=m[1];
+  let lo=parseInt(m[2]),hi=m[3]?parseInt(m[3]):lo,rir=parseInt(m[4]);
+  if(prof.goal==='strength'){
+    lo=Math.max(3,lo-3);
+    hi=Math.max(lo+1,hi-4);
+    rir=Math.max(0,rir-1);
+  }
+  if(prof.level==='beginner')rir=Math.min(4,rir+1);
+  if(prof.level==='advanced')rir=Math.max(0,rir-1);
+  return hi>lo?`${sets}×${lo}-${hi}·RIR${rir}`:`${sets}×${lo}·RIR${rir}`;
+}
+
+// Reduce el descanso sugerido cuando el objetivo es pérdida de grasa
+function adjustRestForGoal(baseRest){
+  const prof=DB.get('mikefit_profile')||{};
+  if(prof.goal==='fat')return Math.max(30,Math.round(baseRest*0.75));
+  return baseRest;
+}
+
 // Info detallada por ejercicio (nombre → músculo, técnica, errores)
 const exMeta={
   'Press banca barra':{musculo:'Pecho',sec:['Tríceps','Hombro'],rest:120,
@@ -620,7 +645,7 @@ function buildMuscleDiagram(primary,secondaries,color){
 
 // ── APP STATE ────────────────────────────────────────────────────────────────
 let plan=getPlanToday();
-let planExList=allExercises[plan.name]||[];
+let planExList=(allExercises[plan.name]||[]).map(e=>({...e,sets:adjustSetsForGoal(e.sets)}));
 let exState=[];    // array de {done,series:[{kg,reps,done}],alts,customName}
 let currentEx=0;
 let weightMode='side';
@@ -731,7 +756,7 @@ function renderEx(){
   document.getElementById('circle-reps').textContent=repsGoal;
 
   // Rest
-  restTotal=meta.rest||90;
+  restTotal=adjustRestForGoal(meta.rest||90);
   document.getElementById('rest-val').textContent=restTotal+'s';
   resetRestRing();
   updateCircleSets();
